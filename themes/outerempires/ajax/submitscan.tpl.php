@@ -1,0 +1,30 @@
+
+<div id="scanright">
+	<h2>Instructions</h2>
+	
+	<p>
+		1, Open a scan in OE<br />
+		2, Highlight the text as shown here:<br />
+		<img src="{% viewurl /images/scan.png %}" /><br />
+		<br />
+		3, Paste it in the box on the left as shown here:<br /><br />
+		<img src="{% viewurl /images/scan2.png %}" /><br />
+		<br />
+		4, Press Submit
+	</p>
+</div>
+<div id="scanleft">
+	<h2>Add Scan to Database</h2>
+	
+	<p>
+		Paste the scan below.<br />
+	</p>
+
+	<p>
+		<textarea id="scanpaste" rows="8" cols="50"></textarea><br />
+		<br />
+		<input type="submit" onclick="submitScan();" value="Submit" />
+	</p>
+	<p id="scansubmissionresult" style="color:lime">
+	</p>
+</div>
