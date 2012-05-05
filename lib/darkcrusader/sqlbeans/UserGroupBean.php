@@ -21,7 +21,6 @@ class UserGroupBean extends SQLBean {
 		'id',
 		'group_name',
 		'description',
-		'colour',
 	);
 
 	public function getPermissions() {

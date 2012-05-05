@@ -31,7 +31,7 @@ class ScansController extends Controller {
 		$this->checkAuth("access_scans");
 
 		if ($_POST["submit"]) {
-			$addedScan = ScanModel::getInstance()->addScanPaste($_POST["scanPaste"], $_POST["scanner"]);
+			$addedScan = ScanModel::getInstance()->addScanPaste($_POST["scanPaste"]);
 			View::setVar("scan", $addedScan);
 		}
 

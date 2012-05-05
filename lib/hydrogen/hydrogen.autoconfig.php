@@ -181,7 +181,7 @@ Config::setVal("view", "print_missing_var", true);
  ***/
 /*HydrogenEngine::addFilter('swedishchef', '\myapp\filters\BorkFilter',
 	'lib/myapp/filters/BorkFilter.php'); */
-//HydrogenEngine::addFilterNamespace('\darkcrusader\filters');
+HydrogenEngine::addFilterNamespace('\darkcrusader\filters');
 
 
 /***  FOR THE 'hydrogen' VIEW ENGINE ONLY:

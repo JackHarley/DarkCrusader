@@ -24,16 +24,20 @@
 		<tr>
 			<th>Location&nbsp;&nbsp;</th>
 			<th>Submitter</th>
-			<th>Time</th>
-			<th>Planetary Scan Level</th>
+			<th>Scanner Level</th>
+			<th>Resources</th>
 		</tr>
 		
 		{% for scan in latestScans %}
 			<tr>
 				<td>{{scan.location_string}}&nbsp;&nbsp;</td>
 				<td>{{scan.submitter.username}}</td>
-				<td>{{scan.date_submitted}}</td>
 				<td>{{scan.scanner_level}}</td>
+				<td>
+					{% for result in scan.scan_results %}
+						{% if ! forloop.first %},{% endif %}{{result.resource_string}}
+					{% endfor %}
+				</td>
 			</tr>
 		{% endfor %}
 	</table>

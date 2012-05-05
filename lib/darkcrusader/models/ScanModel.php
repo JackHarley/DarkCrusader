@@ -88,7 +88,8 @@ class ScanModel extends Model{
 	 * @return ScanBean scan
 	 */
 	public function getScan($id) {
-		$q = (new Query("SELECT"))->where("scans.id = ?", $id);
+		$q = new Query("SELECT");
+		$q->where("scans.id = ?", $id);
 		$sbs = ScanBean::select($q, true);
 		return $sbs[0];
 	}
@@ -113,15 +114,24 @@ class ScanModel extends Model{
 	 * @param int $scannerLevel total planetary scans rating of scanners used to get scan
 	 * @return ScanBean the scan that was just submitted
 	 */
-	public function addScanPaste($scanPaste, $scannerLevel) {
+	public function addScanPaste($scanPaste) {
 		
 		$line = explode("\n", $scanPaste);
 		
-		$planet = explode("Scan Results for : Scan : ", $line[0]);
+		// find the scan rating
+		$workingScanRating = explode("Scan Rating ", $line[0]);
+		$scanRating = $workingScanRating[1];
+		$scanRating = floatval($scanRating);
 
-		$numberOfWords = count(explode(" ", $planet[1]));
-		
-		$planet = explode(" ", $planet[1]);
+		$planet = explode("Scan Results for : Scan : ", $line[0]);
+		$planet = explode("|", $planet[1]);
+		$planet = $planet[0];
+		$planet = explode(" ", $planet);
+		foreach($planet as $key => $val)
+			if (!$val)
+				unset($planet[$key]);
+
+		$numberOfWords = count($planet);
 
 		if ($numberOfWords == 2) {
 			$system = $planet[0];
@@ -158,7 +168,7 @@ class ScanModel extends Model{
 			$planetid,
 			$moonid,
 			UserModel::getInstance()->getActiveUser()->id,
-			$scannerLevel
+			$scanRating
 		);
 
 		for ($i=2; $line[$i] != ""; $i++) {	

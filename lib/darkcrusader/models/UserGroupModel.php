@@ -33,11 +33,10 @@ class UserGroupModel extends Model {
 	 * @return mixed boolean true if successful, error string
 	 *				 if failure
 	 */
-	public function addUserGroup($name, $description, $colour, $postForPerms=false, $pbs=false) {
+	public function addUserGroup($name, $description, $postForPerms=false, $pbs=false) {
 		$ugb = new UserGroupBean;
 		$ugb->group_name = $name;
 		$ugb->description = $description;
-		$ugb->colour = $colour;
 
 		$ugb->insert();
 
@@ -156,7 +155,7 @@ class UserGroupModel extends Model {
 	 * @param string $colour hex group colour
 	 * @param array $postForPerms $_POST array to iterate over for perms
 	 */
-	public function updateUserGroup($id, $groupName=false, $description=false, $colour=false, $postForPerms=false) {
+	public function updateUserGroup($id, $groupName=false, $description=false, $postForPerms=false) {
 		$q = new Query("SELECT");
 		$q->where("id = ?", $id);
 
@@ -168,9 +167,6 @@ class UserGroupModel extends Model {
 
 		if ($description)
 			$ugb->description = $description;
-
-		if ($colour)
-			$ugb->colour = $colour;
 
 		if ($postForPerms) {
 			$pm = PermissionsModel::getInstance();

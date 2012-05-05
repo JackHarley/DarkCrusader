@@ -111,7 +111,7 @@ class UserModel extends Model {
 	 * @throws UsernameAlreadyRegisteredException if username is taken
 	 */
 	public function register($username, $password) {
-		$ugb = UserGroupModel::getInstance()->getUserGroup(false, "member");
+		$ugb = UserGroupModel::getInstance()->getUserGroup(false, "user");
 
 		$q = new Query("SELECT");
 		$q->where("username LIKE ?", $username);
@@ -315,7 +315,7 @@ class UserModel extends Model {
 		}
 
 		// Select them using UserBean
-		$userArray = UserBean::select($query);
+		$userArray = UserBean::select($query, true);
 
 		// Return the user array
 		return $userArray;
