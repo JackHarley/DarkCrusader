@@ -256,7 +256,7 @@ class InstallModel extends Model {
 
 		// Create the Root Admin user group
 		$pbs = $pm->getAllPermissions();
-		$ugm->addUserGroup("root_admin", "Root Admin", "33FFFF", false, $pbs, true, true);
+		$ugm->addUserGroup("root_admin", "Root Admin", false, $pbs);
 
 		// Create the Member user group
 		$pbs = $pm->getPermissions(array(
@@ -267,7 +267,7 @@ class InstallModel extends Model {
 			"access_faction_stats",
 			"access_kos")
 		);
-		$ugm->addUserGroup("member", "Member", "16FF05", false, $pbs);
+		$ugm->addUserGroup("user", "User", false, $pbs);
 
 		// Create the Guest user group
 		$pbs = $pm->getPermissions(array(
@@ -277,11 +277,11 @@ class InstallModel extends Model {
 			"access_faction_stats",
 			"access_kos")
 		);
-		$ugm->addUserGroup("guest", "Guest", "FFFFFF", false, $pbs);
+		$ugm->addUserGroup("guest", "Guest", false, $pbs);
 
 		// Create the Banned user group
 		$pbs = array();
-		$ugm->addUserGroup("banned", "Banned", "FF0000", false, $pbs);
+		$ugm->addUserGroup("banned", "Banned", false, $pbs);
 
 		// Create the admin user
 		$query = new Query("SELECT");

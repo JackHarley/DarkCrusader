@@ -49,6 +49,8 @@ if ($im->checkIfDatabaseIsUpToDate() !== true) {
 $activeUser = UserModel::getInstance()->getActiveUser();
 View::setVar("activeUser", $activeUser);
 View::setVar("siteName", Config::getVal("general", "site_name"));
+if ($activeUser->permissions->hasPermission("access_admin_panel"))
+    View::setVar("userIsAdmin", "yes");
 
 // Add the dispatcher rules
 Dispatcher::addHomeMatchRule('\darkcrusader\controllers\HomeController', "index");

@@ -1,8 +1,7 @@
 <?php
 if (!defined('STDIN'))
 	die("This is a cron job which is run from the CLI, it cannot be accessed via the web");
-error_reporting(E_ALL & ~E_NOTICE);
-ini_set("display_errors", "On");
+ini_set("display_errors", "Off");
 
 require_once(__DIR__ . '/../../hydrogen/hydrogen.inc.php');
 require_once(__DIR__ . '/../darkcrusader.inc.php');
@@ -10,6 +9,7 @@ require_once(__DIR__ . '/../darkcrusader.inc.php');
 use darkcrusader\sqlbeans\SystemStatsBean;
 use darkcrusader\sqlbeans\SystemStatsSetBean;
 use darkcrusader\sqlbeans\SystemBean;
+use hydrogen\recache\RECacheManager;
 use hydrogen\database\Query;
 
 $statsSet = new SystemStatsSetBean;
@@ -23,7 +23,9 @@ $query->limit(1);
 $statsSet = SystemStatsSetBean::select($query);
 $statsSet = $statsSet[0];
 
-echo "Scraping System Stats...";
+echo "Scraping System Stats...\n\n";
+
+sleep(1);
 
 for($q=1;$q<5;$q++) {
 	for($s=1;$s<5;$s++) {
@@ -70,7 +72,10 @@ for($q=1;$q<5;$q++) {
 		}
 	}
 }
-echo "...done!\n";
+
+// clear cache
+RECacheManager::getInstance()->clearAll();
+echo "\nClearing cache...done!\n";
 
 echo "\nAll stats scraped successfully\n";
 ?>

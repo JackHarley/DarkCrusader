@@ -1,5 +1,7 @@
 {% extends base %}
 
+{% block pageTitle %}System Stats{% endblock %}
+
 {% block content %}
 
 <h2>Get System Stats</h2>

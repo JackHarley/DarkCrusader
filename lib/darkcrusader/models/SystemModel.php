@@ -18,7 +18,7 @@ use darkcrusader\sqlbeans\SystemBean;
 use darkcrusader\sqlbeans\SystemStatsBean;
 use darkcrusader\sqlbeans\SystemStatsSetBean;
 
-class SystemModel extends Model{
+class SystemModel extends Model {
 	
 	protected static $modelID = "Sys";
 	
@@ -119,7 +119,7 @@ class SystemModel extends Model{
 			$q->where("systems.id = ?", $id);
 
 		if ($name)
-			$q->where("system_name LIKE ?", '%' . $name);
+			$q->where("system_name = ?", $name);
 
 		$q->limit(1);
 		$sbs = SystemBean::select($q);
@@ -167,9 +167,13 @@ class SystemModel extends Model{
 
 		return $stbs;
 	}
-	
-	public function getFactionStats($faction) {
-		$faction = '%' . $faction . '%';
+
+	/**
+	 * Gets the latest system stats set
+	 * 
+	 * @return SystemStatsSetBean latest stats set
+	 */
+	public function getLatestSystemStatsSet__3600_systemstats() {
 		
 		// Get latest stats set
 		$query = new Query("SELECT");
@@ -177,164 +181,8 @@ class SystemModel extends Model{
 		$query->limit(1);
 		$latestSystemStatsSets = SystemStatsSetBean::select($query);
 		$latestSystemStatsSet = $latestSystemStatsSets[0];
-		
-		// Get number of owned systems
-		$query = new Query("SELECT");
-		$query->from("system_stats");
-		$query->field("faction");
-		$query->where("faction LIKE ?", $faction);
-		$query->where("stats_set = ?", $latestSystemStatsSet->id);
-		$stmt = $query->prepare();
-		$stmt->execute();
-		$numberOfOwnedSystems = $stmt->rowCount();
-		
-		// Faction name
-		$faction = $stmt->fetchObject();
-		$faction = $faction->faction;
-		
-		// Get number of owned space station systems
-		$query = new Query("SELECT");
-		$query->from("system_stats");
-		$query->field("id");
-		$query->where("faction LIKE ?", $faction);
-		$query->where("stats_set = ?", $latestSystemStatsSet->id);
-		$query->where("has_station = ?", 1);
-		$stmt = $query->prepare();
-		$stmt->execute();
-		$numberOfOwnedStationSystems = $stmt->rowCount();
-		
-		$graphs = $this->createFactionCharts($faction);
-		
-		$return = array(
-			"faction_name" => $faction,
-			"number_of_owned_systems" => $numberOfOwnedSystems,
-			"number_of_owned_station_systems" => $numberOfOwnedStationSystems,
-			"owned_systems_graph" => $graphs["systems"],
-			"owned_station_systems_graph" => $graphs["station_systems"]);
-		
-		return $return;
-	}
-	
-	public function createFactionCharts($faction) {
-		$factionName = $faction;
-		$factionName = str_replace(" ", "_", $factionName);
-		
-		$faction = '%' . $faction . '%';
-		
-		// Get latest stats sets
-		$query = new Query("SELECT");
-		$query->orderby("time", "DESC");
-		$query->limit(14);
-		$latestSystemStatsSets = SystemStatsSetBean::select($query);
-		
-		// Get number of owned systems for each set
-		$historicalNumberOfOwnedSystems = array();
-		$historicalNumberOfOwnedSystemsDates = array();
-		
-		foreach($latestSystemStatsSets as $systemStatsSet) {
-			$time = explode(" ", $systemStatsSet->time);
-			$time = explode("-", $time[0]);
-			$time = $time[2] . "/" . $time[1];
-			
-			$query = new Query("SELECT");
-			$query->from("system_stats");
-			$query->field("faction");
-			$query->where("faction LIKE ?", $faction);
-			$query->where("stats_set = ?", $systemStatsSet->id);
-			$stmt = $query->prepare();
-			$stmt->execute();
-			$numberOfOwnedSystems = $stmt->rowCount();
-			
-			$historicalNumberOfOwnedSystems[] = $numberOfOwnedSystems;
-			$historicalNumberOfOwnedSystemsDates[] = $time;
-		}
-		
-		// Reverse the order of the data (newest->oldest ---> oldest->newest)
-		$historicalNumberOfOwnedSystems = array_reverse($historicalNumberOfOwnedSystems);
-		$historicalNumberOfOwnedSystemsDates = array_reverse($historicalNumberOfOwnedSystemsDates);
-		
-		// Create the chart
-		$DataSet = new \pData;
-		foreach($historicalNumberOfOwnedSystems as $id => $numberOfOwnedSystems) {
-			$DataSet->AddPoint($numberOfOwnedSystems, "Serie1", $historicalNumberOfOwnedSystemsDates[$id]);
-		}
-		$DataSet->AddSerie("Serie1");
-		$DataSet->SetSerieName("Number of Owned Systems","Serie1");
-		
-		$chart = new \pChart(700,230);
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",10);
-		$chart->setGraphArea(40,30,680,200);
-		$chart->drawGraphArea(252,252,252,TRUE);
-		$chart->drawScale($DataSet->GetData(),$DataSet->GetDataDescription(),SCALE_NORMAL,0,0,0,TRUE,0,0);
-		$chart->drawGrid(4,TRUE,230,230,230,70);
-		
-		$chart->drawLineGraph($DataSet->GetData(),$DataSet->GetDataDescription());
-		$chart->drawPlotGraph($DataSet->GetData(),$DataSet->GetDataDescription(),3,2,255,255,255);
-		
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",8);
-		$chart->drawLegend(45,35,$DataSet->GetDataDescription(),255,255,255);
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",10);
-		$chart->drawTitle(60,22,"Number of Owned Systems over the Past 2 Weeks",50,50,50,585);
-		
-		$chart->Render(__DIR__ . "/../../../graphs/" . $factionName . "-Systems.png");
-		
-		// Get number of owned systems for each set
-		$historicalNumberOfOwnedStationSystems = array();
-		$historicalNumberOfOwnedStationSystemsDates = array();
-		
-		foreach($latestSystemStatsSets as $systemStatsSet) {
-			$time = explode(" ", $systemStatsSet->time);
-			$time = explode("-", $time[0]);
-			$time = $time[2] . "/" . $time[1];
-			
-			$query = new Query("SELECT");
-			$query->from("system_stats");
-			$query->field("faction");
-			$query->where("faction LIKE ?", $faction);
-			$query->where("stats_set = ?", $systemStatsSet->id);
-			$query->where("has_station = ?", 1);
-			$stmt = $query->prepare();
-			$stmt->execute();
-			$numberOfOwnedStationSystems = $stmt->rowCount();
-			
-			$historicalNumberOfOwnedStationSystems[] = $numberOfOwnedStationSystems;
-			$historicalNumberOfOwnedStationSystemsDates[] = $time;
-		}
-		
-		// Reverse the order of the data (newest->oldest ---> oldest->newest)
-		$historicalNumberOfOwnedStationSystems = array_reverse($historicalNumberOfOwnedStationSystems);
-		$historicalNumberOfOwnedStationSystemsDates = array_reverse($historicalNumberOfOwnedStationSystemsDates);
-		
-		// Create the chart
-		$DataSet = new \pData;
-		foreach($historicalNumberOfOwnedStationSystems as $id => $numberOfOwnedStationSystems) {
-			$DataSet->AddPoint($numberOfOwnedStationSystems, "Serie1", $historicalNumberOfOwnedStationSystemsDates[$id]);
-		}
-		$DataSet->AddSerie("Serie1");
-		$DataSet->SetSerieName("Number of Owned Station Systems","Serie1");
-		
-		$chart = new \pChart(700,230);
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",10);
-		$chart->setGraphArea(40,30,680,200);
-		$chart->drawGraphArea(252,252,252,TRUE);
-		$chart->drawScale($DataSet->GetData(),$DataSet->GetDataDescription(),SCALE_NORMAL,0,0,0,TRUE,0,0);
-		$chart->drawGrid(4,TRUE,230,230,230,70);
-		
-		$chart->drawLineGraph($DataSet->GetData(),$DataSet->GetDataDescription());
-		$chart->drawPlotGraph($DataSet->GetData(),$DataSet->GetDataDescription(),3,2,255,255,255);
-		
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",8);
-		$chart->drawLegend(45,35,$DataSet->GetDataDescription(),255,255,255);
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",10);
-		$chart->drawTitle(60,22,"Number of Owned Station Systems over the Past 2 Weeks",50,50,50,585);
-		
-		$chart->Render(__DIR__ . "/../../../graphs/" . $factionName . "-StationSystems.png");
-		
-		$return = array(
-			"systems" => __DIR__ . "/../../../graphs/" . $factionName . "-Systems.png",
-			"station_systems" => __DIR__ . "/../../../graphs/" . $factionName . "-StationSystems.png");
-		
-		return $return;
+
+		return $latestSystemStatsSet;
 	}
 		
 }

@@ -29,9 +29,6 @@
 		<p>
 			<textarea name="scanPaste" rows="8" cols="50"></textarea><br />
 			<br />
-			Scanner Level (Total Planetary Scans Added by Sensors):<br />
-			<input type="text" name="scanner" value="0" /><br />
-			<br />
 			<input type="submit" name="submit" value="Submit" />
 		</p>
 	</form>

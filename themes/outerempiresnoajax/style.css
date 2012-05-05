@@ -19,7 +19,7 @@ p {
 }
 
 h2 {
-	font-size:160%;
+	font-size:140%;
 }
 
 h1 {
@@ -66,10 +66,11 @@ img {
 th {
 	font-weight:bold;
 	font-size:120%;
+	padding-left: 15px;
 }
 
 td {
-	padding-right:15px;
+	padding-left:15px;
 }
 #container {
 	width: 1100px;
