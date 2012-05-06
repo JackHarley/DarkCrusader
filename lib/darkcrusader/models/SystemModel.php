@@ -123,7 +123,9 @@ class SystemModel extends Model {
 
 		$q->limit(1);
 		$sbs = SystemBean::select($q);
-		return $sbs[0];
+		$sb = $sbs[0];
+
+		return $sb;
 	}
 
 	/**
@@ -146,8 +148,20 @@ class SystemModel extends Model {
 		$query->where("system_id = ?", $system);
 		$query->where("stats_set = ?", $statsSets[0]->id);
 		$systemStatsBeans = SystemStatsBean::select($query);
-		
-		return $systemStatsBeans[0];
+		$systemStatsBean = $systemStatsBeans[0];
+
+		// To keep DB size down, we only store stats for systems with a non standard faction
+		// and or station, if there's no stats entry for a system, just fake what a default
+		// system would have
+		if (!$systemStatsBean) {
+			$systemStatsBean = new SystemStatsBean;
+			$systemStatsBean->has_station = 0;
+			$systemStatsBean->faction = "None";
+			$systemStatsBean->system_id = $system;
+			$systemStatsBean->stats_set = $statsSets[0]->id;
+		}
+
+		return $systemStatsBean;
 	}
 
 	/**

@@ -211,5 +211,21 @@ class ScanModel extends Model{
 
 		return $this->getScan($scanId);
 	}
+
+	/**
+	 * Get scans for a system
+	 * 
+	 * @param int $system system id
+	 * @return array array of ScanBeans
+	 */
+	public function getScansForSystem($system) {
+		$q = new Query("SELECT");
+		$q->where("system_id = ?", $system);
+		$q->orderby("planet_number");
+		$q->orderby("moon_number");
+		$q->orderby("scanner_level", "DESC");
+
+		return ScanBean::select($q, true);
+	}
 }
 ?>

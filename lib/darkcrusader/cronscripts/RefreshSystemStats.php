@@ -61,12 +61,14 @@ for($q=1;$q<5;$q++) {
 					$systemBeans = SystemBean::select($query);
 					$systemBean = $systemBeans[0];
 					
-					$systemStatsBean = new SystemStatsBean;
-					$systemStatsBean->system_id = $systemBean->id;
-					$systemStatsBean->stats_set = $statsSet->id;
-					$systemStatsBean->faction = $faction;
-					$systemStatsBean->has_station = $hasStation;
-					$systemStatsBean->insert();
+					if (($faction != "None") || ($hasStation != 0)) {
+						$systemStatsBean = new SystemStatsBean;
+						$systemStatsBean->system_id = $systemBean->id;
+						$systemStatsBean->stats_set = $statsSet->id;
+						$systemStatsBean->faction = $faction;
+						$systemStatsBean->has_station = $hasStation;
+						$systemStatsBean->insert();
+					}
 				}
 			}
 		}

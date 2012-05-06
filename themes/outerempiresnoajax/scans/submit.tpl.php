@@ -35,7 +35,7 @@
 	<p id="scansubmissionresult" style="color:lime">
 		{% if exists scan %}
 			{% for result in scan.scan_results %}
-				{{scan.location_string}} - {{result.resource_string}}<br />
+				{{scan.location_string|unescape}} - {{result.resource_string}}<br />
 			{% endfor %}
 		{% endif %}
 	</p>

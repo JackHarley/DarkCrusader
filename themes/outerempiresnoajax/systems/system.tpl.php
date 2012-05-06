@@ -21,6 +21,27 @@
 	</tr>
 </table>
 
+{% if exists scans %}
+
+	<h2>Scans</h2>
+
+	{% if scans == "none" %}
+		<p>No scans available for this system</p>
+	{% else %}
+		{% for scan in scans %}
+		<p>
+			{{scan.location_string|unescape}} - {{scan.submitter.username}} - Rating: {{scan.scanner_level}}
+			<ul>
+			{% for result in scan.scan_results %}
+				<li><i>{{result.resource_string}}</i></li>
+			{% endfor %}
+			</ul>
+		</p>
+		{% endfor %}
+	{% endif %}
+
+{% endif %} 
+
 <h3>Historical Information</h3>
 <table cellpadding="2" border="0" id="history">
 	<tr>
