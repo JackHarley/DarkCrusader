@@ -12,6 +12,7 @@ use darkcrusader\controllers\Controller;
 use hydrogen\view\View;
 
 use darkcrusader\models\SystemModel;
+use darkcrusader\models\ScanModel;
 
 class SystemsController extends Controller {
 	
@@ -22,8 +23,16 @@ class SystemsController extends Controller {
 		}
 
 		$sm = SystemModel::getInstance();
-		$system = $sm->getSystem(false, $_GET["name"]);
-		$historicalStats = $sm->getHistoricalSystemStats($system->id, 30);
+		$system = $sm->getSystem(false, $_GET["name"]); 
+		$historicalStats = $sm->getHistoricalSystemStats($system->id, 15);
+
+		if ($this->checkAuth("access_scans", false)) {
+			$scans = ScanModel::getInstance()->getScansForSystem($system->id);
+			if (count($scans) > 0)
+				View::setVar("scans", $scans);
+			else
+				View::setVar("scans", "none");
+		}
 
 		View::load('systems/system', array(
 			"system" => $system,

@@ -13,7 +13,7 @@
 <p>
 	<a href="{% url /index.php/scans/submit %}">Submit scan</a><br />
 	<a href="{% url /index.php/scans/resource %}">Search for a resource</a><br />
-	<a href="{% url /index.php/scans/system %}">Search for a system</a><br />
+	<a href="{% url /index.php/systems %}">Search for a system</a><br />
 	<a href="{% url /index.php/scans/locality %}">Get locality information</a><br />
 </p>
 
@@ -30,7 +30,7 @@
 		
 		{% for scan in latestScans %}
 			<tr>
-				<td>{{scan.location_string}}&nbsp;&nbsp;</td>
+				<td>{{scan.location_string|unescape}}</td>
 				<td>{{scan.submitter.username}}</td>
 				<td>{{scan.scanner_level}}</td>
 				<td>

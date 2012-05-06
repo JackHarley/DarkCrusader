@@ -7,6 +7,7 @@
  */
 namespace darkcrusader\sqlbeans;
 use hydrogen\sqlbeans\SQLBean;
+use hydrogen\config\Config;
 use darkcrusader\models\ScanModel;
 
 class ScanBean extends SQLBean {
@@ -40,7 +41,10 @@ class ScanBean extends SQLBean {
 
 	public function get_location_string() {
 		$system = $this->getMapped("system");
-		$locationString = $system->system_name . " " . $this->planet_number;
+
+		$system_name = '<a href="' . Config::getVal("general", "app_url") . '/index.php/systems?name=' . $system->system_name . '">' . $system->system_name . '</a>';
+
+		$locationString = $system_name . " " . $this->planet_number;
 		
 		if ($this->moon_number != 0)
 			$locationString .= " M" . $this->moon_number;

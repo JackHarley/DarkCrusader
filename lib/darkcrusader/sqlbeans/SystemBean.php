@@ -28,7 +28,7 @@ class SystemBean extends SQLBean {
 	protected static $beanMap = array(
 	);
 
-	protected $stats;
+	public $stats;
 	public function get_stats() {
 		if (!$this->stats)
 			$this->stats = SystemModel::getInstance()->getSystemStats($this->id);

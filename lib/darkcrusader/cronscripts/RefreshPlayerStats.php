@@ -26,7 +26,7 @@ $statsSet = PlayerStatsSetBean::select($query);
 $statsSet = $statsSet[0];
 
 echo "Scraping XP and Rank Stats...";
-for($i=5;$i<10000;$i+=10) {
+for($i=5;$i<1000;$i+=10) {
 	$html = file_get_contents("http://gameview.outer-empires.com/Ladders/LadderRank.asp?c=0&F=0&s=" . $i);
 	
 	$working = explode('<table class="ladders"', $html);
@@ -376,7 +376,7 @@ for($i=5;$i<10000;$i+=10) {
 echo "..done!\n";
 
 echo "Scraping credit stats...";
-for($i=5;$i<10000;$i+=10) {
+for($i=5;$i<1000;$i+=10) {
 	$html = file_get_contents("http://gameview.outer-empires.com/Ladders/LadderRichest.asp?c=0&F=0&s=" . $i);
 	
 	$working = explode('<table class="ladders"', $html);

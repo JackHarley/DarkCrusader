@@ -23,20 +23,26 @@ class UserGroupBean extends SQLBean {
 		'description',
 	);
 
+	protected $permissions = false;
 	public function getPermissions() {
-		$q = new Query("SELECT");
-		$q->where("group_id = ?", $this->id);
-		$gpbs = GroupPermissionBean::select($q, true);
+		if (!$this->permissions) {
+			$q = new Query("SELECT");
+			$q->where("group_id = ?", $this->id);
+			$this->permissions = GroupPermissionBean::select($q, true);
+		}
 
-		return $gpbs;
+		return $this->permissions;
 	}
 
+	protected $users = false;
 	public function getUsers() {
-		$q = new Query("SELECT");
-		$q->where("group_id = ?", $this->id);
+		if (!$this->users) {
+			$q = new Query("SELECT");
+			$q->where("group_id = ?", $this->id);
+			$this->users = UserBean::select($q, true);
+		}
 
-		$ubs = UserBean::select($q, true);
-		return $ubs;
+		return $this->users;
 	}
 }
 ?>
