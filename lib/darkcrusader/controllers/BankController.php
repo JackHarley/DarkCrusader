@@ -24,10 +24,10 @@ class BankController extends Controller {
 
 		$bm = BankModel::getInstance();
 		$bm->generateDonorsGraph();
-		
+
 		View::load('bank/index', array(
-			"bankBalance" => $bm->getCurrentBankBalance(),
-			"latestTransactions" => $bm->getLatestTransactions(10)
+			"bankBalance" => $bm->getCurrentBankBalanceCached(),
+			"latestTransactions" => $bm->getLatestTransactionsCached(10)
 		));
 	}
 
