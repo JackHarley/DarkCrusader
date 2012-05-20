@@ -2,7 +2,7 @@
 /**
  * KoS SQLBean
  *
- * Copyright (c) 2011, Jack Harley
+ * Copyright (c) 2012, Jack Harley
  * All Rights Reserved
  */
 namespace darkcrusader\sqlbeans;

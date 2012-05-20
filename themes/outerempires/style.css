@@ -32,11 +32,9 @@ h3 {
 
 a {
 	text-decoration: underline;
-	color:white;
 }
 a:link { 
 	text-decoration: none;
-	color:white;
 }
 
 a.navbarlink {
@@ -45,7 +43,6 @@ a.navbarlink {
 }
 
 a:visited {
-	color:white;
 	text-decoration: none;
 }
 

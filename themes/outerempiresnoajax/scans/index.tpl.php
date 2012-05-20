@@ -11,10 +11,12 @@
 </p>
 
 <p>
-	<a href="{% url /index.php/scans/submit %}">Submit scan</a><br />
-	<a href="{% url /index.php/scans/resource %}">Search for a resource</a><br />
-	<a href="{% url /index.php/systems %}">Search for a system</a><br />
-	<a href="{% url /index.php/scans/locality %}">Get locality information</a><br />
+	<ul>
+		<li><a href="{% url /index.php/scans/submit %}">Submit scan</a><br /></li>
+		<li><a href="{% url /index.php/scans/search %}">Search for a resource</a></li>
+		<li><a href="{% url /index.php/systems %}">Search for a system</a></li>
+		<li><a href="{% url /index.php/locality %}">Get locality information</a></li>
+	</ul>
 </p>
 
 <h3>Latest Submitted Scans</h3>
@@ -34,9 +36,7 @@
 				<td>{{scan.submitter.username}}</td>
 				<td>{{scan.scanner_level}}</td>
 				<td>
-					{% for result in scan.scan_results %}
-						{% if ! forloop.first %},{% endif %}{{result.resource_string}}
-					{% endfor %}
+					{% for result in scan.scan_results %}{% if ! forloop.first %}, {% endif %}{{result.resource_string}}{% endfor %}
 				</td>
 			</tr>
 		{% endfor %}

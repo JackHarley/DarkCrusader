@@ -22,7 +22,13 @@
 	<h2>Add Scan to Database</h2>
 	
 	<p>
-		Paste the scan below.<br />
+		Paste the scan below.
+	</p>
+	<p>
+		<ul>
+			<li>Do NOT upload scans with no resources!</li>
+			<li>You can upload food/water scans if you wish, but it's a bit pointless.</li>
+		</uL>
 	</p>
 
 	<form action="" method="post">

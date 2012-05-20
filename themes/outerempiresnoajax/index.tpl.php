@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-	<h2>Welcome to Tactical Response Team / SWAT</h2>
+	<h2>Welcome to the SWAT/FIRE Faction Site</h2>
 
 	<p>
 		We provide several utilities for non members, including player stats, faction stats and system stats. If you are a member, please see the post regarding this site in the ingame faction forums to get access to the members only utilities.<br />
@@ -14,12 +14,27 @@
 
 	<p>
 		--Hoploa Wington<br />
-		Leader
+		SWAT Leader
 	</p>
 
 	<p>
 		--Kronos<br />
-		Leader
+		SWAT Leader
+	</p>
+
+	<p>
+		--Steve Austion<br />
+		FIRE Leader
+	</p>
+
+	<p>
+		--Mylo Lickess<br />
+		FIRE Leader
+	</p>
+
+	<p>
+		--Doc Con<br />
+		FIRE Leader
 	</p>
 
 	<p>

@@ -3,7 +3,7 @@
  * System Model
  * Handles data requests regarding systems
  *
- * Copyright (c) 2011, Jack Harley
+ * Copyright (c) 2012, Jack Harley
  * All Rights Reserved
  */
 namespace darkcrusader\models;
@@ -13,6 +13,7 @@ use hydrogen\model\Model;
 use darkcrusader\models\UserModel;
 
 use hydrogen\database\Query;
+use darkcrusader\sqlbeans\ScanBean;
 use darkcrusader\sqlbeans\ScanResultBean;
 use darkcrusader\sqlbeans\SystemBean;
 use darkcrusader\sqlbeans\SystemStatsBean;
@@ -22,48 +23,164 @@ class SystemModel extends Model {
 	
 	protected static $modelID = "Sys";
 	
-	public function getLocalityInformation($quadrant, $sector, $region, $locality) {
-		$UserModel = UserModel::getInstance();
-		$user = $UserModel->getLoggedInUser();
+	/**
+	 * Gets the number of scanned objects in a system, if $user is specified,
+	 * only gets number of objects scanned by that user
+	 * 
+	 * @param int $system system id
+	 * @param int $user user id, optional
+	 * @return int number of objects (planets/moons) scanned in system
+	 */
+	public function getNumberOfScannedObjectsInSystem($system, $user=false) {
+		$q = new Query("SELECT");
+		$q->where("system_id = ?", $system);
+
+		if ($user)
+			$q->where("submitter_id = ?", $user);
+
+		$sbs = ScanBean::select($q);
+		$objectsScanned = array();
+
+		foreach($sbs as $sb) {
+			$object = $sb->planet_number . $sb->moon_number;
+
+			if (!in_array($object, $objectsScanned))
+				$objectsScanned[] = $object;
+		}
+
+		return count($objectsScanned);
+	}
+
+	/**
+	 * Get systems in a locality
+	 *
+	 * @param int $quadrant quadrant
+	 * @param int $sector sector
+	 * @param int $region region
+	 * @param int $locality locality 
+	 * @return array array of SystemBeans
+	 */
+	public function getSystemsInLocality__3600_systems($quadrant, $sector, $region, $locality) {
+		$q = new Query("SELECT");
+		$q->where("quadrant = ?", $quadrant);
+		$q->where("sector = ?", $sector);
+		$q->where("region = ?", $region);
+		$q->where("locality = ?", $locality);
+		$q->orderby("system_name", "ASC");
+
+		return SystemBean::select($q, true);
+	}
+
+	/**
+	 * Gets all the systems in a locality and appends two properties to each
+	 * SystemBean, "objects_scanned" and "objects_scanned_by_active_user"
+	 * 
+	 * @param int $quadrant quadrant
+	 * @param int $sector sector
+	 * @param int $region region
+	 * @param int $locality locality
+	 * @param int $user submitter id, optional
+	 * @return array array of SystemBeans
+	 */
+	public function getSystemsInLocalityWithScanStats__3600_systemscans($quadrant, $sector, $region, $locality, $user=false) {
 		
-		$return = array();
-		$return["location"] = $quadrant . ':' . $sector . ':' . $region . ':' . $locality;
-		$return["systems"] = array();
-		
-		$query = new Query("SELECT");
-		$query->from("systems");
-		$query->field("systems.system_name");
-		$query->field("scan_results.planet_number");
-		$query->field("scan_results.moon_number");
-		$query->field("scan_results.submitter_id");
-		$query->where("systems.quadrant = ?", $quadrant);
-		$query->where("systems.sector = ?", $sector);
-		$query->where("systems.region = ?", $region);
-		$query->where("systems.locality = ?", $locality);
-		$query->join("scan_results", "scan_results", "LEFT");
-		$query->on("systems.id = scan_results.system_id");
-		$stmt = $query->prepare();
+		// complex query that i coded ages ago, ill work out what it does later...
+		$q = new Query("SELECT");
+		$q->from("systems");
+		$q->field("systems.system_name");
+		$q->field("systems.id");
+		$q->field("scans.planet_number");
+		$q->field("scans.moon_number");
+		$q->field("scans.submitter_id");
+		$q->where("systems.quadrant = ?", $quadrant);
+		$q->where("systems.sector = ?", $sector);
+		$q->where("systems.region = ?", $region);
+		$q->where("systems.locality = ?", $locality);
+		$q->join("scans", "scans", "LEFT");
+		$q->on("systems.id = scans.system_id");
+		$stmt = $q->prepare();
 		$stmt->execute();
 		
-		while($result = $stmt->fetchObject()) {
-			if ($result->planet_number) {
-				$return["systems"][$result->system_name]["planetsScanned"]++;
-				
-				if ($user->id == $result->submitter_id)
-					$return["systems"][$result->system_name]["planetsScannedByUser"]++;
-				else
-					if (!$return["systems"][$result->system_name]["planetsScannedByUser"])
-						$return["systems"][$result->system_name]["planetsScannedByUser"] = 0;
-			}
-			else {
-				$return["systems"][$result->system_name]["planetsScanned"] = 0;
-				$return["systems"][$result->system_name]["planetsScannedByUser"] = 0;
+		$results = array();
+		while($result = $stmt->fetchObject())
+			$results[] = $result;
+		
+		$systems = $this->getSystemsInLocalityCached($quadrant, $sector, $region, $locality); 
+
+		foreach($systems as $key => $system) {
+			foreach($results as $result) {
+				if (($result->id == $system->id) && ($result->planet_number)) {
+					
+					// just increment the systems objects count for each planet/moon
+					$objectsScanned = array();
+					$objectsScannedByUser = array();
+
+					$object = $result->planet_number . $result->moon_number;
+
+					if (!in_array($object, $objectsScanned)) {
+						$objectsScanned[] = $object;
+						$systems[$key]->objects_scanned++;
+					}
+
+					if ((!in_array($object, $objectsScannedByUser)) && ($user == $result->submitter_id)) {
+						$objectsScannedByUser[] = $object;
+						$systems[$key]->objects_scanned_by_user++;
+					}
+				}
 			}
 		}
-		
-		return $return;
+
+		return $systems;
 	}
-			
+	
+	/**
+	 * Get number of systems in a locality which there is at least one scan for in the db
+	 * If the user parameter is specified, it will give the number of systems which there is
+	 * at least one scan for in the db submitted by that user
+	 * 
+	 * @param int $quadrant quadrant
+	 * @param int $sector sector
+	 * @param int $region region
+	 * @param int $locality locality
+	 * @param int $user submitter id, optional
+	 * @return int number of systems
+	 */
+	public function getNumberOfSystemsInLocalityWithAtLeastOneScan__3600_systemscans($quadrant, $sector, $region, $locality, $user=false) {
+		$systems = $this->getSystemsInLocalityWithScanStatsCached($quadrant, $sector, $region, $locality, $user);
+
+		$systemsNumber = 0;
+		$userSystems = 0;
+		foreach($systems as $system) {
+			if ($system->objects_scanned > 0)
+				$systemsNumber++;
+			if ($system->objects_scanned_by_user > 0)
+				$userSystems++;
+		}
+
+		if ($user)
+			return $userSystems;
+		else
+			return $systemsNumber;
+	}
+
+	/**
+	 * Gets the number of systems in a locality
+	 * 
+	 * @param int $quadrant quadrant
+	 * @param int $sector sector
+	 * @param int $region region
+	 * @param int $locality locality
+	 * @return int number of systems
+	 */ 
+	public function getNumberOfSystemsInLocality__3600_systems($quadrant, $sector, $region, $locality) {
+		$q = new Query("SELECT");
+		$q->where("quadrant = ?", $quadrant);
+		$q->where("sector = ?", $sector);
+		$q->where("region = ?", $region);
+		$q->where("locality = ?", $locality);
+
+		return count(SystemBean::select($q));
+	}
 		
 	public function scrapeLocality($quadrant, $sector, $region, $locality) {
 		$html = file_get_contents('http://gameview.outer-empires.com/GalaxyViewer/GView.asp?VS=1&Q=' . $quadrant . '&S=' . $sector . '&R=' . $region . '&L=' . $locality);
