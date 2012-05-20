@@ -3,7 +3,7 @@
  * Scans Controller
  * Scans database
  *
- * Copyright (c) 2011, Jack Harley
+ * Copyright (c) 2012, Jack Harley
  * All Rights Reserved
  */
 namespace darkcrusader\controllers;
@@ -36,6 +36,21 @@ class ScansController extends Controller {
 		}
 
 		View::load('scans/submit');
+	}
+
+	public function search() {
+		$this->checkAuth("access_scans");
+		
+		if (!$this->checkFormInput(array("resource"), "get")) {
+			View::load("scans/resource");
+			return;
+		}
+
+		$scans = ScanModel::getInstance()->searchScansByResource($_GET["resource"]);
+
+		View::load('scans/results', array(
+			"scans" => $scans
+		));
 	}
 }
 ?>

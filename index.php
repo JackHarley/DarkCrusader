@@ -5,7 +5,7 @@
  * Index.php, loads all the required libraries and dispatches
  * the request
  *
- * Copyright (c) 2011, Jack Harley
+ * Copyright (c) 2012, Jack Harley
  * All Rights Reserved
  */
 
@@ -17,9 +17,10 @@ session_start();
 // Include libraries
 require_once(__DIR__ . '/lib/hydrogen/hydrogen.inc.php');
 require_once(__DIR__ . '/lib/darkcrusader/darkcrusader.inc.php');
-require_once(__DIR__ . '/lib/pChart/pChart/pChart.class');
-require_once(__DIR__ . '/lib/pChart/pChart/pData.class');
-require_once(__DIR__ . '/lib/pChart/pChart/pCache.class');
+require_once(__DIR__ . '/lib/pChart/class/pData.class.php');
+require_once(__DIR__ . '/lib/pChart/class/pDraw.class.php');
+require_once(__DIR__ . '/lib/pChart/class/pImage.class.php');
+require_once(__DIR__ . '/lib/pChart/class/pCache.class.php');
 
 // Load classes
 use hydrogen\errorhandler\ErrorHandler;

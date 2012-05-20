@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<h2>Faction Info</h2>
+<h2>SWAT/FIRE Faction Info</h2>
 
 <h3>Recruitment</h3>
 <p>

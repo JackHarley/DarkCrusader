@@ -4,7 +4,7 @@
  * Handles data requests regarding the kill
  * on sight list
  *
- * Copyright (c) 2011, Jack Harley
+ * Copyright (c) 2012, Jack Harley
  * All Rights Reserved
  */
 namespace darkcrusader\models;

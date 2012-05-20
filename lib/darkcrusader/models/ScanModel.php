@@ -4,7 +4,7 @@
  * Handles data requests regarding the
  * scans database
  *
- * Copyright (c) 2011, Jack Harley
+ * Copyright (c) 2012, Jack Harley
  * All Rights Reserved
  */
 namespace darkcrusader\models;
@@ -12,6 +12,8 @@ namespace darkcrusader\models;
 use hydrogen\model\Model;
 
 use hydrogen\database\Query;
+use hydrogen\recache\RECacheManager;
+
 use darkcrusader\sqlbeans\ScanResultBean;
 use darkcrusader\sqlbeans\ScanBean;
 use darkcrusader\sqlbeans\SystemBean;
@@ -209,6 +211,8 @@ class ScanModel extends Model{
 			$this->addScanResult($scanId, $resource, $dbquality, $rate);					  
 		}
 
+		RECacheManager::getInstance()->clearGroup("systemscans");
+
 		return $this->getScan($scanId);
 	}
 
@@ -226,6 +230,40 @@ class ScanModel extends Model{
 		$q->orderby("scanner_level", "DESC");
 
 		return ScanBean::select($q, true);
+	}
+
+	/**
+	 * Searches scans by resource and orders by quality and then rate
+	 * 
+	 * @param string $resource resource name to search
+	 * @return array array of ScanResultBeans
+	 */
+	public function searchScansByResource($resource) {
+		$q = new Query("SELECT");
+		$q->where("resource_name LIKE ?", '%' . $resource . '%');
+		$q->orderby("resource_extraction_rate", "DESC");
+		$q->where("resource_quality = ?", "good");
+		$highSrbs = ScanResultBean::select($q, true);
+
+		$q = new Query("SELECT");
+		$q->where("resource_name LIKE ?", '%' . $resource . '%');
+		$q->orderby("resource_extraction_rate", "DESC");
+		$q->where("resource_quality = ?", "medium");
+		$mediumSrbs = ScanResultBean::select($q, true);
+
+		$q = new Query("SELECT");
+		$q->where("resource_name LIKE ?", '%' . $resource . '%');
+		$q->orderby("resource_extraction_rate", "DESC");
+		$q->where("resource_quality = ?", "low");
+		$lowSrbs = ScanResultBean::select($q, true);
+
+		$q = new Query("SELECT");
+		$q->where("resource_name LIKE ?", '%' . $resource . '%');
+		$q->orderby("resource_extraction_rate", "DESC");
+		$q->where("resource_quality = ?", "na");
+		$naSrbs = ScanResultBean::select($q, true);
+
+		return array_merge($highSrbs, $mediumSrbs, $lowSrbs, $naSrbs);
 	}
 }
 ?>

@@ -13,7 +13,7 @@
 	</tr>
 	<tr>
 		<td>Location:</td>
-		<td>{{system.location}}</td>
+		<td><a href="{% url /index.php/locality %}?q={{system.quadrant}}&s={{system.sector}}&r={{system.region}}&l={{system.locality}}">{{system.location}}</a></td>
 	</tr>
 	<tr>
 		<td>Station?</td>
@@ -42,21 +42,23 @@
 
 {% endif %} 
 
-<h3>Historical Information</h3>
-<table cellpadding="2" border="0" id="history">
-	<tr>
-		<th>Time</th>
-		<th>Faction</th>
-		<th>Has Station?</th>
-	</tr>
-
-	{% for historicalStatsSet in historicalStats %}
+{% if ! empty historicalStats %}
+	<h3>Historical Information</h3>
+	<table cellpadding="2" border="0" id="history">
 		<tr>
-			<td>{{historicalStatsSet.set.time}}</td>
-			<td>{{historicalStatsSet.faction}}</td>
-			<td>{% if historicalStatsSet.has_station == 1%}Yes{% else %}No{% endif %}</td>
+			<th>Time</th>
+			<th>Faction</th>
+			<th>Has Station?</th>
 		</tr>
-	{% endfor %}
-</table>
+
+		{% for historicalStatsSet in historicalStats %}
+			<tr>
+				<td>{{historicalStatsSet.set.time}}</td>
+				<td>{{historicalStatsSet.faction}}</td>
+				<td>{% if historicalStatsSet.has_station == 1%}Yes{% else %}No{% endif %}</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endif %}
 
 {% endblock %}

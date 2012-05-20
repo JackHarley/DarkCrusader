@@ -2,7 +2,7 @@
 /**
  * System SQLBean
  *
- * Copyright (c) 2011, Jack Harley
+ * Copyright (c) 2012, Jack Harley
  * All Rights Reserved
  */
 namespace darkcrusader\sqlbeans;
@@ -25,6 +25,9 @@ class SystemBean extends SQLBean {
 		'locality'
 	);
 	
+	public $objects_scanned = 0;
+	public $objects_scanned_by_user = 0;
+
 	protected static $beanMap = array(
 	);
 

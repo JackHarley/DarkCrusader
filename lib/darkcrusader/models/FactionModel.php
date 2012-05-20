@@ -3,7 +3,7 @@
  * Faction Model
  * Handles data requests regarding factions
  *
- * Copyright (c) 2011, Jack Harley
+ * Copyright (c) 2012, Jack Harley
  * All Rights Reserved
  */
 namespace darkcrusader\models;
@@ -122,28 +122,30 @@ class FactionModel extends Model {
 		
 		// Create the chart
 		$DataSet = new \pData;
-		foreach($historicalNumberOfOwnedSystems as $id => $numberOfOwnedSystems) {
-			$DataSet->AddPoint($numberOfOwnedSystems, "Serie1", $historicalNumberOfOwnedSystemsDates[$id]);
-		}
-		$DataSet->AddSerie("Serie1");
-		$DataSet->SetSerieName("Number of Owned Systems","Serie1");
+		$DataSet->addPoints($historicalNumberOfOwnedSystems, "NumberOfOwnedSystems");
+		$DataSet->setAxisName(0, "Number of Owned Systems");
+		$DataSet->addPoints($historicalNumberOfOwnedSystemsDates, "Labels");
+		$DataSet->setSerieDescription("Labels", "Date");
+		$DataSet->setAbscissa("Labels");
+		$DataSet->setSerieShape("NumberOfOwnedSystems",SERIE_SHAPE_FILLEDCIRCLE);
+		$serieSettings = array("R"=>0,"G"=>0,"B"=>0,"Alpha"=>80);
+		$DataSet->setPalette("NumberOfOwnedSystems", $serieSettings);
+		$DataSet->setSerieWeight("NumberOfOwnedSystems",1);
+
+		$myPicture = new \pImage(700,230,$DataSet);
+		$GradientSettings = array("StartR"=>0,"StartG"=>191,"StartB"=>255,"Alpha"=>100,"Levels"=>50);
+		$myPicture->drawGradientArea(0,0,700,230,DIRECTION_VERTICAL,$GradientSettings);
+		$myPicture->drawText(350,45,"Number Of Owned Systems",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+		$myPicture->setGraphArea(60,60,640,190);
+		$myPicture->drawFilledRectangle(60,60,640,190,array("R"=>255,"G"=>255,"B"=>255,"Surrounding"=>-200,"Alpha"=>10));
+		$myPicture->drawScale(array("DrawSubTicks"=>TRUE));
+		$myPicture->setShadow(TRUE,array("X"=>1,"Y"=>1,"R"=>0,"G"=>0,"B"=>0,"Alpha"=>10));
+		$myPicture->setFontProperties(array("FontName"=>__DIR__ . "/../../pChart/fonts/Forgotte.ttf","FontSize"=>6));
+		$myPicture->drawLineChart(array("DisplayValues"=>false,"DisplayColor"=>DISPLAY_AUTO));
+		$myPicture->setShadow(FALSE); 
 		
-		$chart = new \pChart(700,230);
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",10);
-		$chart->setGraphArea(40,30,680,200);
-		$chart->drawGraphArea(252,252,252,TRUE);
-		$chart->drawScale($DataSet->GetData(),$DataSet->GetDataDescription(),SCALE_NORMAL,0,0,0,TRUE,0,0);
-		$chart->drawGrid(4,TRUE,230,230,230,70);
-		
-		$chart->drawLineGraph($DataSet->GetData(),$DataSet->GetDataDescription());
-		$chart->drawPlotGraph($DataSet->GetData(),$DataSet->GetDataDescription(),3,2,255,255,255);
-		
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",8);
-		$chart->drawLegend(45,35,$DataSet->GetDataDescription(),255,255,255);
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",10);
-		$chart->drawTitle(60,22,"Number of Owned Systems over the Past 2 Weeks",50,50,50,585);
-		
-		$chart->Render(__DIR__ . "/../../../graphs/" . $factionName . "-Systems.png");
+		unlink(__DIR__ . "/../../../graphs/" . $factionName . "-Systems.png");
+		$myPicture->render(__DIR__ . "/../../../graphs/" . $factionName . "-Systems.png");
 		
 		// Get number of owned systems for each set
 		$historicalNumberOfOwnedStationSystems = array();
@@ -174,29 +176,30 @@ class FactionModel extends Model {
 		
 		// Create the chart
 		$DataSet = new \pData;
-		foreach($historicalNumberOfOwnedStationSystems as $id => $numberOfOwnedStationSystems) {
-			$DataSet->AddPoint($numberOfOwnedStationSystems, "Serie1", $historicalNumberOfOwnedStationSystemsDates[$id]);
-		}
-		$DataSet->AddSerie("Serie1");
-		$DataSet->SetSerieName("Number of Owned Station Systems","Serie1");
-		
-		$chart = new \pChart(700,230);
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",10);
-		$chart->setGraphArea(40,30,680,200);
-		$chart->drawGraphArea(252,252,252,TRUE);
-		$chart->drawScale($DataSet->GetData(),$DataSet->GetDataDescription(),SCALE_NORMAL,0,0,0,TRUE,0,0);
-		$chart->drawGrid(4,TRUE,230,230,230,70);
-		
-		$chart->drawLineGraph($DataSet->GetData(),$DataSet->GetDataDescription());
-		$chart->drawPlotGraph($DataSet->GetData(),$DataSet->GetDataDescription(),3,2,255,255,255);
-		
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",8);
-		$chart->drawLegend(45,35,$DataSet->GetDataDescription(),255,255,255);
-		$chart->setFontProperties(__DIR__ ."/../../pChart/Fonts/tahoma.ttf",10);
-		$chart->drawTitle(60,22,"Number of Owned Station Systems over the Past 2 Weeks",50,50,50,585);
-		
-		$chart->Render(__DIR__ . "/../../../graphs/" . $factionName . "-StationSystems.png");
+		$DataSet->addPoints($historicalNumberOfOwnedStationSystems, "NumberOfOwnedStationSystems");
+		$DataSet->setAxisName(0, "NumberOfOwnedStationSystems");
+		$DataSet->addPoints($historicalNumberOfOwnedStationSystemsDates, "Labels");
+		$DataSet->setSerieDescription("Labels", "Date");
+		$DataSet->setAbscissa("Labels");
+		$serieSettings = array("R"=>0,"G"=>0,"B"=>0,"Alpha"=>80);
+		$DataSet->setPalette("NumberOfOwnedStationSystems", $serieSettings);
+		$DataSet->setSerieWeight("NumberOfOwnedStationSystems",1);
 
+		$myPicture = new \pImage(700,230,$DataSet);
+		$GradientSettings = array("StartR"=>50,"StartG"=>205,"StartB"=>50,"Alpha"=>100,"Levels"=>50); 
+		$myPicture->drawGradientArea(0,0,700,230,DIRECTION_VERTICAL,$GradientSettings);
+		$myPicture->drawText(350,45,"Number Of Owned Station Systems",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+		$myPicture->setGraphArea(60,60,640,190);
+		$myPicture->drawFilledRectangle(60,60,640,190,array("R"=>255,"G"=>255,"B"=>255,"Surrounding"=>-200,"Alpha"=>10));
+		$myPicture->drawScale(array("DrawSubTicks"=>TRUE));
+		$myPicture->setShadow(TRUE,array("X"=>1,"Y"=>1,"R"=>0,"G"=>0,"B"=>0,"Alpha"=>10));
+		$myPicture->setFontProperties(array("FontName"=>__DIR__ . "/../../pChart/fonts/Forgotte.ttf","FontSize"=>6));
+		$myPicture->drawLineChart(array("DisplayValues"=>false,"DisplayColor"=>DISPLAY_AUTO));
+		$myPicture->setShadow(FALSE);
+		
+		unlink(__DIR__ . "/../../../graphs/" . $factionName . "-StationSystems.png");
+		$myPicture->render(__DIR__ . "/../../../graphs/" . $factionName . "-StationSystems.png");
+		
 		$return = array(
 			"systems" => $factionName . "-Systems.png",
 			"station_systems" => $factionName . "-StationSystems.png");
