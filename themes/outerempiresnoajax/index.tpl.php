@@ -13,28 +13,11 @@
 	</p>
 
 	<p>
-		--Hoploa Wington<br />
-		SWAT Leader
+		--The SWAT Leadership
 	</p>
 
 	<p>
-		--Kronos<br />
-		SWAT Leader
-	</p>
-
-	<p>
-		--Steve Austion<br />
-		FIRE Leader
-	</p>
-
-	<p>
-		--Mylo Lickess<br />
-		FIRE Leader
-	</p>
-
-	<p>
-		--Doc Con<br />
-		FIRE Leader
+		--The FIRE Leadership
 	</p>
 
 	<p>

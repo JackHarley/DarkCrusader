@@ -205,7 +205,8 @@ class BankModel extends Model {
 			$datetime = $fields[0];
 			$oeType = $fields[1];
 
-			// if oe type is not 'faction', then the user probably pasted their own accidentally
+			// if oe type is not 'faction', then the user probably pasted their own accidentally,
+			// or else something else went horribly wrong with parsing
 			if ($oeType != "Faction")
 				throw new IncorrectTransactionLogPasteException;
 
