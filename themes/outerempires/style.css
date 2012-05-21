@@ -19,7 +19,7 @@ p {
 }
 
 h2 {
-	font-size:160%;
+	font-size:140%;
 }
 
 h1 {
@@ -27,23 +27,26 @@ h1 {
 }
 
 h3 {
-	font-size:135%;
+	font-size:120%; 
 }
 
 a {
 	text-decoration: underline;
+	color: white;
 }
 a:link { 
 	text-decoration: none;
+	color: white;
 }
 
 a.navbarlink {
 	text-decoration: none;
-	color:white;
+	color: white;
 }
 
 a:visited {
 	text-decoration: none;
+	color: white;
 }
 
 a:active { 
@@ -63,11 +66,18 @@ img {
 th {
 	font-weight:bold;
 	font-size:120%;
+	padding-left: 15px;
+	padding-right: 15px;
 }
 
+td {
+	padding-left:15px;
+	padding-right:15px;
+}
 #container {
 	width: 1100px;
 	margin: 0 auto;
+	padding-bottom:40px;  
 }
 	
 #header {
@@ -85,12 +95,13 @@ th {
 .content {
 }
 
-#home, #recruitment, #kos, #blog, #login, #scans {
-	display: none;
+#leftright {
+	display:table;
+	width:100%;
 }
 
 #scanleft {
-	width:50%;
+	width:40%;
 	margin: 0 auto;
 	float: left;    
 }
@@ -99,4 +110,19 @@ th {
 	width:50%;
 	margin: 0 auto;
 	float: right;
+}
+#left {
+	width:48%;
+	margin: 0 auto;
+	float: left;
+	padding-bottom:40px; 
+	display: block;
+}
+
+#right {
+	width:48%;
+	margin: 0 auto;
+	float: right;
+	padding-bottom:40px;
+	display: block;
 }
