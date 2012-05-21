@@ -267,13 +267,13 @@ class SystemModel extends Model {
 		$data->setSerieDescription("Systems", "Systems");
 		$data->setAbscissa("Factions");
 
-		$myPicture = new \pImage(600,450,$data);
+		$myPicture = new \pImage(800,450,$data);
 		$GradientSettings = array("StartR"=>0,"StartG"=>191,"StartB"=>255,"Alpha"=>100,"Levels"=>50);
-		$myPicture->drawGradientArea(0,0,600,450,DIRECTION_VERTICAL,$GradientSettings);
-		$myPicture->drawText(300,45,"Breakdown of Colonised Systems",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+		$myPicture->drawGradientArea(0,0,800,450,DIRECTION_VERTICAL,$GradientSettings);
+		$myPicture->drawText(400,45,"Breakdown of Colonised Systems",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
 
 		$pie = new \pPie($myPicture, $data);
-		$pie->draw2DPie(300,250,array("DrawLabels"=>TRUE,"WriteValues"=>PIE_VALUE_NATURAL,"LabelStacked"=>TRUE,"Border"=>TRUE,"Radius"=>135,"ValuePosition"=>PIE_VALUE_INSIDE));
+		$pie->draw2DPie(400,250,array("DrawLabels"=>TRUE,"WriteValues"=>PIE_VALUE_NATURAL,"LabelStacked"=>TRUE,"Border"=>TRUE,"Radius"=>135,"ValuePosition"=>PIE_VALUE_INSIDE));
 		
 		$myPicture->render(__DIR__ . "/../../../graphs/controlledsystems.png"); 
 
