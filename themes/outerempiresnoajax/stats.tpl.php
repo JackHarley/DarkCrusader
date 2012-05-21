@@ -6,7 +6,7 @@
 <h2>Stats</h2>
 
 <p>
-	Choose which stats you wish to look up
+	Choose which stats you wish to take a look at
 </p>
 
 <p>

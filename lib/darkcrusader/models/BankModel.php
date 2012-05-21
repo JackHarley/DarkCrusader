@@ -124,7 +124,8 @@ class BankModel extends Model {
 		$data->setPalette("Credits",$serieSettings);
 
 		$myPicture = new \pImage(900,500,$data);
-		$myPicture->drawGradientArea(0,0,1000,500,DIRECTION_VERTICAL,array("StartR"=>32,"StartG"=>178,"StartB"=>170,"Alpha"=>100,"Levels"=>50));
+		$GradientSettings = array("StartR"=>0,"StartG"=>191,"StartB"=>255,"Alpha"=>100,"Levels"=>50);
+		$myPicture->drawGradientArea(0,0,1000,500,DIRECTION_VERTICAL,$GradientSettings);
 		$myPicture->setGraphArea(100,70,870,450);
 		$myPicture->drawText(450,45,"Total Credits Donated by Top 8 Faction Members",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
 		$myPicture->drawScale(array("CycleBackground"=>TRUE,"DrawSubTicks"=>TRUE,"GridR"=>0,"GridG"=>0,"GridB"=>0,"GridAlpha"=>10)); 
