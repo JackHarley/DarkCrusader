@@ -18,6 +18,8 @@ use darkcrusader\sqlbeans\SystemBean;
 use darkcrusader\sqlbeans\SystemStatsBean;
 use darkcrusader\sqlbeans\SystemStatsSetBean;
 
+use darkcrusader\factions\exceptions\NoSuchFactionException;
+
 class FactionModel extends Model {
 	
 	protected static $modelID = "Faction";
@@ -39,6 +41,9 @@ class FactionModel extends Model {
 		$stmt = $query->prepare();
 		$stmt->execute();
 		$numberOfOwnedSystems = $stmt->rowCount();
+
+		if (!$numberOfOwnedSystems)
+			throw new NoSuchFactionException();
 
 		return $numberOfOwnedSystems;
 	}
@@ -62,6 +67,9 @@ class FactionModel extends Model {
 		$stmt->execute();
 		$numberOfOwnedStationSystems = $stmt->rowCount();
 
+		if ($numberOfOwnedStationSystems === null)
+			throw new NoSuchFactionException();
+
 		return $numberOfOwnedStationSystems;
 	}
 
@@ -78,6 +86,10 @@ class FactionModel extends Model {
 		$q->limit(1);
 
 		$ssbs = SystemStatsBean::select($q);
+
+		if (!$ssbs[0])
+			throw new NoSuchFactionException();
+
 		return $ssbs[0]->faction;
 	}
 	
@@ -111,6 +123,9 @@ class FactionModel extends Model {
 			$stmt = $query->prepare();
 			$stmt->execute();
 			$numberOfOwnedSystems = $stmt->rowCount();
+
+			if (!$numberOfOwnedSystems)
+				throw new NoSuchFactionException();
 			
 			$historicalNumberOfOwnedSystems[] = $numberOfOwnedSystems;
 			$historicalNumberOfOwnedSystemsDates[] = $time;
@@ -144,7 +159,8 @@ class FactionModel extends Model {
 		$myPicture->drawLineChart(array("DisplayValues"=>false,"DisplayColor"=>DISPLAY_AUTO));
 		$myPicture->setShadow(FALSE); 
 		
-		unlink(__DIR__ . "/../../../graphs/" . $factionName . "-Systems.png");
+		if (file_exists(__DIR__ . "/../../../graphs/" . $factionName . "-Systems.png"))
+			unlink(__DIR__ . "/../../../graphs/" . $factionName . "-Systems.png");
 		$myPicture->render(__DIR__ . "/../../../graphs/" . $factionName . "-Systems.png");
 		
 		// Get number of owned systems for each set
@@ -165,6 +181,8 @@ class FactionModel extends Model {
 			$stmt = $query->prepare();
 			$stmt->execute();
 			$numberOfOwnedStationSystems = $stmt->rowCount();
+			if ($numberOfOwnedStationSystems === null)
+				throw new NoSuchFactionException();
 			
 			$historicalNumberOfOwnedStationSystems[] = $numberOfOwnedStationSystems;
 			$historicalNumberOfOwnedStationSystemsDates[] = $time;
@@ -173,7 +191,7 @@ class FactionModel extends Model {
 		// Reverse the order of the data (newest->oldest ---> oldest->newest)
 		$historicalNumberOfOwnedStationSystems = array_reverse($historicalNumberOfOwnedStationSystems);
 		$historicalNumberOfOwnedStationSystemsDates = array_reverse($historicalNumberOfOwnedStationSystemsDates);
-		
+
 		// Create the chart
 		$DataSet = new \pData;
 		$DataSet->addPoints($historicalNumberOfOwnedStationSystems, "NumberOfOwnedStationSystems");
@@ -197,7 +215,8 @@ class FactionModel extends Model {
 		$myPicture->drawLineChart(array("DisplayValues"=>false,"DisplayColor"=>DISPLAY_AUTO));
 		$myPicture->setShadow(FALSE);
 		
-		unlink(__DIR__ . "/../../../graphs/" . $factionName . "-StationSystems.png");
+		if (file_exists(__DIR__ . "/../../../graphs/" . $factionName . "-StationSystems.png"))
+			unlink(__DIR__ . "/../../../graphs/" . $factionName . "-StationSystems.png");
 		$myPicture->render(__DIR__ . "/../../../graphs/" . $factionName . "-StationSystems.png");
 		
 		$return = array(
