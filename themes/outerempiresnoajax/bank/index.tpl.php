@@ -53,7 +53,7 @@
 	</div>
 </div>
 
-<h3>Graphs</h3>
+<h3>Charts</h3>
 
 <img src="{% url /graphs/bankdonors.png %}" />
 {% endblock %}

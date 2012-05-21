@@ -7,11 +7,11 @@
 	
 	<table cellpadding="2" border="0">
 		<tr>
-			<td>Number of Owned Systems:</td>
+			<td>Number of Controlled Systems:</td>
 			<td>{{faction.number_of_owned_systems}}</td>
 		</tr>
 		<tr>
-			<td>Number of Owned Station Systems:</td>
+			<td>Number of Controlled Station Systems:</td>
 			<td>{{faction.number_of_owned_station_systems}}</td>
 		</tr>
 	</table>

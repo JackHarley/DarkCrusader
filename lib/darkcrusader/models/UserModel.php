@@ -174,11 +174,12 @@ class UserModel extends Model {
 			return "Error! Unable to create autologin, no user logged in.";
 
 		// Clear all autologins for this user currently set
-		$query = new Query("DELETE");
+		// ^^ Why exactly? lol
+		/*$query = new Query("DELETE");
 		$query->from("autologin");
 		$query->where("user_id = ?", $user->id);
 		$stmt = $query->prepare();
-		$stmt->execute();
+		$stmt->execute();*/
 
 		// Generate a public and private key
 		$publicKey = md5($user->email . microtime() . rand(1,100000));

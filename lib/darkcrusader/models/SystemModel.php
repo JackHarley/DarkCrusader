@@ -181,7 +181,104 @@ class SystemModel extends Model {
 
 		return count(SystemBean::select($q));
 	}
+	
+	/**
+	 * Gets an associative array of factions and the amount of systems they control
+	 * ordered by the amount of systems they control
+	 * NOTE: "Colonised" is converted to "Independent"
+	 * 
+	 * @return array Faction Name => Number of Controlled Systems
+	 */
+	public function getFactionsWithNumberOfControlledSystems__5200_systems() {
+		$q = new Query("SELECT");
+		$q->where("stats_set = ?", $this->getLatestSystemStatsSetCached()->id);
+		$q->where("faction != ?", "None");
+
+		$ssbs = SystemStatsBean::select($q);
+
+		$factions = array();
+
+		foreach($ssbs as $ssb) {
+
+			// convert Colonised to Independent (more descriptive)
+			if ($ssb->faction == "Colonised")
+				$ssb->faction = "Independent";
+
+			// init factions array key if none exists
+			if (!$factions[$ssb->faction])
+				$factions[$ssb->faction] = 0;
+
+			// increment number of systems
+			$factions[$ssb->faction]++;
+		}
+
+		// sort factions by number of controlled systems
+		$orderedFactions = array();
+		while (count($factions) > 0) {
+			$best = array("faction" => null, "systems" => 0);
+
+			foreach($factions as $faction => $systems) {
+				if ($systems > $best["systems"]) {
+					$best["faction"] = $faction;
+					$best["systems"] = $systems;
+				}
+
+			}
+
+			$orderedFactions[] = $best;
+			unset($factions[$best["faction"]]);
+		}
+
+		// remove any factions with less than 5% controlled and aggregrate them into "Other"
+		$colonisedSystems = count($ssbs);
+		$other = array("faction" => "Other Factions", "systems" => 0);
+		foreach($orderedFactions as $id => $faction) {
+			$percentage = ($faction["systems"] / $colonisedSystems) * 100;
+			if ($percentage < 5) {
+				$other["systems"] += $faction["systems"];
+				unset($orderedFactions[$id]);
+			}
+
+		}
+		if ($other["systems"] > 0)
+			$orderedFactions[] = $other;
+
+		return $orderedFactions;
+
+	}
+
+	/**
+	 * Generates the controlled systems pie chart/ring chart and stores it /graphs/controlledsystems.png
+	 */
+	public function generateControlledSystemsGraph() {
+		$bestFactions = $this->getFactionsWithNumberOfControlledSystemsCached();
+
+		$systems = array();
+		$factions = array();
+		foreach($bestFactions as $faction) {
+			$systems[] = $faction["systems"];
+			$factions[] = $faction["faction"];
+		}
+
+		$data = new \pData;
+		$data->addPoints($systems, "Systems");
+		$data->addPoints($factions, "Factions");
+		$data->setSerieDescription("Factions", "Factions");
+		$data->setSerieDescription("Systems", "Systems");
+		$data->setAbscissa("Factions");
+
+		$myPicture = new \pImage(600,450,$data);
+		$GradientSettings = array("StartR"=>0,"StartG"=>191,"StartB"=>255,"Alpha"=>100,"Levels"=>50);
+		$myPicture->drawGradientArea(0,0,600,450,DIRECTION_VERTICAL,$GradientSettings);
+		$myPicture->drawText(300,45,"Breakdown of Colonised Systems",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+
+		$pie = new \pPie($myPicture, $data);
+		$pie->draw2DPie(300,250,array("DrawLabels"=>TRUE,"WriteValues"=>PIE_VALUE_NATURAL,"LabelStacked"=>TRUE,"Border"=>TRUE,"Radius"=>135,"ValuePosition"=>PIE_VALUE_INSIDE));
 		
+		$myPicture->render(__DIR__ . "/../../../graphs/controlledsystems.png"); 
+
+	} 
+
 	public function scrapeLocality($quadrant, $sector, $region, $locality) {
 		$html = file_get_contents('http://gameview.outer-empires.com/GalaxyViewer/GView.asp?VS=1&Q=' . $quadrant . '&S=' . $sector . '&R=' . $region . '&L=' . $locality);
 		

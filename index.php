@@ -18,6 +18,7 @@ session_start();
 require_once(__DIR__ . '/lib/hydrogen/hydrogen.inc.php');
 require_once(__DIR__ . '/lib/darkcrusader/darkcrusader.inc.php');
 require_once(__DIR__ . '/lib/pChart/class/pData.class.php');
+require_once(__DIR__ . '/lib/pChart/class/pPie.class.php');
 require_once(__DIR__ . '/lib/pChart/class/pDraw.class.php');
 require_once(__DIR__ . '/lib/pChart/class/pImage.class.php');
 require_once(__DIR__ . '/lib/pChart/class/pCache.class.php');
