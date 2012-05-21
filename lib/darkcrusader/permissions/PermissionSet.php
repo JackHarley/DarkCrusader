@@ -1,7 +1,7 @@
 <?php
 /**
  * Project Nebula
- * Copyright (c) 2012, BroadcasTheNet
+ * Copyright (c) 2012, Jack Harley
  * All Rights Reserved
  */
 namespace darkcrusader\permissions;
