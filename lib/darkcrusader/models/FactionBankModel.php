@@ -19,7 +19,7 @@ use darkcrusader\bank\exceptions\IncorrectTransactionLogPasteException;
 
 class FactionBankModel extends Model {
 	
-	protected static $modelID = "Bank";
+	protected static $modelID = "FactionBank";
 
 	/**
 	 * Gets the current bank balance
