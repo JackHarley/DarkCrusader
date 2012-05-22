@@ -17,7 +17,7 @@ use darkcrusader\bank\exceptions\IncorrectTransactionLogPasteException;
 class FactionbankController extends Controller {
 	
 	public function index() {
-		$this->checkAuth("access_bank");
+		$this->checkAuth("access_faction_bank");
 
 		if ($this->checkAuth("administrate_bank", false))
 			View::setVar("isBankAdmin", true);
@@ -25,7 +25,7 @@ class FactionbankController extends Controller {
 		$bm = FactionBankModel::getInstance();
 		$bm->generateDonorsGraph();
 
-		View::load('bank/index', array(
+		View::load('faction_bank/index', array(
 			"bankBalance" => $bm->getCurrentBankBalanceCached(),
 			"latestTransactions" => $bm->getLatestTransactionsCached(10)
 		));
@@ -33,12 +33,12 @@ class FactionbankController extends Controller {
 
 	public function pastetransactionlog() {
 		$this->checkAuth(array(
-			"access_bank",
-			"administrate_bank"
+			"access_faction_bank",
+			"administrate_faction_bank"
 		));
 
 		if (!$this->checkFormInput("paste")) {
-			View::load('bank/paste_transaction_log');
+			View::load('faction_bank/paste_transaction_log');
 			return;
 		}
 
@@ -47,7 +47,7 @@ class FactionbankController extends Controller {
 		}
 		catch (IncorrectTransactionLogPasteException $e) {
 			$this->alert("error", "Incorrect transaction log pasted, ensure you're pasting the faction transaction log, not your own");
-			View::load('bank/paste_transaction_log');
+			View::load('faction_bank/paste_transaction_log');
 			return;
 		}
 
