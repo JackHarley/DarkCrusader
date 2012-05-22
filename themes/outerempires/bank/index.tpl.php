@@ -1,6 +1,6 @@
 {% extends base %}
 
-{% block pageTitle %}Bank{% endblock %}
+{% block pageTitle %}Faction Bank{% endblock %}
 
 {% block content %}
 <h2>Faction Bank</h2>

@@ -26,9 +26,10 @@
 		<tr>
 			<th>System Name</th>
 			{% if exists hasAccessToScans %}
-				<th>Number of Planets/Moons Scanned</th>
-				<th>Number of Planets/Moons Scanned by You</th>
+				<th>Objs Scanned</th>
+				<th>Objs Scanned by You</th>
 			{% endif %}
+			<th>Faction</th>
 		</tr>
 
 		{% for system in systems %}
@@ -54,6 +55,7 @@
 						{% endif %}
 					</td>
 				{% endif %}
+				<td><a href="{% url /index.php/factions %}?name={{system.stats.faction|urlencode}}">{{system.stats.faction}}</a></td>
 			</tr>
 		{% endfor %}
 	</table>

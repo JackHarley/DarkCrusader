@@ -13,11 +13,11 @@ use hydrogen\database\Query;
 use hydrogen\recache\RECacheManager;
 
 use darkcrusader\models\UserModel;
-use darkcrusader\sqlbeans\BankTransactionBean;
+use darkcrusader\sqlbeans\FactionBankTransactionBean;
 
 use darkcrusader\bank\exceptions\IncorrectTransactionLogPasteException;
 
-class BankModel extends Model {
+class FactionBankModel extends Model {
 	
 	protected static $modelID = "Bank";
 
@@ -31,7 +31,7 @@ class BankModel extends Model {
 		$q->orderby("date", "DESC");
 		$q->limit(1);
 
-		$btbs = BankTransactionBean::select($q);
+		$btbs = FactionBankTransactionBean::select($q);
 		return $btbs[0]->balance;
 	}
 
@@ -45,7 +45,7 @@ class BankModel extends Model {
 		$q->orderby("date", "DESC");
 		$q->limit($limit);
 
-		return BankTransactionBean::select($q, true);
+		return FactionBankTransactionBean::select($q, true);
 	}
 
 	/**
@@ -60,7 +60,7 @@ class BankModel extends Model {
 		$q->where("type = ?", "transfer");
 		$q->where("direction = ?", "in");
 
-		$btbs = BankTransactionBean::select($q);
+		$btbs = FactionBankTransactionBean::select($q);
 
 		$players = array();
 
@@ -154,12 +154,12 @@ class BankModel extends Model {
 			$q->where("balance = ?", $balance);
 			$q->where("direction = ?", $direction);
 
-			$btbs = BankTransactionBean::select($q);
+			$btbs = FactionBankTransactionBean::select($q);
 			if ($btbs[0])
 				return false;
 		}
 
-		$btb = new BankTransactionBean;
+		$btb = new FactionBankTransactionBean;
 		$btb->type = $type;
 		$btb->direction = $direction;
 		$btb->amount = $amount;

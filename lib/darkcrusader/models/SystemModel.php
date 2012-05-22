@@ -18,6 +18,7 @@ use darkcrusader\sqlbeans\ScanResultBean;
 use darkcrusader\sqlbeans\SystemBean;
 use darkcrusader\sqlbeans\SystemStatsBean;
 use darkcrusader\sqlbeans\SystemStatsSetBean;
+use darkcrusader\systems\exceptions\NoSuchSystemException;
 
 class SystemModel extends Model {
 	
@@ -327,6 +328,9 @@ class SystemModel extends Model {
 	 * @return SystemBean system info
 	 */
 	public function getSystem($id=false, $name=false) {
+		if ((!$id) && (!$name))
+			throw new NoSuchSystemException;
+
 		$q = new Query("SELECT");
 
 		if ($id)
@@ -338,6 +342,9 @@ class SystemModel extends Model {
 		$q->limit(1);
 		$sbs = SystemBean::select($q);
 		$sb = $sbs[0];
+
+		if (!$sb)
+			throw new NoSuchSystemException;
 
 		return $sb;
 	}

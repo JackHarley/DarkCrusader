@@ -9,12 +9,12 @@
 namespace darkcrusader\controllers;
 
 use darkcrusader\controllers\Controller;
-use darkcrusader\models\BankModel;
+use darkcrusader\models\FactionBankModel;
 use hydrogen\view\View;
 
 use darkcrusader\bank\exceptions\IncorrectTransactionLogPasteException;
 
-class BankController extends Controller {
+class FactionbankController extends Controller {
 	
 	public function index() {
 		$this->checkAuth("access_bank");
@@ -22,7 +22,7 @@ class BankController extends Controller {
 		if ($this->checkAuth("administrate_bank", false))
 			View::setVar("isBankAdmin", true);
 
-		$bm = BankModel::getInstance();
+		$bm = FactionBankModel::getInstance();
 		$bm->generateDonorsGraph();
 
 		View::load('bank/index', array(
@@ -43,7 +43,7 @@ class BankController extends Controller {
 		}
 
 		try {
-			$transactionsAdded = BankModel::getInstance()->parseTransactionLogPaste($_POST["paste"]);
+			$transactionsAdded = FactionBankModel::getInstance()->parseTransactionLogPaste($_POST["paste"]);
 		}
 		catch (IncorrectTransactionLogPasteException $e) {
 			$this->alert("error", "Incorrect transaction log pasted, ensure you're pasting the faction transaction log, not your own");
