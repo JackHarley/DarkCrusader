@@ -1,22 +1,20 @@
 {% extends base %}
 
-{% block pageTitle %}Faction Bank{% endblock %}
+{% block pageTitle %}Personal Bank{% endblock %}
 
 {% block content %}
-<h2>Faction Bank</h2>
+<h2>Personal Bank</h2>
 
 <div id="leftright">
 	<div id="left">
-		<h3>Current Balance: <span style="color:aqua">{{bankBalance|numberformat}}c</span></h3>
+		<h3>Current Balance: <span style="color:aqua">{{bankBalance|numberformat}}c</span> (if this is not correct, do a transaction log paste to correct it)</h3>
 
-		{% if exists isBankAdmin %}
-		<h3>Admin Options</h3>
+		<h3>Options</h3>
 		<p>
 			<ul>
-				<li><a href="{% url /index.php/factionbank/pastetransactionlog %}">Paste Transaction Log</a></li>
+				<li><a href="{% url /index.php/personalbank/pastetransactionlog %}">Paste Transaction Log</a></li>
 			</ul>
 		<p>
-		{% endif %}
 	</div>
 
 	<div id="right">
@@ -25,7 +23,7 @@
 		<p>
 			<table cellpadding="0" border="0">
 				<tr>
-					<th>Player</th>
+					<th>Type</th>
 					<th>Amount</th>
 					<th>Balance</th>
 				</tr>
@@ -37,7 +35,7 @@
 						<tr>
 					{% endif %}
 						
-						<td>{{transaction.player_name}}</td>
+						<td>{{transaction.type}}</td>
 						
 						{% if transaction.direction == "out" %}
 							<td><span style="color:red">-{{transaction.amount|numberformat}}c</span></td>
@@ -55,5 +53,7 @@
 
 <h3>Charts</h3>
 
-<img src="{% url /graphs/bankdonors.png %}" />
+<img src="{% url /graphs %}/{{incomeGraph}}" />
+
+
 {% endblock %}

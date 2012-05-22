@@ -19,7 +19,7 @@ class FactionbankController extends Controller {
 	public function index() {
 		$this->checkAuth("access_faction_bank");
 
-		if ($this->checkAuth("administrate_bank", false))
+		if ($this->checkAuth("administrate_faction_bank", false))
 			View::setVar("isBankAdmin", true);
 
 		$bm = FactionBankModel::getInstance();
