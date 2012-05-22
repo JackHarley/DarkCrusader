@@ -14,6 +14,8 @@ use hydrogen\view\View;
 use darkcrusader\models\SystemModel;
 use darkcrusader\models\ScanModel;
 
+use darkcrusader\systems\exceptions\NoSuchSystemException;
+
 class SystemsController extends Controller {
 	
 	public function index() {
@@ -26,7 +28,16 @@ class SystemsController extends Controller {
 		}
 
 		$sm = SystemModel::getInstance();
-		$system = $sm->getSystem(false, $_GET["name"]); 
+
+		try {
+			$system = $sm->getSystem(false, $_GET["name"]);
+		}
+		catch (NoSuchSystemException $e) {
+			$this->alert("error", "No system by that name was found, please check your spelling and try again");
+			View::load('systems/index');
+			return;
+		}
+
 		$historicalStats = $sm->getHistoricalSystemStats($system->id, 15);
 
 		if ($this->checkAuth("access_scans", false)) {

@@ -9,10 +9,10 @@ namespace darkcrusader\sqlbeans;
 
 use hydrogen\sqlbeans\SQLBean;
 
-class BankTransactionBean extends SQLBean {
+class FactionBankTransactionBean extends SQLBean {
 
-	protected static $tableNoPrefix = 'bank_transactions';
-	protected static $tableAlias = 'bank_transactions';
+	protected static $tableNoPrefix = 'faction_bank_transactions';
+	protected static $tableAlias = 'faction_bank_transactions';
 	protected static $primaryKey = 'id';
 	protected static $primaryKeyIsAutoIncrement = true;
 	protected static $fields = array(
