@@ -5,9 +5,10 @@
 {% block content %}
 <h2>Faction Bank</h2>
 
+<h3>Current Balance: <span style="color:aqua">{{bankBalance|numberformat}}c</span></h3>
+
 <div id="leftright">
 	<div id="left">
-		<h3>Current Balance: <span style="color:aqua">{{bankBalance|numberformat}}c</span></h3>
 
 		{% if exists isBankAdmin %}
 		<h3>Admin Options</h3>
