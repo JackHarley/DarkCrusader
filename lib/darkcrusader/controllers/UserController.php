@@ -45,9 +45,8 @@ class UserController extends Controller {
 				UserModel::getInstance()->register($_POST["username"], $_POST["password"]);
 			}
 			catch (UsernameAlreadyRegisteredException $b) {
-				View::load("user/register_form", array(
-					"error" => "Error! Username already registered!")
-				);
+				$this->alert("error", "Username already registered, please use a different username");
+				View::load("user/register_form");
 				return;
 			}
 
@@ -73,15 +72,13 @@ class UserController extends Controller {
 				$um->login($_POST["username"], $_POST["password"]);
 			}
 			catch (NoSuchUserException $e) {
-				View::load("user/login_form", array(
-					"error" => "User does not exist"
-				));
+				$this->alert("error", "No such username, ensure you are spelling it correctly");
+				View::load("user/login_form");
 				return;
 			}
 			catch (PasswordIncorrectException $e) {
-				View::load("user/login_form", array(
-					"error" => "Password incorrect"
-				));
+				$this->alert("error", "Password incorrect, please try again");
+				View::load("user/login_form");
 				return;
 			}
 

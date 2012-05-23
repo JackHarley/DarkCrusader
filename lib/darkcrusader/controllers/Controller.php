@@ -108,16 +108,24 @@ class Controller extends \hydrogen\controller\Controller {
 
 	/**
 	 * Sets an alert for the page to be loaded
-	 * Note that this WILL overwrite any existing alert
 	 *
 	 * @param string $type alert type: success, info, warning, error
 	 * @param string $message alert message
 	 */
 	public function alert($type, $message) {
-		View::setVar("alert", array(
+		try {
+			$alerts = View::getVar("alerts");
+		}
+		catch (\hydrogen\view\exceptions\NoSuchVariableException $e) {
+			$alerts = array();
+		}
+
+		$alerts[] = array(
 			"type" => $type,
-			"message" => $message)
+			"message" => $message
 		);
+
+		View::setVar("alerts", $alerts);
 	}
 }
 
