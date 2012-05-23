@@ -7,7 +7,15 @@
 
 <div id="leftright">
 	<div id="left">
-		<h3>Current Balance: <span style="color:aqua">{{bankBalance|numberformat}}c</span> (if this is not correct, do a transaction log paste to correct it)</h3>
+		<h3>Current Balance: <span style="color:aqua">{{bankBalance|numberformat}}c</span></h3>
+
+		<h3>Stats</h3>
+
+		<p>
+			<ul>
+				<li>Your Richest Moment was on {{richestMoment.date|date:"d/m/Y"}} when you had {{richestMoment.balance|numberformat}}c</li>
+			</ul>
+		<p>
 
 		<h3>Options</h3>
 		<p>
@@ -47,6 +55,8 @@
 					</tr>
 				{% endfor %}
 			</table>
+			<br />
+			<a href="{% url /index.php/personalbank/transactions %}">See More...</a>
 		</p>
 	</div>
 </div>
@@ -54,6 +64,12 @@
 <h3>Charts</h3>
 
 <img src="{% url /graphs %}/{{incomeGraph}}" />
+
+<br />
+<br />
+<br />
+
+<img src="{% url /graphs %}/{{expenditureGraph}}" />
 
 
 {% endblock %}

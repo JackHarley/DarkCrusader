@@ -19,16 +19,32 @@ class PersonalbankController extends Controller {
 	
 	public function index() {
 		$this->checkAuth("access_personal_bank");
+		$this->alert("info", "All transaction logs were cleared on 23 MAY 15:00 BST due to a bug with parsing, apologies, please repaste your logs");
 
 		$bm = PersonalBankModel::getInstance();
 		$user = UserModel::getInstance()->getActiveUser();
 
-		$incomeGraph = $bm->generateIncomeGraph($user->id);
+		if (!$bm->checkIfUserHasAtLeastOneTransaction($user->id)) {
+			View::load('personal_bank/first_time');
+			return;
+		}
 
 		View::load('personal_bank/index', array(
 			"bankBalance" => $bm->getCurrentBankBalance($user->id),
 			"latestTransactions" => $bm->getLatestTransactions($user->id, 10),
-			"incomeGraph" => $incomeGraph
+			"incomeGraph" => $bm->generateTransactionTypesGraph($user->id, "forever", "in"),
+			"expenditureGraph" => $bm->generateTransactionTypesGraph($user->id, "forever", "out"),
+			"richestMoment" => $bm->getRichestMoment($user->id)
+		));
+	}
+
+	public function transactions() {
+		$this->checkAuth("access_personal_bank");
+
+		$user = UserModel::getInstance()->getActiveUser();
+
+		View::load('personal_bank/transactions', array(
+			"transactions" => PersonalBankModel::getInstance()->getLatestTransactions($user->id, 300)
 		));
 	}
 
