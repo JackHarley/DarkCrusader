@@ -5,10 +5,10 @@
 {% block content %}
 <h2>Personal Bank</h2>
 
+<h3>Current Balance: <span style="color:aqua">{{bankBalance|numberformat}}c</span></h3>
+
 <div id="leftright">
 	<div id="left">
-		<h3>Current Balance: <span style="color:aqua">{{bankBalance|numberformat}}c</span></h3>
-
 		<h3>Stats</h3>
 
 		<p>
