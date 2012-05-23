@@ -22,6 +22,24 @@ class PersonalBankModel extends Model {
 	protected static $modelID = "PersonalBank";
 
 	/**
+	 * Checks if a user has at least one transaction added to the database
+	 * 
+	 * @param int $user user id
+	 * @return boolean true if user has at least one transaction, otherwise false
+	 */
+	public function checkIfUserHasAtLeastOneTransaction($user) {
+		$q = new Query("SELECT");
+		$q->where("user_id = ?", $user);
+		$q->limit(1);
+
+		$btbs = PersonalBankTransactionBean::select($q);
+		if ($btbs[0])
+			return true;
+		else
+			return false;
+	}
+
+	/**
 	 * Gets the current bank balance
 	 * 
 	 * @return int number of credits in bank
@@ -34,6 +52,22 @@ class PersonalBankModel extends Model {
 
 		$btbs = PersonalBankTransactionBean::select($q);
 		return $btbs[0]->balance;
+	}
+
+	/**
+	 * Gets a user's richest moment (highest balance)
+	 * 
+	 * @param int $user user id
+	 * @return PersonalTransactionBean transaction at which balance was highest
+	 */
+	public function getRichestMoment($user) {
+		$q = new Query("SELECT");
+		$q->orderby("balance", "DESC");
+		$q->where("user_id = ?", $user);
+		$q->limit(1);
+
+		$btbs = PersonalBankTransactionBean::select($q);
+		return $btbs[0];
 	}
 
 	/**
@@ -51,16 +85,17 @@ class PersonalBankModel extends Model {
 	}
 
 	/**
-	 * Gets an associative array of types of income and the amount of credits each
+	 * Gets an associative array of types of transaction and the amount of credits each
 	 * type generated for the time period
 	 * 
 	 * @param int $user user id
 	 * @param string $period time period, 'forever', 'last24hours', 'last7days' or 'last30days'
+	 * @param string $direction 'in' for income, 'out' for expenditure
 	 * @return array Type => Credits 
 	 */
-	public function getTypesOfIncome($user, $period="forever") {
+	public function getTransactionTypes($user, $period="forever", $direction) {
 		$q = new Query("SELECT");
-		$q->where("direction = ?", "in");
+		$q->where("direction = ?", $direction);
 		$q->where("user_id = ?", $user);
 
 		switch($period) {
@@ -111,10 +146,13 @@ class PersonalBankModel extends Model {
 	 * Generates an income graph for the specified user and returns the name of the file in
 	 * /graphs/
 	 * 
+	 * @param int $user user id
+	 * @param string $period time period, 'forever', 'last24hours', 'last7days' or 'last30days'
+	 * @param string $direction 'in' for income, 'out' for expenditure
 	 * @return string name of image in /graphs/
 	 */
-	public function generateIncomeGraph($user, $period="forever") {
-		$bestTypes = $this->getTypesOfIncome($user, $period);
+	public function generateTransactionTypesGraph($user, $period="forever", $direction) {
+		$bestTypes = $this->getTransactionTypes($user, $period, $direction);
 
 		$credits = array();
 		$types = array();
@@ -148,10 +186,13 @@ class PersonalBankModel extends Model {
 			break;
 
 		}
-		$myPicture->drawText(400,45,"Breakdown of Income - " . $period,array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+		if ($direction == "in")
+			$myPicture->drawText(400,45,"Breakdown of Income - " . $period,array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+		else if ($direction == "out")
+			$myPicture->drawText(400,45,"Breakdown of Expenditure - " . $period,array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
 
 		$pie = new \pPie($myPicture, $data);
-		$pie->draw3DPie(400,250,array("WriteValues"=>PIE_VALUE_NATURAL,"Border"=>TRUE,"Radius"=>175,"ValuePosition"=>PIE_VALUE_OUTSIDE,"ValuePadding"=>45,"DataGapAngle"=>7,"DataGapRadius"=>6,"ValueSuffix"=>"c"));
+		$pie->draw3DPie(400,250,array("WriteValues"=>PIE_VALUE_NATURAL,"Border"=>TRUE,"Radius"=>220,"ValuePosition"=>PIE_VALUE_OUTSIDE,"ValuePadding"=>45,"DataGapAngle"=>7,"DataGapRadius"=>6,"ValueSuffix"=>"c"));
 		$pie->drawPieLegend(30,80,array("Alpha"=>20));
 
 		$name = rand(100000,999999);
@@ -164,7 +205,7 @@ class PersonalBankModel extends Model {
 
 		return $name;
 
-	} 
+	}
 
 	/**
 	 * Adds a transaction to the DB
@@ -175,9 +216,10 @@ class PersonalBankModel extends Model {
 	 * @param int $amount transaction amount
 	 * @param int $balance bank balance after transaction
 	 * @param date YYYY-MM-DD HH MM SS $date date and time of transaction
+	 * @param string $description description of transaction, according to oe, for future parsing features
 	 * @param boolean $checkDuplicate if set to true, checks if transaction is duplicate before inserting
 	 */
-	public function addTransaction($user, $type, $direction, $amount, $balance, $date, $checkDuplicate=true) {
+	public function addTransaction($user, $type, $direction, $amount, $balance, $date, $description, $checkDuplicate=true) {
 		if ($checkDuplicate) {
 			$q = new Query("SELECT");
 			$q->where("date = ?", $date);
@@ -186,6 +228,7 @@ class PersonalBankModel extends Model {
 			$q->where("direction = ?", $direction);
 			$q->where("user_id = ?", $user);
 			$q->where("type = ?", $type);
+			$q->where("description = ?", $description);
 
 			$btbs = PersonalBankTransactionBean::select($q);
 			if ($btbs[0])
@@ -198,6 +241,7 @@ class PersonalBankModel extends Model {
 		$btb->direction = $direction;
 		$btb->amount = $amount;
 		$btb->balance = $balance;
+		$btb->description = $description;
 		$btb->date = $date;
 
 		$btb->insert();
@@ -239,6 +283,9 @@ class PersonalBankModel extends Model {
 			$description = $fields[2];
 			$amount = $fields[3];
 			$balance = $fields[4];
+
+			if ((!$datetime) || (!$type) || (!$description) || (!$amount) || (!$balance))
+				continue;
 
 			// direction
 			if (strpos($amount, "-") !== false)
@@ -286,7 +333,8 @@ class PersonalBankModel extends Model {
 				$direction,
 				$amount,
 				$balance,
-				$datetime
+				$datetime,
+				$description
 			);
 
 			if ($result === true)

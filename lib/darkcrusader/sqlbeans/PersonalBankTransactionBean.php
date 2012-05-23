@@ -22,6 +22,8 @@ class PersonalBankTransactionBean extends SQLBean {
 		'direction', // 'in' or 'out'
 		'amount', // amount of credits
 		'balance', // balance after transaction
+		'description', // oe description of transaction, for backwards compatibility when more info
+					   // is dealt with in future (e.g. market breakdown by items, etc)
 		'date', // date as datetime, YYYY-MM-DD HH MM SS
 	);
 	
