@@ -19,7 +19,7 @@ class PersonalbankController extends Controller {
 	
 	public function index() {
 		$this->checkAuth("access_personal_bank");
-		$this->alert("info", "All transaction logs were cleared on 23 MAY 15:00 BST due to a bug with parsing, apologies, please repaste your logs");
+		$this->alert("warning", "All transaction logs were cleared on 23 MAY 15:00 BST due to a bug with parsing, apologies, please repaste your logs");
 
 		$bm = PersonalBankModel::getInstance();
 		$user = UserModel::getInstance()->getActiveUser();

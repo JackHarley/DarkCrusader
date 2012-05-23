@@ -4,11 +4,7 @@
 
 {% block content %}
 
-{% if !empty error %}
-	<p style="color:red;text-align:center">
-		{{error}}
-	</p>
-{% endif %}
+<h2>Login</h2>
 
 <p>
 	<form action="" method="post">

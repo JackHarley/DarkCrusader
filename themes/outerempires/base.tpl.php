@@ -10,6 +10,7 @@
 		{% endblock %}
 		
 		<!-- google analytics -->
+		{% if ! exists userIsAdmin %}
 		<script type="text/javascript">
 			var _gaq = _gaq || [];
 			_gaq.push(['_setAccount', 'UA-31924198-1']);
@@ -21,6 +22,7 @@
 			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 			})();
 		</script>
+		{% endif %}
 
 	</head>
 	<body>
@@ -32,17 +34,15 @@
 			
 			<div id="page">
 				<div id="content">
-					{% if exists alert %}
-						{% if alert.type == "success" %}
-							<p style="color:lime">{{alert.message}}</p>
-						{% else if alert.type == "error" %}
-							<p style="color:red">{{alert.message}}</p>
-						{% else if alert.type == "info" %}
-							<p style="color:aqua">{{alert.message}}</p>
-						{% else if alert.type == "warning" %}
-							<p style="color:yellow">{{alert.message}}</p>
+					{% block alerts %}
+						{% if exists alerts %}
+							{% for alert in alerts %}
+								<div class="alert-message {{alert.type}}">
+									{{alert.message}}
+								</div>
+							{% endfor %}
 						{% endif %}
-					{% endif %}
+					{% endblock %}
 
 					{% block content %}{% endblock %}
 				</div>
