@@ -13,7 +13,7 @@
 error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
 ini_set("display_errors", "On");
 session_start();
-date_default_timezone_set("Europe/Dublin");
+date_default_timezone_set("Europe/Dublin"); 
 
 // Include libraries
 require_once(__DIR__ . '/lib/hydrogen/hydrogen.inc.php');
