@@ -22,28 +22,30 @@ class OuterEmpiresModel extends Model {
 	protected static $quickCache = array();
 	
 	/**
-	 * Gets the latest player bank transactions for a user within the
-	 * specified number of days
+	 * Queries the OE API with the specified query and returns the result
+	 * as an object
 	 * 
-	 * @param int $user user id
-	 * @param string $days time period in days
+	 * @param string $method method name
+	 * @param array $parameters associative array of parameters to pass
+	 * @param int $user user id to use access key for
 	 */
-	public function getPlayerBankTransactions($user, $days, $cache=true) {
-		
-		if (is_array(static::$quickCache[$user . "-" . $days]))
-			return static::$quickCache[$user . "-" . $days];
-		
+	protected function queryAPI($method, $parameters=array(), $user) {
 		$accessKey = UserModel::getInstance()->getUser($user)->oe_api_access_key;
-		$applicationKey = Config::getVal('general', 'oe_api_application_key');
+		if (!$accessKey)
+			throw new UserHasNotSetupAPIAccessKeyException;
+
+		$applicationKey = Config::getRequiredVal('general', 'oe_api_application_key');
 		
 		$query = array(
 			"callback" => "lol",
 			"AccessKey" => '"' . $accessKey . '"',
 			"ApplicationKey" => '"' . $applicationKey . '"',
-			"Days" => $days
 		);
 		
-		$url = static::$APIURL . "/GetTransactions?";
+		foreach ($parameters as $key => $value)
+			$query[$key] = '"' . $value . '"';
+
+		$url = static::$APIURL . "/" . $method . "?";
 		
 		$runs = 0;
 		foreach($query as $key => $value) {
@@ -56,11 +58,23 @@ class OuterEmpiresModel extends Model {
 		}
 		
 		$data = file_get_contents($url);
-		
-		// strip the callback off it
 		$data = str_replace(array("lol(", ");"), "", $data);
+		return json_decode($data);
+	}
+
+	/**
+	 * Gets the latest player bank transactions for a user within the
+	 * specified number of days
+	 * 
+	 * @param int $user user id
+	 * @param string $days time period in days
+	 */
+	public function getPlayerBankTransactions($user, $days, $cache=true) {
 		
-		$working = json_decode($data)->d;
+		if (is_array(static::$quickCache[$user . "-" . $days]))
+			return static::$quickCache[$user . "-" . $days];
+
+		$working = $this->queryAPI("GetTransactions", array("Days" => $days), $user)->d;
 		
 		$transactions = $working->Transactions;
 		
