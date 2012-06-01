@@ -125,6 +125,7 @@ class ScanModel extends Model{
 		$scanRating = $workingScanRating[1];
 		$scanRating = floatval($scanRating);
 
+		// split off everything except the planet/moon string (sss ss p Mm) s=system, p=planet, m=moon
 		$planet = explode("Scan Results for : Scan : ", $line[0]);
 		$planet = explode("|", $planet[1]);
 		$planet = $planet[0];
@@ -133,34 +134,30 @@ class ScanModel extends Model{
 			if (!$val)
 				unset($planet[$key]);
 
+		// we're going to knock off the last term each time until we have only the system name left, and
+		// the planet numeral, and if applicable moon number, stored
 		$numberOfWords = count($planet);
 
-		if ($numberOfWords == 2) {
-			$system = $planet[0];
-			$planetid = $planet[1];
-			$moonid = 0;
+		// check if last word has an M (this is a moon if it does)
+		$lastWord = $planet[($numberOfWords - 1)];
+		if (strpos($lastWord, "M") !== false) {
+			$moonid = intval(str_replace("M", "", $lastWord));
+			unset($planet[($numberOfWords - 1)]);
+			$numberOfWords--;
 		}
-		else if ($numberOfWords == 4) {
-			$system = $planet[0] . " " . $planet[1];
-			$planetid = $planet[2];
-			$moonid = $planet[3];
-			$moonid = str_replace("M", "", $moonid);
-			$moonid = intval($moonid);
+
+		// last word must now be the planet numeral
+		$lastWord = $planet[($numberOfWords - 1)];
+		$planetid = $lastWord;
+		unset($planet[($numberOfWords - 1)]);
+		$numberOfWords--;
+
+		// we're left with the system name
+		$system = "";
+		foreach($planet as $word) {
+			$system .= $word . " ";
 		}
-		else if ($numberOfWords == 3) {
-			if (strpos($planet[2], "M") !== false) {
-				$system = $planet[0];
-				$planetid = $planet[1];
-				$moonid = $planet[2];
-				$moonid = str_replace("M", "", $moonid);
-				$moonid = intval($moonid);
-			}
-			else {
-				$system = $planet[0] . " " . $planet[1];
-				$planetid = $planet[2];
-				$moonid = 0;
-			}
-		}
+		$system = trim($system);
 		
 		if (!$moonid)
 			$moonid = 0;
@@ -174,9 +171,10 @@ class ScanModel extends Model{
 		);
 
 		for ($i=2; $line[$i] != ""; $i++) {	
-			$resource = explode(" ", $line[$i]);
+			$resource = explode(" ", trim($line[$i]));
 			$resource[0] = str_replace("\t", "", $resource[0]);
 			$resource[0] = str_replace(",", "", $resource[0]);
+			
 			if ($resource[1] == "Ore,") {
 				$resource = $resource[0] . " Ore";
 			}
@@ -194,18 +192,20 @@ class ScanModel extends Model{
 				
 			$system = $system;
 			$resource = $resource;
-				
-			if ($quality == "") {
-				$dbquality = "na";
-			}
-			else if ($quality == "Low Quality") {
-				$dbquality = "low";
-			}
-			else if ($quality == "Medium Quality") {
-				$dbquality = "medium";
-			}
-			else if ($quality == "Good Quality") {
-				$dbquality = "good";
+			
+			switch ($quality) {
+				case "":
+					$dbquality = "na";
+				break;
+				case "Low Quality":
+					$dbquality = "low";
+				break;
+				case "Medium Quality":
+					$dbquality = "medium";
+				break;
+				case "Good Quality":
+					$dbquality = "good";
+				break;
 			}
 
 			$this->addScanResult($scanId, $resource, $dbquality, $rate);					  
@@ -239,31 +239,21 @@ class ScanModel extends Model{
 	 * @return array array of ScanResultBeans
 	 */
 	public function searchScansByResource($resource) {
-		$q = new Query("SELECT");
-		$q->where("resource_name LIKE ?", '%' . $resource . '%');
-		$q->orderby("resource_extraction_rate", "DESC");
-		$q->where("resource_quality = ?", "good");
-		$highSrbs = ScanResultBean::select($q, true);
 
-		$q = new Query("SELECT");
-		$q->where("resource_name LIKE ?", '%' . $resource . '%');
-		$q->orderby("resource_extraction_rate", "DESC");
-		$q->where("resource_quality = ?", "medium");
-		$mediumSrbs = ScanResultBean::select($q, true);
+		$scans = array();
+		$qualities = array("good", "medium", "low", "na");
 
-		$q = new Query("SELECT");
-		$q->where("resource_name LIKE ?", '%' . $resource . '%');
-		$q->orderby("resource_extraction_rate", "DESC");
-		$q->where("resource_quality = ?", "low");
-		$lowSrbs = ScanResultBean::select($q, true);
+		foreach($qualities as $quality) {
+			$q = new Query("SELECT");
+			$q->where("resource_name LIKE ?", '%' . $resource . '%');
+			$q->orderby("resource_extraction_rate", "DESC");
+			$q->where("resource_quality = ?", $quality);
+			$scanBatch = ScanResultBean::select($q, true);
+			foreach($scanBatch as $scan)
+				$scans[] = $scan;
+		}
 
-		$q = new Query("SELECT");
-		$q->where("resource_name LIKE ?", '%' . $resource . '%');
-		$q->orderby("resource_extraction_rate", "DESC");
-		$q->where("resource_quality = ?", "na");
-		$naSrbs = ScanResultBean::select($q, true);
-
-		return array_merge($highSrbs, $mediumSrbs, $lowSrbs, $naSrbs);
+		return $scans;
 	}
 }
 ?>

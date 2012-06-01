@@ -19,54 +19,34 @@ class PersonalbankController extends Controller {
 	
 	public function index() {
 		$this->checkAuth("access_personal_bank");
-		$this->alert("warning", "All transaction logs were cleared on 23 MAY 15:00 BST due to a bug with parsing, apologies, please repaste your logs");
-
+		$this->checkAuth("access_admin_panel");
+		
 		$bm = PersonalBankModel::getInstance();
 		$user = UserModel::getInstance()->getActiveUser();
 
-		if (!$bm->checkIfUserHasAtLeastOneTransaction($user->id)) {
+		/*if (!$bm->checkIfUserHasAtLeastOneTransaction($user->id)) {
 			View::load('personal_bank/first_time');
 			return;
-		}
+		}*/
 
 		View::load('personal_bank/index', array(
 			"bankBalance" => $bm->getCurrentBankBalance($user->id),
-			"latestTransactions" => $bm->getLatestTransactions($user->id, 10),
-			"incomeGraph" => $bm->generateTransactionTypesGraph($user->id, "forever", "in"),
-			"expenditureGraph" => $bm->generateTransactionTypesGraph($user->id, "forever", "out"),
-			"richestMoment" => $bm->getRichestMoment($user->id)
+			"latestTransactions" => $bm->getLatestTransactions($user->id, 30, 10),
+			"incomeGraph" => $bm->generateTransactionTypesGraph($user->id, 30, "in"),
+			"expenditureGraph" => $bm->generateTransactionTypesGraph($user->id, 30, "out"),
+			//"richestMoment" => $bm->getRichestMoment($user->id)
 		));
 	}
 
 	public function transactions() {
 		$this->checkAuth("access_personal_bank");
-
+		$this->checkAuth("access_admin_panel");
+		
 		$user = UserModel::getInstance()->getActiveUser();
 
 		View::load('personal_bank/transactions', array(
-			"transactions" => PersonalBankModel::getInstance()->getLatestTransactions($user->id, 300)
+			"transactions" => PersonalBankModel::getInstance()->getLatestTransactions($user->id, 7, 300)
 		));
-	}
-
-	public function pastetransactionlog() {
-		$this->checkAuth("access_personal_bank");
-
-		if (!$this->checkFormInput("paste")) {
-			View::load('personal_bank/paste_transaction_log');
-			return;
-		}
-
-		try {
-			$transactionsAdded = PersonalBankModel::getInstance()->parseTransactionLogPaste(UserModel::getInstance()->getActiveUser()->id, $_POST["paste"]);
-		}
-		catch (IncorrectTransactionLogPasteException $e) {
-			$this->alert("error", "Transaction log parsing failed, ensure you're pasting it properly");
-			View::load('personal_bank/paste_transaction_log');
-			return;
-		}
-
-		$this->alert("success", $transactionsAdded . " transactions added to database successfully!");
-		$this->index();
 	}
 }
 ?>

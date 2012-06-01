@@ -35,10 +35,7 @@ class UserController extends Controller {
 			if (UserModel::getInstance()->userIsLoggedIn()) {
 				$this->redirect();
 			}
-			
-			View::load("user/register_form", array(
-				"invite" => $_GET["invite"])
-			);
+			View::load("user/register_form");
 		}
 		else {
 			try {
