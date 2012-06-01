@@ -14,6 +14,7 @@ class UserBean extends SQLBean {
 		'username',
 		'group_id',
 		'passhash',
+		'oe_api_access_key'
 	);
 	
 	protected static $beanMap = array(
