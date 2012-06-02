@@ -209,7 +209,6 @@
    /* Return the surrounding box of text area */
    function getTextBox($X,$Y,$FontName,$FontSize,$Angle,$Text)
     {
-      echo $FontName;
      $coords = imagettfbbox($FontSize, 0, $FontName, $Text);
 
      $a = deg2rad($Angle); $ca = cos($a); $sa = sin($a); $RealPos = array();
