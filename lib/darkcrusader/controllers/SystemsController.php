@@ -21,7 +21,7 @@ class SystemsController extends Controller {
 	public function index() {
 		if (!isset($_GET["name"])) {
 			$sm = SystemModel::getInstance();
-			$sm->generateControlledSystemsGraphCached();
+			$sm->generateControlledSystemsGraph/*Cached*/();
 
 			View::load('systems/index');
 			return;

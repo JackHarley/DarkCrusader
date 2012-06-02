@@ -84,7 +84,7 @@
    /* Class constructor */
    function pImage($XSize,$YSize,$DataSet=NULL,$TransparentBackground=FALSE)
     {
-      $this->FontName = __DIR__ . "/../fonts/Forgotte.ttf";
+      $this->FontName = __DIR__ . "/../Fonts/Forgotte.ttf";
      $this->TransparentBackground = $TransparentBackground;
 
      if ( $DataSet != NULL ) { $this->DataSet = $DataSet; }
@@ -209,6 +209,7 @@
    /* Return the surrounding box of text area */
    function getTextBox($X,$Y,$FontName,$FontSize,$Angle,$Text)
     {
+      echo $FontName;
      $coords = imagettfbbox($FontSize, 0, $FontName, $Text);
 
      $a = deg2rad($Angle); $ca = cos($a); $sa = sin($a); $RealPos = array();
