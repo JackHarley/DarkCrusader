@@ -13,6 +13,7 @@ use darkcrusader\models\FactionBankModel;
 use hydrogen\view\View;
 
 use darkcrusader\bank\exceptions\IncorrectTransactionLogPasteException;
+use darkcrusader\bank\exceptions\NoFactionBankTransactionsAddedException;
 
 class FactionbankController extends Controller {
 	
@@ -23,11 +24,19 @@ class FactionbankController extends Controller {
 			View::setVar("isBankAdmin", true);
 
 		$bm = FactionBankModel::getInstance();
-		$bm->generateDonorsGraph();
+		try {
+			$bm->generateDonorsGraph();
+			$balance = $bm->getCurrentBankBalance();
+			$latestTransactions = $bm->getLatestTransactions(10);
+		}
+		catch (NoFactionBankTransactionsAddedException $e) {
+			$this->pastetransactionlog();
+			return;
+		}
 
 		View::load('faction_bank/index', array(
-			"bankBalance" => $bm->getCurrentBankBalanceCached(),
-			"latestTransactions" => $bm->getLatestTransactionsCached(10)
+			"bankBalance" => $balance,
+			"latestTransactions" => $latestTransactions
 		));
 	}
 

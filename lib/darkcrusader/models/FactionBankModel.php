@@ -16,6 +16,7 @@ use darkcrusader\models\UserModel;
 use darkcrusader\sqlbeans\FactionBankTransactionBean;
 
 use darkcrusader\bank\exceptions\IncorrectTransactionLogPasteException;
+use darkcrusader\bank\exceptions\NoFactionBankTransactionsAddedException;
 
 class FactionBankModel extends Model {
 	
@@ -26,12 +27,16 @@ class FactionBankModel extends Model {
 	 * 
 	 * @return int number of credits in bank
 	 */
-	public function getCurrentBankBalance__5200_bank() {
+	public function getCurrentBankBalance() {
 		$q = new Query("SELECT");
 		$q->orderby("date", "DESC");
 		$q->limit(1);
 
 		$btbs = FactionBankTransactionBean::select($q);
+
+		if (!$btbs[0])
+			throw new NoFactionBankTransactionsAddedException;
+
 		return $btbs[0]->balance;
 	}
 
@@ -40,12 +45,15 @@ class FactionBankModel extends Model {
 	 * 
 	 * @param int $limit number of transactions to get
 	 */
-	public function getLatestTransactions__5200_bank($limit=10) {
+	public function getLatestTransactions($limit=10) {
 		$q = new Query("SELECT");
 		$q->orderby("date", "DESC");
 		$q->limit($limit);
 
-		return FactionBankTransactionBean::select($q, true);
+		$transactions = FactionBankTransactionBean::select($q, true);
+
+		if (!$transactions[0])
+			throw new NoFactionBankTransactionsAddedException;
 	}
 
 	/**
@@ -55,12 +63,14 @@ class FactionBankModel extends Model {
 	 * @param int $limit maximum number of players to get, set to true for all
 	 * @return array Player Name => Total Donation
 	 */
-	public function getPlayerTotalDonations__5200_bank($limit=true) {
+	public function getPlayerTotalDonations($limit=true) {
 		$q = new Query("SELECT");
 		$q->where("type = ?", "transfer");
 		$q->where("direction = ?", "in");
 
 		$btbs = FactionBankTransactionBean::select($q);
+		if (!$btbs[0])
+			throw new NoFactionBankTransactionsAddedException;
 
 		$players = array();
 
@@ -105,7 +115,7 @@ class FactionBankModel extends Model {
 	 * Generates the donors bar chart and stores it in /graphs/bankdonors.png
 	 */
 	public function generateDonorsGraph() {
-		$bestDonors = $this->getPlayerTotalDonationsCached(8);
+		$bestDonors = $this->getPlayerTotalDonations(8);
 
 		$creditsDonated = array();
 		$donors = array();
