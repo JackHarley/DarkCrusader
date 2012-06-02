@@ -11,7 +11,7 @@ use hydrogen\view\View;
 use darkcrusader\controllers\Controller;
 use darkcrusader\models\InstallModel;
 
-define("ALLOW_INSTALL", false);
+define("ALLOW_INSTALL", true);
 
 /**
  * Install Controller
