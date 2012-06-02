@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 1;
+	const maxDbVersion = 2;
 
 	/**
 	 * Checks if the DB is installed
@@ -331,6 +331,21 @@ class InstallModel extends Model {
 		$pm->createPermission("bank", "access_personal_bank", "Access personal bank");
 		$pm->createPermission("bank", "access_faction_bank", "Access faction bank");
 		$pm->createPermission("bank", "administrate_faction_bank", "Admin faction bank");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 2
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion2($pdo, $user, $pass) {
+		$pdo->pdo->query("ALTER TABLE scans MODIFY `scanner_level` float(1) NOT NULL");
 
 		return true;
 	}
