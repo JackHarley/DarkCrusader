@@ -2,6 +2,7 @@
 if (!defined('STDIN'))
 	die("This is a cron job which is run from the CLI, it cannot be accessed via the web");
 ini_set("display_errors", "Off");
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
 
 require_once(__DIR__ . '/../../hydrogen/hydrogen.inc.php');
 require_once(__DIR__ . '/../darkcrusader.inc.php');
@@ -9,8 +10,16 @@ require_once(__DIR__ . '/../darkcrusader.inc.php');
 use darkcrusader\sqlbeans\SystemStatsBean;
 use darkcrusader\sqlbeans\SystemStatsSetBean;
 use darkcrusader\sqlbeans\SystemBean;
+use darkcrusader\models\SystemModel;
 use hydrogen\recache\RECacheManager;
 use hydrogen\database\Query;
+
+$q = new Query("SELECT");
+$systems = SystemBean::select($q);
+if (count($systems) < 20000) {
+	echo "Doing first time scrape...";
+	SystemModel::getInstance()->scrapeAllLocalities();
+}
 
 $statsSet = new SystemStatsSetBean;
 $statsSet->set("time", "NOW()", true);

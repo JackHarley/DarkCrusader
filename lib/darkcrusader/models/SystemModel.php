@@ -251,7 +251,7 @@ class SystemModel extends Model {
 	/**
 	 * Generates the controlled systems pie chart/ring chart and stores it /graphs/controlledsystems.png
 	 */
-	public function generateControlledSystemsGraph() {
+	public function generateControlledSystemsGraph__3600_systemsgraph() {
 		$bestFactions = $this->getFactionsWithNumberOfControlledSystemsCached();
 
 		$systems = array();
@@ -289,6 +289,15 @@ class SystemModel extends Model {
 		unset($working[0]);
 		$systemsHTMLArray = $working;
 		
+		$q = new Query("DELETE");
+		$q->from("systems");
+		$q->where("quadrant = ?", $quadrant);
+		$q->where("sector = ?", $sector);
+		$q->where("region = ?", $region);
+		$q->where("locality = ?", $locality);
+		$stmt = $q->prepare();
+		$stmt->execute();
+
 		foreach($systemsHTMLArray as $systemHTML) {
 			$workingFaction = explode('<span title="', $systemHTML);
 			$workingFaction = explode('"><img src="images/tiny_star.png"', $workingFaction[1]);
@@ -393,7 +402,7 @@ class SystemModel extends Model {
 	 * @param int $count number of stats sets to get
 	 * @return array array of SystemStatsBeans
 	 */
-	public function getHistoricalSystemStats($id, $count=10) {
+	public function getHistoricalSystemStats__3600_systemstats($id, $count=10) {
 		$q = new Query("SELECT");
 		$q->where("system_id = ?", $id);
 		$q->orderby("stats_set", "DESC");

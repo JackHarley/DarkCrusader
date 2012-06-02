@@ -101,7 +101,9 @@ class InstallModel extends Model {
 		// Drop existing tables
 		if ($overwriteExisting) {
 			$tables = array(
-				'users', 'user_groups', 'permissions', 'group_permissions', 'database_version'
+				'users', 'user_groups', 'permissions', 'group_permissions', 'database_version', 'faction_bank_transactions',
+				'intelligence', 'kill_on_sight_list', 'personal_bank_transactions', 'scans', 'scan_results', 'systems', 'system_stats',
+				'system_stats_sets'
 			);
 			$tablestr = '`' . implode('`, `', $tables) . '`';
 
@@ -174,6 +176,7 @@ class InstallModel extends Model {
 				`username` varchar(32) NOT NULL,
 				`group_id` bigint(20) unsigned NOT NULL,
 				`passhash` varchar(60) NOT NULL,
+				`oe_api_access_key` varchar(60) NOT NULL,
 				PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
 		);
@@ -183,7 +186,6 @@ class InstallModel extends Model {
 				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 				`group_name` varchar(32) NOT NULL,
 				`description` varchar(128) NOT NULL,
-				`colour` varchar(6) NOT NULL,
 				PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
 		);
@@ -215,8 +217,99 @@ class InstallModel extends Model {
 				`public_key` varchar(32) NOT NULL,
 				`private_key` varchar(32) NOT NULL,
 				`created_on` datetime NOT NULL,
-				`last_used_on` datetime NOT NULL,
-				`last_used_ip` bigint(20) unsigned NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `personal_bank_transactions` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`user_id` bigint(20) unsigned NOT NULL,
+				`type` varchar(16) NOT NULL,
+				`direction` varchar(4) NOT NULL,
+				`amount` bigint(20) unsigned NOT NULL,
+				`balance` bigint(20) unsigned NOT NULL,
+				`description` varchar(255) NOT NULL,
+				`date` datetime NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `faction_bank_transactions` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`player_name` varchar(32) NOT NULL,
+				`type` varchar(16) NOT NULL,
+				`direction` varchar(4) NOT NULL,
+				`amount` bigint(20) unsigned NOT NULL,
+				`balance` bigint(20) unsigned NOT NULL,
+				`date` datetime NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `scans` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`system_id` bigint(20) unsigned NOT NULL,
+				`planet_number` varchar(4) NOT NULL,
+				`moon_number` tinyint NOT NULL,
+				`date_submitted` datetime NOT NULL,
+				`submitter_id` bigint(20) unsigned NOT NULL,
+				`scanner_level` bigint(20) unsigned NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `scan_results` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`scan_id` bigint(20) unsigned NOT NULL,
+				`resource_name` varchar(16) NOT NULL,
+				`resource_quality` varchar(16) NOT NULL,
+				`resource_extraction_rate` bigint(20) unsigned NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `autologin` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`user_id` bigint(20) unsigned NOT NULL,
+				`public_key` varchar(32) NOT NULL,
+				`private_key` varchar(32) NOT NULL,
+				`created_on` datetime NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `systems` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`system_name` varchar(32) NOT NULL,
+				`quadrant` tinyint unsigned NOT NULL,
+				`sector` tinyint unsigned NOT NULL,
+				`region` tinyint unsigned NOT NULL,
+				`locality` tinyint unsigned NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `system_stats` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`stats_set` bigint(20) unsigned NOT NULL NOT NULL,
+				`has_station` tinyint(1) unsigned NOT NULL,
+				`faction` varchar(32) NOT NULL,
+				`system_id` bigint(20) unsigned NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `system_stats_sets` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`time` datetime NOT NULL,
 				PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
 		);
@@ -235,6 +328,9 @@ class InstallModel extends Model {
 		$pm->createPermission("faction", "access_faction_stats", "Access faction stats");
 		$pm->createPermission("kos", "access_kos", "Access the KoS list");
 		$pm->createPermission("admin", "access_admin_panel", "Access the admin panel");
+		$pm->createPermission("bank", "access_personal_bank", "Access personal bank");
+		$pm->createPermission("bank", "access_faction_bank", "Access faction bank");
+		$pm->createPermission("bank", "administrate_faction_bank", "Admin faction bank");
 
 		return true;
 	}

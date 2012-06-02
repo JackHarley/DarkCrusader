@@ -1,0 +1,50 @@
+<?php $ini = <<<'EOF'
+;*************************************************************************
+; Hydrogen Configuration
+;*************************************************************************
+
+[general]
+app_url = "http://tacticalresponseteam.in"
+site_name = "SWAT/FIRE"
+oe_api_application_key = "vcbxcvbbcvx"
+
+[settings]
+default_group = 1
+
+[cache]
+engine = "Memcached"
+
+[database]
+engine = "MysqlPDO"
+host = "localhost"
+port = 3306
+socket = 
+database = "darkcrusader"
+username = "darkcrusader"
+password = "xcvxvcxcvxcv"
+table_prefix = 
+
+[recache]
+unique_name = 'DRK'
+
+[semaphore]
+engine = "Cache"
+
+[errorhandler]
+log_errors = 1
+
+[log]
+engine = TextFile
+logdir = logs
+fileprefix = "SWAT_"
+; 0 = No logging
+; 1 = Log Errors
+; 2 = Log Warnings & worse
+; 3 = Log Notices & worse
+; 4 = Log Info & worse
+; 5 = Log Debug messages & worse
+loglevel = 1
+
+;*************************************************************************
+EOF;
+?>

@@ -21,7 +21,7 @@ class SystemsController extends Controller {
 	public function index() {
 		if (!isset($_GET["name"])) {
 			$sm = SystemModel::getInstance();
-			$sm->generateControlledSystemsGraph();
+			$sm->generateControlledSystemsGraphCached();
 
 			View::load('systems/index');
 			return;
@@ -38,7 +38,7 @@ class SystemsController extends Controller {
 			return;
 		}
 
-		$historicalStats = $sm->getHistoricalSystemStats($system->id, 15);
+		$historicalStats = $sm->getHistoricalSystemStatsCached($system->id, 15);
 
 		if ($this->checkAuth("access_scans", false)) {
 			$scans = ScanModel::getInstance()->getScansForSystem($system->id);
