@@ -52,6 +52,8 @@ if ($im->checkIfDatabaseIsUpToDate() !== true) {
 $activeUser = UserModel::getInstance()->getActiveUser();
 View::setVar("activeUser", $activeUser);
 View::setVar("siteName", Config::getVal("general", "site_name"));
+if (Config::getVal("general", "google_analytics_code"))
+    View::setVar("googleAnalyticsCode", Config::getVal("general", "google_analytics_code"));
 if ($activeUser->permissions->hasPermission("access_admin_panel"))
     View::setVar("userIsAdmin", "yes");
 if ($activeUser->permissions->hasPermission("access_faction_bank"))

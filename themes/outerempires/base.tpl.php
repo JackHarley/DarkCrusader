@@ -11,17 +11,19 @@
 		
 		<!-- google analytics -->
 		{% if ! exists userIsAdmin %}
-		<script type="text/javascript">
-			var _gaq = _gaq || [];
-			_gaq.push(['_setAccount', 'UA-31924198-1']);
-			_gaq.push(['_trackPageview']);
+			{% if exists googleAnalyticsCode %}
+				<script type="text/javascript">
+					var _gaq = _gaq || [];
+					_gaq.push(['_setAccount', '{{googleAnalyticsCode}}']);
+					_gaq.push(['_trackPageview']);
 
-			(function() {
-			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-			})();
-		</script>
+					(function() {
+					var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+					ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+					var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+					})();
+				</script>
+			{% endif %}
 		{% endif %}
 
 	</head>
@@ -29,7 +31,7 @@
 		<div id="container">
 			<div id="header">
 				<img src="{% viewurl /images/logo.png %}" />
-				<h2><a href="{% url /index.php/home %}">Home</a> | <a href="{% url /forums %}">Forums</a> | <a href="{% url /index.php/info %}">Info</a> | <a href="{% url /index.php/scans %}">Scans</a> | <a href="{% url /index.php/stats %}">Stats</a> | {% if exists userCanAccessFactionBank %}<a href="{% url /index.php/factionbank %}">Faction Bank</a> |{% endif %} <a href="{% url /index.php/personalbank %}">Personal Bank</a> {% if exists userIsAdmin %}| <a href="{% url /index.php/admin %}">ACP</a>{% endif %}{% if empty activeUser.user %} | <a href="{% url /index.php/user/register %}">Register</a> | <a href="{% url /index.php/user/login %}">Login</a>{% else %} | <a href="{% url /index.php/user/logout %}">Logout</a>{% endif %}</h2>
+				<h2><a href="{% url /index.php/home %}">Home</a> | <a href="http://forums.tacticalresponseteam.in">Forums</a> | <a href="{% url /index.php/info %}">Info</a> | <a href="{% url /index.php/scans %}">Scans</a> | <a href="{% url /index.php/stats %}">Stats</a> | {% if exists userCanAccessFactionBank %}<a href="{% url /index.php/factionbank %}">Faction Bank</a> |{% endif %} <a href="{% url /index.php/personalbank %}">Personal Bank</a> {% if exists userIsAdmin %}| <a href="{% url /index.php/admin %}">ACP</a>{% endif %}{% if empty activeUser.user %} | <a href="{% url /index.php/user/register %}">Register</a> | <a href="{% url /index.php/user/login %}">Login</a>{% else %} | <a href="{% url /index.php/user/logout %}">Logout</a>{% endif %}</h2>
 			</div>
 			
 			<div id="page">
