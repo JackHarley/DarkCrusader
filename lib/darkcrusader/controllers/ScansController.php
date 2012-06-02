@@ -28,7 +28,7 @@ class ScansController extends Controller {
 	}
 
 	public function submit() {
-		$this->checkAuth("access_scans");
+		$this->checkAuth(array("access_scans", "submit_scans"));
 
 		if ($_POST["submit"]) {
 			$addedScan = ScanModel::getInstance()->addScanPaste($_POST["scanPaste"]);

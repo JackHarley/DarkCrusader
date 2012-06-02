@@ -8,6 +8,9 @@ app_url = "http://tacticalresponseteam.in"
 site_name = "SWAT/FIRE"
 oe_api_application_key = "vcbxcvbbcvx"
 
+; uncomment this and put in your google analytics user code to enable google analytics
+;google_analytics_code = "UA-XXXXXXX-X"
+
 [settings]
 default_group = 1
 
