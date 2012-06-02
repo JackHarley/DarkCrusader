@@ -1,5 +1,11 @@
 # Changelog
 
+1.0.004
+--------------
+* Change Google Analytics to be a config setting
+* Correctly check authentication for submitting scans
+* Fixed dead forums link
+
 1.0.003
 --------------
 * Fixed a bug with scanner ratings
