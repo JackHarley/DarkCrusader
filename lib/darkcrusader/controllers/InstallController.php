@@ -12,6 +12,7 @@ use darkcrusader\controllers\Controller;
 use darkcrusader\models\InstallModel;
 
 define("ALLOW_INSTALL", true);
+define("ALLOW_UPGRADE", true);
 
 /**
  * Install Controller
@@ -44,7 +45,7 @@ class InstallController extends Controller {
 	 * Database upgrader
 	 */
 	public function upgrade() {
-		if (ALLOW_INSTALL) {
+		if (ALLOW_UPGRADE) {
 			if (!isset($_POST["submit"]))
 				View::load('install/upgrade');
 			else {
