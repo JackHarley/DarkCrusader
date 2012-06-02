@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.003
+--------------
+* Fixed a bug with scanner ratings
+
 1.0.002
 --------------
 * Removed debug stuff from testing a fix in 1.0.001
