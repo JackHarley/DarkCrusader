@@ -54,6 +54,8 @@ class FactionBankModel extends Model {
 
 		if (!$transactions[0])
 			throw new NoFactionBankTransactionsAddedException;
+
+		return $transactions;
 	}
 
 	/**
