@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 2;
+	const maxDbVersion = 3;
 
 	/**
 	 * Checks if the DB is installed
@@ -351,6 +351,23 @@ class InstallModel extends Model {
 	}
 
 	/**
+	 * Migrate the database to version 3
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion3($pdo, $user, $pass) {
+		$pm = PermissionsModel::getInstance();
+		$pm->createPermission("locality", "access_locality_stats", "Access locality stats");
+		$pm->createPermission("beta", "test_beta_features", "Test beta features");
+
+		return true;
+	}
+
+	/**
 	 * Preload data
 	 *
 	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
@@ -369,16 +386,30 @@ class InstallModel extends Model {
 		$pbs = $pm->getAllPermissions();
 		$ugm->addUserGroup("root_admin", "Root Admin", false, $pbs);
 
+		// Create the User user group
+		$pbs = $pm->getPermissions(array(
+			"access_site",
+			"access_player_stats",
+			"access_system_stats",
+			"access_faction_stats",
+			"access_locality_stats",
+			"access_personal_bank")
+		);
+		$ugm->addUserGroup("user", "User", false, $pbs);
+
 		// Create the Member user group
 		$pbs = $pm->getPermissions(array(
 			"access_site",
 			"access_scans",
+			"submit_scans",
+			"access_personal_bank",
+			"access_faction_bank",
 			"access_player_stats",
 			"access_system_stats",
 			"access_faction_stats",
-			"access_kos")
+			"access_locality_stats")
 		);
-		$ugm->addUserGroup("user", "User", false, $pbs);
+		$ugm->addUserGroup("member", "Member", false, $pbs);
 
 		// Create the Guest user group
 		$pbs = $pm->getPermissions(array(
@@ -386,7 +417,8 @@ class InstallModel extends Model {
 			"access_player_stats",
 			"access_system_stats",
 			"access_faction_stats",
-			"access_kos")
+			"access_locality_stats",
+			"access_personal_bank")
 		);
 		$ugm->addUserGroup("guest", "Guest", false, $pbs);
 
