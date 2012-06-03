@@ -19,6 +19,8 @@ use darkcrusader\systems\exceptions\NoSuchSystemException;
 class SystemsController extends Controller {
 	
 	public function index() {
+		$this->checkAuth("access_system_stats");
+
 		if (!isset($_GET["name"])) {
 			$sm = SystemModel::getInstance();
 			$sm->generateControlledSystemsGraphCached();
