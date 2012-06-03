@@ -1,5 +1,12 @@
 # Changelog
 
+1.0.005
+--------------
+* Added special test_beta_features privilege for testing beta features (like the new personal bank)
+* Added permissions check for system stats
+* Fixed the latest transactions not showing up for faction bank
+* Fixed a locality permissions error
+
 1.0.004
 --------------
 * Change Google Analytics to be a config setting
