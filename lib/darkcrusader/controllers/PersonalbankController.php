@@ -19,7 +19,7 @@ class PersonalbankController extends Controller {
 	
 	public function index() {
 		$this->checkAuth("access_personal_bank");
-		$this->checkAuth("access_admin_panel");
+		$this->checkAuth("test_beta_features");
 		
 		$bm = PersonalBankModel::getInstance();
 		$user = UserModel::getInstance()->getActiveUser();
@@ -40,7 +40,7 @@ class PersonalbankController extends Controller {
 
 	public function transactions() {
 		$this->checkAuth("access_personal_bank");
-		$this->checkAuth("access_admin_panel");
+		$this->checkAuth("test_beta_features");
 		
 		$user = UserModel::getInstance()->getActiveUser();
 
