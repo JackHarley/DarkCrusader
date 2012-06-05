@@ -147,12 +147,12 @@ class FactionModel extends Model {
 		$DataSet->setPalette("NumberOfOwnedSystems", $serieSettings);
 		$DataSet->setSerieWeight("NumberOfOwnedSystems",1);
 
-		$myPicture = new \pImage(900,230,$DataSet);
+		$myPicture = new \pImage(750,230,$DataSet);
 		$GradientSettings = array("StartR"=>0,"StartG"=>191,"StartB"=>255,"Alpha"=>100,"Levels"=>50);
-		$myPicture->drawGradientArea(0,0,900,230,DIRECTION_VERTICAL,$GradientSettings);
-		$myPicture->drawText(450,45,"Number Of Controlled Systems - " . $faction,array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
-		$myPicture->setGraphArea(60,60,840,190);
-		$myPicture->drawFilledRectangle(60,60,840,190,array("R"=>255,"G"=>255,"B"=>255,"Surrounding"=>-200,"Alpha"=>10));
+		$myPicture->drawGradientArea(0,0,750,230,DIRECTION_VERTICAL,$GradientSettings);
+		$myPicture->drawText(375,45,"Number Of Controlled Systems - " . $faction,array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+		$myPicture->setGraphArea(60,60,700,190);
+		$myPicture->drawFilledRectangle(60,60,700,190,array("R"=>255,"G"=>255,"B"=>255,"Surrounding"=>-200,"Alpha"=>10));
 		$myPicture->drawScale(array("DrawSubTicks"=>TRUE));
 		$myPicture->setShadow(TRUE,array("X"=>1,"Y"=>1,"R"=>0,"G"=>0,"B"=>0,"Alpha"=>10));
 		$myPicture->setFontProperties(array("FontName"=>__DIR__ . "/../../pChart/fonts/Forgotte.ttf","FontSize"=>6));
@@ -203,12 +203,12 @@ class FactionModel extends Model {
 		$DataSet->setPalette("NumberOfOwnedStationSystems", $serieSettings);
 		$DataSet->setSerieWeight("NumberOfOwnedStationSystems",1);
 
-		$myPicture = new \pImage(900,230,$DataSet);
+		$myPicture = new \pImage(750,230,$DataSet);
 		$GradientSettings = array("StartR"=>50,"StartG"=>205,"StartB"=>50,"Alpha"=>100,"Levels"=>50); 
-		$myPicture->drawGradientArea(0,0,900,230,DIRECTION_VERTICAL,$GradientSettings);
-		$myPicture->drawText(450,45,"Number Of Controlled Station Systems - " . $faction,array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
-		$myPicture->setGraphArea(60,60,840,190);
-		$myPicture->drawFilledRectangle(60,60,840,190,array("R"=>255,"G"=>255,"B"=>255,"Surrounding"=>-200,"Alpha"=>10));
+		$myPicture->drawGradientArea(0,0,750,230,DIRECTION_VERTICAL,$GradientSettings);
+		$myPicture->drawText(375,45,"Number Of Controlled Station Systems - " . $faction,array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+		$myPicture->setGraphArea(60,60,700,190);
+		$myPicture->drawFilledRectangle(60,60,700,190,array("R"=>255,"G"=>255,"B"=>255,"Surrounding"=>-200,"Alpha"=>10));
 		$myPicture->drawScale(array("DrawSubTicks"=>TRUE));
 		$myPicture->setShadow(TRUE,array("X"=>1,"Y"=>1,"R"=>0,"G"=>0,"B"=>0,"Alpha"=>10));
 		$myPicture->setFontProperties(array("FontName"=>__DIR__ . "/../../pChart/fonts/Forgotte.ttf","FontSize"=>6));

@@ -117,7 +117,7 @@ class FactionBankModel extends Model {
 	 * Generates the donors bar chart and stores it in /graphs/bankdonors.png
 	 */
 	public function generateDonorsGraph() {
-		$bestDonors = $this->getPlayerTotalDonations(8);
+		$bestDonors = $this->getPlayerTotalDonations(5);
 
 		$creditsDonated = array();
 		$donors = array();
@@ -135,11 +135,11 @@ class FactionBankModel extends Model {
 		$serieSettings = array("R"=>0,"G"=>0,"B"=>0,"Alpha"=>80);
 		$data->setPalette("Credits",$serieSettings);
 
-		$myPicture = new \pImage(900,500,$data);
+		$myPicture = new \pImage(750,500,$data);
 		$GradientSettings = array("StartR"=>0,"StartG"=>191,"StartB"=>255,"Alpha"=>100,"Levels"=>50);
-		$myPicture->drawGradientArea(0,0,1000,500,DIRECTION_VERTICAL,$GradientSettings);
-		$myPicture->setGraphArea(100,70,870,450);
-		$myPicture->drawText(450,45,"Total Credits Donated by Top 8 Faction Members",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+		$myPicture->drawGradientArea(0,0,750,500,DIRECTION_VERTICAL,$GradientSettings);
+		$myPicture->setGraphArea(100,70,700,450);
+		$myPicture->drawText(375,45,"Total Credits Donated by Top 7 Faction Members",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
 		$myPicture->drawScale(array("CycleBackground"=>TRUE,"DrawSubTicks"=>TRUE,"GridR"=>0,"GridG"=>0,"GridB"=>0,"GridAlpha"=>10)); 
 		$myPicture->setShadow(TRUE,array("X"=>1,"Y"=>1,"R"=>0,"G"=>0,"B"=>0,"Alpha"=>10));
 		$myPicture->drawBarChart(array("DisplayPos"=>LABEL_POS_OUTSIDE,"DisplayValues"=>TRUE,"Rounded"=>TRUE,"Surrounding"=>30));

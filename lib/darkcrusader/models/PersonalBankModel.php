@@ -143,17 +143,17 @@ class PersonalBankModel extends Model {
 		$data->setSerieDescription("Credits", "Credits");
 		$data->setAbscissa("Types");
 
-		$myPicture = new \pImage(800,450,$data);
+		$myPicture = new \pImage(700,450,$data);
 		$GradientSettings = array("StartR"=>0,"StartG"=>191,"StartB"=>255,"Alpha"=>100,"Levels"=>50);
-		$myPicture->drawGradientArea(0,0,800,450,DIRECTION_VERTICAL,$GradientSettings);
+		$myPicture->drawGradientArea(0,0,700,450,DIRECTION_VERTICAL,$GradientSettings);
 
 		if ($direction == "in")
-			$myPicture->drawText(400,45,"Breakdown of Income - Last " . $days . " Days",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+			$myPicture->drawText(350,45,"Breakdown of Income - Last " . $days . " Days",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
 		else if ($direction == "out")
-			$myPicture->drawText(400,45,"Breakdown of Expenditure - Last " . $days . " Days",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+			$myPicture->drawText(350,45,"Breakdown of Expenditure - Last " . $days . " Days",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
 
 		$pie = new \pPie($myPicture, $data);
-		$pie->draw3DPie(400,250,array("WriteValues"=>PIE_VALUE_NATURAL,"Border"=>TRUE,"Radius"=>220,"ValuePosition"=>PIE_VALUE_OUTSIDE,"ValuePadding"=>45,"DataGapAngle"=>7,"DataGapRadius"=>6,"ValueSuffix"=>"c"));
+		$pie->draw3DPie(350,250,array("WriteValues"=>PIE_VALUE_NATURAL,"Border"=>TRUE,"Radius"=>220,"ValuePosition"=>PIE_VALUE_OUTSIDE,"ValuePadding"=>45,"DataGapAngle"=>7,"DataGapRadius"=>6,"ValueSuffix"=>"c"));
 		$pie->drawPieLegend(30,80,array("Alpha"=>20));
 
 		$name = rand(100000,999999);
