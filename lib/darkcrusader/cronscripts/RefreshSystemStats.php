@@ -1,7 +1,7 @@
 <?php
-if (!defined('STDIN'))
+/*if (!defined('STDIN'))
 	die("This is a cron job which is run from the CLI, it cannot be accessed via the web");
-ini_set("display_errors", "Off");
+ini_set("display_errors", "Off");*/
 error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
 
 require_once(__DIR__ . '/../../hydrogen/hydrogen.inc.php');
