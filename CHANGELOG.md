@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.006
+--------------
+* Completely revamped theme, looks much nicer
+
 1.0.005
 --------------
 * Added special test_beta_features privilege for testing beta features (like the new personal bank)
