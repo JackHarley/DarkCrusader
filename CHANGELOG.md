@@ -1,5 +1,10 @@
 # Changelog
 
+1.0.008
+--------------
+* Streamlined the character addition process a bit
+* Error setting moved into config file
+
 1.0.007-3
 --------------
 * Bug fixes
