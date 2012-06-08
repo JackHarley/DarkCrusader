@@ -52,7 +52,8 @@ if ($im->checkIfDatabaseIsUpToDate() !== true) {
 
 // Set some vars for the base view
 $activeUser = UserModel::getInstance()->getActiveUser();
-View::setVar("activeUser", $activeUser);
+if ($activeUser->username)
+    View::setVar("activeUser", $activeUser);
 View::setVar("siteName", Config::getVal("general", "site_name"));
 View::setVar("siteBankCharacterName", Config::getRequiredVal("general", "site_bank_character_name"));
 if (Config::getVal("general", "google_analytics_code"))
