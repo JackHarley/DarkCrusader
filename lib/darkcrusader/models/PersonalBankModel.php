@@ -99,7 +99,7 @@ class PersonalBankModel extends Model {
 		// sort types by amount of credits earned
 		$orderedTypes = array();
 		while (count($types) > 0) {
-			$best = array("type" => null, "credits" => 0);
+			$best = array("type" => null, "credits" => -1);
 
 			foreach($types as $type => $credits) {
 				if ($credits > $best["credits"]) {

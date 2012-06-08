@@ -130,6 +130,9 @@ class OuterEmpiresModel extends Model {
 					// included here for backwards compatibility
 					$direction = "out";
 				break;
+				case "Ship Mod": // for some reason Jacky Jhonson had 0c income from ship mods, meh, add an overried
+					$direction = "out";
+				break;
 			}
 			
 			// if amount is negative, change it to positive, we don't deal with signed ints
