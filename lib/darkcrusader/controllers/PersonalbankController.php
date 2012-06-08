@@ -19,7 +19,6 @@ class PersonalbankController extends Controller {
 	
 	public function index() {
 		$this->checkAuth("access_personal_bank");
-		$this->checkAuth("test_beta_features");
 		$this->checkForValidCharacterAndAPIKey();
 
 		$bm = PersonalBankModel::getInstance();
@@ -38,7 +37,6 @@ class PersonalbankController extends Controller {
 
 	public function transactions() {
 		$this->checkAuth("access_personal_bank");
-		$this->checkAuth("test_beta_features");
 		$this->checkForValidCharacterAndAPIKey();
 		
 		$user = UserModel::getInstance()->getActiveUser();

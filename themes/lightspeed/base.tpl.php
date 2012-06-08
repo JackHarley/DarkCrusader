@@ -62,6 +62,7 @@
 		<!-- begin sidebar -->
 		<div id="sidebar">
 			<ul>
+				{% if exists activeUser %}
 				<li>
 					<h2>{{activeUser.username}}</h2>
 					<div class="pagecontent">
@@ -72,6 +73,7 @@
 						</p>
 					</div>
 				</li>
+				{% endif %}
 				<li>
 					<h2>Statistics</h2>
 					<ul>
