@@ -15,12 +15,18 @@ use hydrogen\database\DatabaseEngineFactory;
 use darkcrusader\sqlbeans\UserBean;
 use darkcrusader\sqlbeans\UserGroupBean;
 use darkcrusader\sqlbeans\AutologinBean;
+use darkcrusader\sqlbeans\LinkedCharacterBean;
+use darkcrusader\sqlbeans\CharacterLinkRequestBean;
 
 use darkcrusader\permissions\PermissionSet;
 
 use darkcrusader\user\exceptions\UsernameAlreadyRegisteredException;
 use darkcrusader\user\exceptions\NoSuchUserException;
 use darkcrusader\user\exceptions\PasswordIncorrectException;
+use darkcrusader\user\exceptions\CannotSetCharacterAsDefaultWithoutAPIKeyException;
+use darkcrusader\user\exceptions\CharacterIsAlreadyLinkedException;
+
+use darkcrusader\oe\exceptions\APIKeyInvalidException;
 
 use darkcrusader\models\UserGroupModel;
 use darkcrusader\models\PermissionsModel;
@@ -423,51 +429,191 @@ class UserModel extends Model {
 
 		return true;
 	}
+
 	/**
-	 * getStats
-	 * Gets user statistics
-	 *
-	 * @return array associative array with stats
+	 * Gets the linked characters associated with a user
+	 * 
+	 * @param int $user user id
+	 * @return array array of LinkedCharacterBeans
 	 */
-	public function getStats() {
-
-		$ugm = UserGroupModel::getInstance();
-
-		// get user, group and forced group count
-		$userCount = $this->getNumberOfUsers();
-		$userGroupCount = $ugm->getNumberOfUserGroups();
-
-		return array(
-			"userCount" => $userCount,
-			"userGroupCount" => $userGroupCount);
+	public function getLinkedCharacters($user) {
+		$q = new Query("SELECT");
+		$q->where("user_id = ?", $user);
+		$q->orderby("is_default", "DESC");
+		$lcbs = LinkedCharacterBean::select($q, true);
+		return $lcbs;
 	}
 
 	/**
-	 * getNumberOfUsers
-	 * Gets the number of users registered
-	 *
-	 * @param int $group optionally, a group id and
-	 *			   this function will only count
-	 *			   users in that group
-	 * @return int number of users
+	 * Gets any character link requests for a user
+	 * 
+	 * @param int $user user id
+	 * @return array array of CharacterLinkRequestBeans
 	 */
-	public function getNumberOfUsers($group=false) {
-
+	public function getCharacterLinkRequests($user) {
 		$q = new Query("SELECT");
-		$q->from("users");
-		$q->field("id");
+		$q->where("user_id = ?", $user);
+		$clrbs = CharacterLinkRequestBean::select($q, true);
+		return $clrbs;
+	}
 
-		if ($group)
-			$q->where("group_id = ?", $group);
+	/**
+	 * Approves a character link request
+	 * 
+	 * @param int $id character link request id
+	 */
+	public function approveCharacterLinkRequest($id) {
+		$q = new Query("SELECT");
+		$q->where("id = ?", $id);
+		$clrbs = CharacterLinkRequestBean::select($q);
+		$clrb = $clrbs[0];
 
-		$stmt = $q->prepare();
-		$stmt->execute();
+		$this->addLinkedCharacter($clrb->user_id, $clrb->character_name, $clrb->api_key);
 
-		$i = 0;
-		while($stmt->fetchObject())
-			$i++;
+		$clrb->delete();
+	}
 
-		return $i;
+	/**
+	 * Adds a linked character to a user
+	 * 
+	 * @param int $user user id
+	 * @param string $characterName character name
+	 * @param string $key api access key (optional)
+	 */
+	public function addLinkedCharacter($user, $characterName, $key=false) {
+		$lcb = new LinkedCharacterBean;
+		$lcb->user_id = $user;
+		$lcb->character_name = $characterName;
+		if ($key)
+			$lcb->api_key = $key;
+		$lcb->insert();
+	}
+
+	/**
+	 * Sets a linked character as default
+	 * 
+	 * @param int $id linked character id
+	 */
+	public function setDefaultCharacter($id) {
+		// get the linked character
+		$q = new Query("SELECT");
+		$q->where("linked_characters.id = ?", $id);
+		$lcbs = LinkedCharacterBean::select($q, true);
+		$lcb = $lcbs[0];
+
+		// if it doesn't have an api key, it can't be default
+		if (!$lcb->api_key)
+			throw new CannotSetCharacterAsDefaultWithoutAPIKeyException;
+
+		// set all linked characters as not default
+		$q = new Query("UPDATE");
+		$q->table("linked_characters");
+		$q->where("user_id = ?", $lcb->user_id);
+		$q->set("is_default = ?", 0);
+		$q->prepare()->execute();
+
+		// set linked character as default
+		$lcb->is_default = 1;
+		$lcb->update();
+	}
+
+	/**
+	 * Deletes a linked character
+	 * 
+	 * @param int $id linked character id
+	 */
+	public function deleteLinkedCharacter($id) {
+		// get the linked character
+		$q = new Query("SELECT");
+		$q->where("linked_characters.id = ?", $id);
+		$lcbs = LinkedCharacterBean::select($q);
+		$lcb = $lcbs[0];
+
+		// delete
+		if ($lcb)
+			$lcb->delete();
+	}
+
+	/**
+	 * Deletes a character link request
+	 * 
+	 * @param int $id character link request id
+	 */
+	public function deleteCharacterLinkRequest($id) {
+		$q = new Query("SELECT");
+		$q->where("character_link_requests.id = ?", $id);
+		$clrbs = CharacterLinkRequestBean::select($q);
+		$clrb = $clrbs[0];
+
+		if ($clrb)
+			$clrb->delete();
+	}
+
+	/**
+	 * Requests a character link
+	 * 
+	 * @param int $user user id
+	 * @param string $characterName character name
+	 * @param string $key api access key (optional)
+	 */
+	public function requestCharacterLink($user, $characterName, $key=false) {
+		
+		// if a key was supplied, test it's valid
+		if ($key) {
+			$keyIsValid = OuterEmpiresModel::getInstance()->testAccessKey($key);
+			if ($keyIsValid === false)
+				throw new APIKeyInvalidException;
+		}
+
+		// check the character isn't already linked
+		$q = new Query("SELECT");
+		$q->where("character_name = ?", $characterName);
+		$lcbs = LinkedCharacterBean::select($q);
+		$lcb = $lcbs[0];
+		if ($lcb)
+			throw new CharacterIsAlreadyLinkedException;
+
+		// now add the link request to the db
+		$rand = rand(1,500);
+		$this->addCharacterLinkRequest($user, $characterName, $rand, $key);
+
+	}
+
+	/**
+	 * Adds a character link request to the DB
+	 * 
+	 * @param int $user user id
+	 * @param string $characterName character name
+	 * @param int $verificationAmount amount of credits to be transferred for verification
+	 * @param string $key api access key (optional)
+	 */
+	public function addCharacterLinkRequest($user, $characterName, $verificationAmount, $key=false) {
+		$clrb = new CharacterLinkRequestBean;
+		$clrb->character_name = $characterName;
+		$clrb->verification_amount = $verificationAmount;
+		if ($key)
+			$clrb->api_key = $key;
+		$clrb->set("date_requested", "NOW()", true);
+		$clrb->user_id = $user;
+		$clrb->insert();
+	}
+
+	/**
+	 * Gets the default character for a user
+	 * 
+	 * @param int $user user id
+	 * @return LinkedCharacterBean default character or boolean false if no character
+	 */
+	public function getDefaultCharacter($user) {
+		$q = new Query("SELECT");
+		$q->where("user_id = ?", $user);
+		$q->where("is_default = ?", 1);
+
+		$lcbs = LinkedCharacterBean::select($q, true);
+		if ($lcbs[0])
+			return $lcbs[0];
+		else
+			return false;
 	}
 
     /**

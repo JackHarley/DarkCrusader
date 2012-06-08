@@ -20,16 +20,14 @@ class PersonalbankController extends Controller {
 	public function index() {
 		$this->checkAuth("access_personal_bank");
 		$this->checkAuth("test_beta_features");
-		
-		$bm = PersonalBankModel::getInstance();
-		$user = UserModel::getInstance()->getActiveUser();
+		$this->checkForValidCharacterAndAPIKey();
 
-		/*if (!$bm->checkIfUserHasAtLeastOneTransaction($user->id)) {
-			View::load('personal_bank/first_time');
-			return;
-		}*/
+		$bm = PersonalBankModel::getInstance();
+		$um = UserModel::getInstance();
+		$user = $um->getActiveUser();
 
 		View::load('personal_bank/index', array(
+			"character" => $um->getDefaultCharacter($user->id)->character_name,
 			"bankBalance" => $bm->getCurrentBankBalance($user->id),
 			"latestTransactions" => $bm->getLatestTransactions($user->id, 30, 10),
 			"incomeGraph" => $bm->generateTransactionTypesGraph($user->id, 30, "in"),
@@ -41,6 +39,7 @@ class PersonalbankController extends Controller {
 	public function transactions() {
 		$this->checkAuth("access_personal_bank");
 		$this->checkAuth("test_beta_features");
+		$this->checkForValidCharacterAndAPIKey();
 		
 		$user = UserModel::getInstance()->getActiveUser();
 

@@ -48,6 +48,27 @@ class Controller extends \hydrogen\controller\Controller {
 	}
 
 	/**
+	 * Checks that a valid default character has been set up and has an API key associated for
+	 * the currently active user
+	 * 
+	 * @param boolean $endIfNotSetUp set to true to load an error page with links on setting up a
+	 * default character if a character has not been set up
+	 */
+	public function checkForValidCharacterAndAPIKey($endIfNotSetUp=true) {
+		$um = UserModel::getInstance();
+		$user = $um->getActiveUser();
+		$char = $um->getDefaultCharacter($user->id);
+
+		if (!$char->api_key) {
+			if ($endIfNotSetUp)
+				$this->noValidCharacter();
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Checks if the inputs given exist
 	 * 
 	 * @param array $inputs array of inputs to check
@@ -82,6 +103,17 @@ class Controller extends \hydrogen\controller\Controller {
 	 * @param boolean $endExecution set to true to die() after sending header
 	 */
 	public function redirect($path="", $endExecution=true) {
+		
+		// preserve alerts as a cookie
+		try {
+			$alerts = View::getVar("alerts");
+		}
+		catch (\hydrogen\view\exceptions\NoSuchVariableException $e) {
+		}
+
+		if ($alerts)
+			setcookie("alerts", serialize($alerts), time()+30);
+
 		header('Location: ' . Config::getVal('general', 'app_url') . $path);
 		
 		if ($endExecution)
@@ -103,6 +135,14 @@ class Controller extends \hydrogen\controller\Controller {
 	public function permissionDenied() {
 		ErrorHandler::sendHttpCodeHeader(ErrorHandler::HTTP_UNAUTHORIZED);
 		View::load("permission_denied");
+		die();
+	}
+
+	/**
+	 * Loads a no valid character page and kills execution
+	 */
+	public function noValidCharacter() {
+		View::load("no_valid_character");
 		die();
 	}
 

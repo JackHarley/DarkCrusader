@@ -63,6 +63,16 @@
 		<div id="sidebar">
 			<ul>
 				<li>
+					<h2>{{activeUser.username}}</h2>
+					<div class="pagecontent">
+						<p>
+							Site Bank Balance: {{activeUser.balance|numberformat}}c<br />
+							<br />
+							<a href="{% url /index.php/user/characters %}">Manage Characters</a>
+						</p>
+					</div>
+				</li>
+				<li>
 					<h2>Statistics</h2>
 					<ul>
 						<li><a href="{% url /index.php/players %}">Player Stats</a></li>

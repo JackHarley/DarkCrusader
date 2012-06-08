@@ -17,6 +17,8 @@ use darkcrusader\user\exceptions\EmailAlreadyRegisteredException;
 use darkcrusader\user\exceptions\InviteKeyInvalidException;
 use darkcrusader\user\exceptions\NoSuchUserException;
 use darkcrusader\user\exceptions\PasswordIncorrectException;
+use darkcrusader\user\exceptions\CannotSetCharacterAsDefaultWithoutAPIKeyException;
+use darkcrusader\user\exceptions\CharacterIsAlreadyLinkedException;
 
 class UserController extends Controller {
 
@@ -24,7 +26,59 @@ class UserController extends Controller {
 	 * User Index
 	 */
 	public function index() {
-		View::load("user/index");
+		View::load("user/overview");
+	}
+
+	/**
+	 * Settings
+	 */
+	public function settings() {
+		View::load("user/settings");
+	}
+
+	/**
+	 * OE Character Integration
+	 */
+	public function characters() {
+		$um = UserModel::getInstance();
+		$user = $um->getActiveUser();
+
+		if (isset($_POST["submit"])) {
+			try {
+				$um->requestCharacterLink($user->id, $_POST["character_name"], $_POST["api_key"]);
+			}
+			catch (CharacterIsAlreadyLinkedException $e) {
+				$this->alert("error", "That character has already been added to an account");
+			}
+		}
+
+		switch ($_GET["act"]) {
+			case "default":
+				try {
+					$um->setDefaultCharacter($_GET["id"]);
+				}
+				catch (CannotSetCharacterAsDefaultWithoutAPIKeyException $e) {
+					$this->alert("error", "You cannot set a character as default if it does not have an API key associated with it. Please delete the character and then add it again, this time with your API key");
+				}
+			break;
+			case "deletecharacter":
+				$um->deleteLinkedCharacter($_GET["id"]);
+			break;
+			case "deleterequest":
+				$um->deleteCharacterLinkRequest($_GET["id"]);
+			break;
+		}
+
+		if (($_GET["act"]) || ($_GET["id"]))
+			$this->redirect("/index.php/user/characters");
+
+		$characters = $um->getLinkedCharacters($user->id);
+		$requests = $um->getCharacterLinkRequests($user->id);
+
+		View::load("user/characters", array(
+			"linkedCharacters" => $characters,
+			"linkRequests" => $requests
+		));
 	}
 
 	/**
