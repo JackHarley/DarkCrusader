@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.007-1
+--------------
+* Bug fixes
+
 1.0.007
 --------------
 * Character integration
