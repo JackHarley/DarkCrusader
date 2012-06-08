@@ -13,6 +13,7 @@ use hydrogen\config\Config;
 
 use darkcrusader\models\UserModel;
 use darkcrusader\bank\PersonalBankTransaction;
+use darkcrusader\character\OECharacter;
 
 class OuterEmpiresModel extends Model {
 	
@@ -188,5 +189,33 @@ class OuterEmpiresModel extends Model {
 		
 		return $bts;
 	}
+
+	/**
+	 * Gets character info for a user's default character
+	 * 
+	 * @param int $user user id
+	 * @param mixed $accessKey leave as boolean false to use access key for default character of user
+	 * specified, or optionally override the user and use the access key supplied
+	 * @return OECharacter character info
+	 */
+	public function getCharacterInfo($user, $accessKey=false) {
+
+		if ($accessKey)
+			$userAccessKey = $accessKey;
+		else
+			$userAccessKey = UserModel::getInstance()->getDefaultCharacter($user)->api_key;
+
+		$response = $this->queryAPI("GetCharacterInfo", array(), $userAccessKey);
+
+		$c = new OECharacter;
+		$c->name = $response->FirstName . " " . $response->LastName;
+		$c->rank = $response->Rank;
+		$c->factionName = $response->FactionName;
+		$c->factionTag = $response->FactionTag;
+		$c->factionRank = $response->FactionTitle;
+
+		return $c;
+	}
+
 }
 ?>

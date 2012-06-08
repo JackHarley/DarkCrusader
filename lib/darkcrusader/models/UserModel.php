@@ -577,10 +577,21 @@ class UserModel extends Model {
 		if ($lcb)
 			throw new CharacterIsAlreadyLinkedException;
 
-		// now add the link request to the db
-		$rand = rand(1,500);
-		$this->addCharacterLinkRequest($user, $characterName, $rand, $key);
+		// if a key was supplied we can also insta verify the character and either
+		// exit with invalid key or instantly add a linked character
+		if ($key) {
+			$keyCharacterInfo = OuterEmpiresModel::getInstance()->getCharacterInfo(false, $key);
+			if ($keyCharacterInfo->name != $characterName)
+				throw new APIKeyInvalidException;
 
+			$this->addLinkedCharacter($user, $characterName, $key, true);
+
+		}
+		else { // if no key, manual link request has to be done
+			// now add the link request to the db
+			$rand = rand(1,500);
+			$this->addCharacterLinkRequest($user, $characterName, $rand, $key);
+		}
 	}
 
 	/**
