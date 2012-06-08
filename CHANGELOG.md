@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.008
+--------------
+* Streamlined the character addition process a bit
+
 1.0.007-3
 --------------
 * Bug fixes
