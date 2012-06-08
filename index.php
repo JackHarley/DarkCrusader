@@ -32,32 +32,37 @@ use hydrogen\config\Config;
 use darkcrusader\models\UserModel;
 use darkcrusader\models\InstallModel;
 use darkcrusader\models\SiteBankModel;
+use darkcrusader\controllers\InstallController;
+use darkcrusader\controllers\Controller;
 
 // check if db is not installed, if not, redirect user to install
 $im = InstallModel::getInstance();
+$ic = InstallController::getInstance();
 if ($im->checkIfDatabaseIsInstalled() !== true) {
-    if (strpos($path, "install") === false) {
-        $ic = darkcrusader\controllers\InstallController::getInstance();
+    if (strpos($_SERVER["PATH_INFO"], "install") === false) {
 		$ic->install();
         die();
     }
 }
 if ($im->checkIfDatabaseIsUpToDate() !== true) {
-    if (strpos($path, "install") === false) {
-        $ic = darkcrusader\controllers\InstallController::getInstance();
+    if (strpos($_SERVER["PATH_INFO"], "install") === false) {
 		$ic->upgrade();
 		die();
     }
 }
 
 // Set some vars for the base view
-$activeUser = UserModel::getInstance()->getActiveUser();
+$um = UserModel::getInstance();
+$activeUser = $um->getActiveUser();
 if ($activeUser->username)
     View::setVar("activeUser", $activeUser);
+
 View::setVar("siteName", Config::getVal("general", "site_name"));
 View::setVar("siteBankCharacterName", Config::getRequiredVal("general", "site_bank_character_name"));
+
 if (Config::getVal("general", "google_analytics_code"))
     View::setVar("googleAnalyticsCode", Config::getVal("general", "google_analytics_code"));
+
 if ($activeUser->permissions->hasPermission("access_admin_panel"))
     View::setVar("userIsAdmin", "yes");
 if ($activeUser->permissions->hasPermission("access_faction_bank"))
@@ -72,6 +77,13 @@ $sbm->processAnyUnprocessedTransfers();
 if ($_COOKIE["alerts"]) {
     View::setVar("alerts", unserialize($_COOKIE["alerts"]));
     setcookie("alerts", "null", time()-60*60*24*30*12*20); // expire it 20 years ago :)
+}
+
+// Check if there's any characters awaiting verification, if so let the user know they need to do so
+$characters = $um->getCharacterLinkRequests($activeUser->id);
+$c = Controller::getInstance();
+foreach($characters as $character) {
+    $c->alert("info", "You still need to verify your character " . $character->character_name . ". To verify it, simply type /transfercredits " . Config::getRequiredVal("general", "site_bank_character_name") . "," . $character->verification_amount . " into OE chat while logged in as " . $character->character_name . ". Alternatively, you can delete this link request from Character Management.");
 }
 
 // Add the dispatcher rules

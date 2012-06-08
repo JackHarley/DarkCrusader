@@ -467,8 +467,9 @@ class UserModel extends Model {
 		$q->where("id = ?", $id);
 		$clrbs = CharacterLinkRequestBean::select($q);
 		$clrb = $clrbs[0];
-
-		$this->addLinkedCharacter($clrb->user_id, $clrb->character_name, $clrb->api_key);
+		
+		$default = ($clrb->api_key) ? true : false;
+		$this->addLinkedCharacter($clrb->user_id, $clrb->character_name, $clrb->api_key, $default);
 
 		$clrb->delete();
 	}
@@ -479,13 +480,16 @@ class UserModel extends Model {
 	 * @param int $user user id
 	 * @param string $characterName character name
 	 * @param string $key api access key (optional)
+	 * @param boolean $default should this character be the default
 	 */
-	public function addLinkedCharacter($user, $characterName, $key=false) {
+	public function addLinkedCharacter($user, $characterName, $key=false, $default=false) {
 		$lcb = new LinkedCharacterBean;
 		$lcb->user_id = $user;
 		$lcb->character_name = $characterName;
 		if ($key)
 			$lcb->api_key = $key;
+		if ($default)
+			$lcb->is_default = 1;
 		$lcb->insert();
 	}
 
