@@ -23,10 +23,7 @@ class AdminController extends Controller {
 	public function index() {
 		$this->checkAuth();
 
-	 	View::load("admin/index", array(
-	 		"userStats" => UserModel::getInstance()->getStats(),
-	 		"groups" => UserGroupModel::getInstance()->getUserGroupStats())
-	 	);
+	 	View::load("admin/index");
 	}
 
 
