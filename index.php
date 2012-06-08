@@ -10,8 +10,6 @@
  */
 
 // Initialize
-error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
-ini_set("display_errors", "On");
 session_start();
 date_default_timezone_set("Europe/Dublin"); 
 
@@ -34,6 +32,11 @@ use darkcrusader\models\InstallModel;
 use darkcrusader\models\SiteBankModel;
 use darkcrusader\controllers\InstallController;
 use darkcrusader\controllers\Controller;
+
+// Error Reporting
+if (Config::getRequiredVal("general", "display_errors") == "On")
+    error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
+ini_set("display_errors", Config::getRequiredVal("general", "display_errors"));
 
 // check if db is not installed, if not, redirect user to install
 $im = InstallModel::getInstance();
