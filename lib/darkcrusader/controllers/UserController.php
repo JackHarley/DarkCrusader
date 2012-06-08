@@ -20,6 +20,8 @@ use darkcrusader\user\exceptions\PasswordIncorrectException;
 use darkcrusader\user\exceptions\CannotSetCharacterAsDefaultWithoutAPIKeyException;
 use darkcrusader\user\exceptions\CharacterIsAlreadyLinkedException;
 
+use darkcrusader\oe\exceptions\APIKeyInvalidException;
+
 class UserController extends Controller {
 
 	/**
@@ -49,6 +51,9 @@ class UserController extends Controller {
 			}
 			catch (CharacterIsAlreadyLinkedException $e) {
 				$this->alert("error", "That character has already been added to an account");
+			}
+			catch (APIKeyInvalidException $e) {
+				$this->alert("error", "The API key you provided was invalid or is not for the character you specified. Check you spelled the character's name correctly and that the API key is correct and then try again");
 			}
 		}
 

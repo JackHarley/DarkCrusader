@@ -88,7 +88,7 @@
 	Character Name:<br />
 	<input type="text" name="character_name" /><br />
 	<br />
-	API Key: (this is optional, but without it you won't be able to use many site features, you can find your API key in the Account Management window in Outer Empires)<br />
+	API Key: (this is optional, but verification is instant with it, and without it you won't be able to use many site features. It is highly recommended you give your API key unless you are extremely paranoid. You can find your API key in the Account Management window in Outer Empires)<br />
 	<input type="text" name="api_key" /><br />
 	<br />
 	<input type="submit" name="submit" value="Add" />
