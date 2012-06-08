@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.009
+--------------
+* Instant verification via API keys, no transfer needed
+
 1.0.008
 --------------
 * Streamlined the character addition process a bit
