@@ -3,7 +3,7 @@
 {% block pageTitle %}Personal Bank{% endblock %}
 
 {% block content %}
-<h2>Personal Bank</h2>
+<h2>Bank Overview for {{character}}</h2>
 
 <h3>Current Balance: <span style="color:aqua">{{bankBalance|numberformat}}c</span></h3>
 

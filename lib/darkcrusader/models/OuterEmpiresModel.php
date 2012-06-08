@@ -27,12 +27,9 @@ class OuterEmpiresModel extends Model {
 	 * 
 	 * @param string $method method name
 	 * @param array $parameters associative array of parameters to pass
-	 * @param int $user user id to use access key for
+	 * @param int $accessKey access key (user api key) to use
 	 */
-	protected function queryAPI($method, $parameters=array(), $user) {
-		$accessKey = UserModel::getInstance()->getUser($user)->oe_api_access_key;
-		if (!$accessKey)
-			throw new UserHasNotSetupAPIAccessKeyException;
+	protected function queryAPI($method, $parameters=array(), $accessKey) {
 
 		$applicationKey = Config::getRequiredVal('general', 'oe_api_application_key');
 		
@@ -59,7 +56,24 @@ class OuterEmpiresModel extends Model {
 		
 		$data = file_get_contents($url);
 		$data = str_replace(array("lol(", ");"), "", $data);
-		return json_decode($data);
+		$data = json_decode($data);
+		return $data->d;
+	}
+
+	/**
+	 * Runs a simple transaction query using the access key supplied in order
+	 * to verify that it is a working access key
+	 * 
+	 * @param string $key access key to test
+	 * @return boolean true if key works, false if not
+	 */
+	public function testAccessKey($key) {
+		$response = $this->queryAPI("GetTransactions", array("Days" => 1), $key);
+		
+		if ($response->valid == 1)
+			return true;
+		else
+			return false;
 	}
 
 	/**
@@ -68,13 +82,23 @@ class OuterEmpiresModel extends Model {
 	 * 
 	 * @param int $user user id
 	 * @param string $days time period in days
+	 * @param boolean $cache set to true to allow the quick cache to work (this script run only)
+	 * @param mixed $accessKey leave as boolean false to use access key for default character of user
+	 * specified, or optionally override the user and use the access key supplied
 	 */
-	public function getPlayerBankTransactions($user, $days, $cache=true) {
+	public function getPlayerBankTransactions($user, $days, $cache=true, $accessKey=false) {
 		
-		if (is_array(static::$quickCache[$user . "-" . $days]))
-			return static::$quickCache[$user . "-" . $days];
+		if ($cache) {
+			if (is_array(static::$quickCache[$user . "-" . $days]))
+				return static::$quickCache[$user . "-" . $days];
+		}
 
-		$working = $this->queryAPI("GetTransactions", array("Days" => $days), $user)->d;
+		if ($accessKey)
+			$userAccessKey = $accessKey;
+		else
+			$userAccessKey = UserModel::getInstance()->getDefaultCharacter($user)->api_key;
+
+		$working = $this->queryAPI("GetTransactions", array("Days" => $days), $userAccessKey);
 		
 		$transactions = $working->Transactions;
 		
@@ -126,6 +150,22 @@ class OuterEmpiresModel extends Model {
 			$minute = $hourMinuteAndSecond[1];
 			$second = $hourMinuteAndSecond[2];
 			
+			$datetime = $year . "-" . $month . "-" . $day . " " . $hour . ":" . $minute . ":" . $second;
+
+			// other stuff
+			if ($type == "Transfer") {
+				switch ($direction) {
+					case "out":
+						$working = explode(" credits to ", $description);
+						$characterName = $working[1];
+					break;
+					case "in":
+						$working = explode(" transferred ", $description);
+						$characterName = $working[0];
+					break;
+				}
+			}
+
 			$bt = new PersonalBankTransaction;
 			$bt->date = $datetime;
 			$bt->type = $type;
@@ -133,6 +173,7 @@ class OuterEmpiresModel extends Model {
 			$bt->amount = $amount;
 			$bt->balance = $balance;
 			$bt->direction = $direction;
+			$bt->characterName = $characterName;
 			
 			$bts[] = $bt;
 		}
