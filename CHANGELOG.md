@@ -1,5 +1,11 @@
 # Changelog
 
+1.0.007
+--------------
+* Character integration
+* Site bank accounts
+* New personal bank
+
 1.0.006
 --------------
 * Completely revamped theme, looks much nicer
