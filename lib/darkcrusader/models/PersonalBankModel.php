@@ -28,7 +28,7 @@ class PersonalBankModel extends Model {
 	 * @return int number of credits in bank
 	 */
 	public function getCurrentBankBalance($user) {
-		$bts = $this->getLatestTransactions($user, 1);
+		$bts = $this->getLatestTransactions($user, 30, 1);
 		return $bts[0]->balance;
 	}
 

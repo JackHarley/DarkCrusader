@@ -18,7 +18,8 @@ use darkcrusader\character\OECharacter;
 class OuterEmpiresModel extends Model {
 	
 	protected static $modelID = "OE";
-	protected static $APIURL = "http://oeapi.outer-empires.com/OEAPI.asmx";
+	protected static $WSDL = "http://oeapi.outer-empires.com/OEAPI.asmx?WSDL";
+	protected static $soapInstance = false;
 	
 	protected static $quickCache = array();
 	
@@ -31,34 +32,21 @@ class OuterEmpiresModel extends Model {
 	 * @param int $accessKey access key (user api key) to use
 	 */
 	protected function queryAPI($method, $parameters=array(), $accessKey) {
-
 		$applicationKey = Config::getRequiredVal('general', 'oe_api_application_key');
 		
 		$query = array(
-			"callback" => "lol",
-			"AccessKey" => '"' . $accessKey . '"',
-			"ApplicationKey" => '"' . $applicationKey . '"',
+			"AccessKey" => $accessKey,
+			"ApplicationKey" => $applicationKey,
 		);
 		
 		foreach ($parameters as $key => $value)
-			$query[$key] = '"' . $value . '"';
+			$query[$key] = $value;
 
-		$url = static::$APIURL . "/" . $method . "?";
-		
-		$runs = 0;
-		foreach($query as $key => $value) {
-			if ($runs != 0)
-				$url .= "&";
-			
-			$url .= $key . "=" . $value;
-			
-			$runs++;
-		}
-		
-		$data = file_get_contents($url);
-		$data = str_replace(array("lol(", ");"), "", $data);
-		$data = json_decode($data);
-		return $data->d;
+		if (!static::$soapInstance)
+			static::$soapInstance = new \SoapClient(static::$WSDL);
+
+		$result = static::$soapInstance->{$method}($query);
+		return $result;
 	}
 
 	/**
@@ -71,7 +59,7 @@ class OuterEmpiresModel extends Model {
 	public function testAccessKey($key) {
 		$response = $this->queryAPI("GetTransactions", array("Days" => 1), $key);
 		
-		if ($response->valid == 1)
+		if ($response->GetTransactionsResult->valid == 1)
 			return true;
 		else
 			return false;
@@ -101,7 +89,7 @@ class OuterEmpiresModel extends Model {
 
 		$working = $this->queryAPI("GetTransactions", array("Days" => $days), $userAccessKey);
 		
-		$transactions = $working->Transactions;
+		$transactions = $working->GetTransactionsResult->Transactions->Transaction;
 		
 		$bts = array();
 		foreach($transactions as $transaction) {
@@ -182,8 +170,6 @@ class OuterEmpiresModel extends Model {
 			$bts[] = $bt;
 		}
 		
-		$bts = array_reverse($bts);
-		
 		if ($cache)
 			static::$quickCache[$user . "-" . $days] = $bts;
 		
@@ -206,6 +192,7 @@ class OuterEmpiresModel extends Model {
 			$userAccessKey = UserModel::getInstance()->getDefaultCharacter($user)->api_key;
 
 		$response = $this->queryAPI("GetCharacterInfo", array(), $userAccessKey);
+		$response = $response->GetCharacterInfoResult;
 
 		$c = new OECharacter;
 		$c->name = $response->FirstName . " " . $response->LastName;
