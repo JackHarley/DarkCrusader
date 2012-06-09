@@ -83,10 +83,12 @@ if ($_COOKIE["alerts"]) {
 }
 
 // Check if there's any characters awaiting verification, if so let the user know they need to do so
-$characters = $um->getCharacterLinkRequests($activeUser->id);
-$c = Controller::getInstance();
-foreach($characters as $character) {
-    $c->alert("info", "You still need to verify your character " . $character->character_name . ". To verify it, simply type /transfercredits " . Config::getRequiredVal("general", "site_bank_character_name") . "," . $character->verification_amount . " into OE chat while logged in as " . $character->character_name . ". Alternatively, you can delete this link request from Character Management.");
+if ($activeUser->username) {
+    $characters = $um->getCharacterLinkRequests($activeUser->id);
+    $c = Controller::getInstance();
+    foreach($characters as $character) {
+        $c->alert("info", "You still need to verify your character " . $character->character_name . ". To verify it, simply type /transfercredits " . Config::getRequiredVal("general", "site_bank_character_name") . "," . $character->verification_amount . " into OE chat while logged in as " . $character->character_name . ". Alternatively, you can delete this link request from Character Management.");
+    }
 }
 
 // Add the dispatcher rules

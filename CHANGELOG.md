@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.010-1
+--------------
+* Bug fixes
+
 1.0.010
 --------------
 * API calls switched to XML via SOAP (much prettier, faster and bug free on the OE end)
