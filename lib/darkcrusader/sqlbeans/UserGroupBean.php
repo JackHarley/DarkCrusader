@@ -21,6 +21,7 @@ class UserGroupBean extends SQLBean {
 		'id',
 		'group_name',
 		'description',
+		'premium'
 	);
 
 	protected $permissions = false;

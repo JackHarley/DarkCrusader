@@ -46,6 +46,7 @@ class OuterEmpiresModel extends Model {
 			static::$soapInstance = new \SoapClient(static::$WSDL);
 
 		$result = static::$soapInstance->{$method}($query);
+
 		return $result;
 	}
 

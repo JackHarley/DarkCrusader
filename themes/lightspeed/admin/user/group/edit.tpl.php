@@ -29,6 +29,9 @@
 					<input type="text" class="large" name="group_name" value="{{group.group_name}}"/>
 					<label class="form-label required">Group Description (e.g. Super Moderator):</label>
 					<input type="text" class="large" name="description" value="{{group.description}}"/>
+					<label class="form-label required">Has Permanent Premium?</label>
+					<input {% if group.premium == 1 %}checked{% endif %} type="radio" class="large" name="premium" value="yes"/> Yes 
+					<input {% if group.premium == 0 %}checked{% endif %} type="radio" class="large" name="premium" value="no"/> No
 				</p>
 				<p>
 					<label class="form-label required">Permissions</label>

@@ -54,27 +54,13 @@ if ($im->checkIfDatabaseIsUpToDate() !== true) {
     }
 }
 
-// Set some vars for the base view
-$um = UserModel::getInstance();
-$activeUser = $um->getActiveUser();
-if ($activeUser->username)
-    View::setVar("activeUser", $activeUser);
-
-View::setVar("siteName", Config::getVal("general", "site_name"));
-View::setVar("siteBankCharacterName", Config::getRequiredVal("general", "site_bank_character_name"));
-
-if (Config::getVal("general", "google_analytics_code"))
-    View::setVar("googleAnalyticsCode", Config::getVal("general", "google_analytics_code"));
-
-if ($activeUser->permissions->hasPermission("access_admin_panel"))
-    View::setVar("userIsAdmin", "yes");
-if ($activeUser->permissions->hasPermission("access_faction_bank"))
-    View::setVar("userCanAccessFactionBank", "yes");
-
 // Get any new site bank transactions and so processing stuff
 $sbm = SiteBankModel::getInstance();
 $sbm->updateDB();
 $sbm->processAnyUnprocessedTransfers();
+
+// Set some vars for the base view
+Controller::getInstance()->initializeViewVariables();
 
 // Any preserved alerts from redirect? If so display them and clear cookie
 if ($_COOKIE["alerts"]) {

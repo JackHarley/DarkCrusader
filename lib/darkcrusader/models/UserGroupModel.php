@@ -27,16 +27,17 @@ class UserGroupModel extends Model {
 	 *
 	 * @param string $name unformatted group name e.g. root_admin
 	 * @param string $description formatted group name e.g. Root Admin
-	 * @param string $colour group hex colour
+	 * @param boolean $premium "yes" for unlimited premium, otherwise "no"
 	 * @param array $postForPerms $_POST array to iterate over for perms
 	 * @param array $pbs array of permission beans to grant
 	 * @return mixed boolean true if successful, error string
 	 *				 if failure
 	 */
-	public function addUserGroup($name, $description, $postForPerms=false, $pbs=false) {
+	public function addUserGroup($name, $description, $premium, $postForPerms=false, $pbs=false) {
 		$ugb = new UserGroupBean;
 		$ugb->group_name = $name;
 		$ugb->description = $description;
+		$ugb->premium = ($premium == "yes") ? 1 : 0;
 
 		$ugb->insert();
 
@@ -155,7 +156,7 @@ class UserGroupModel extends Model {
 	 * @param string $colour hex group colour
 	 * @param array $postForPerms $_POST array to iterate over for perms
 	 */
-	public function updateUserGroup($id, $groupName=false, $description=false, $postForPerms=false) {
+	public function updateUserGroup($id, $groupName=false, $description=false, $premium=false, $postForPerms=false) {
 		$q = new Query("SELECT");
 		$q->where("id = ?", $id);
 
@@ -167,6 +168,9 @@ class UserGroupModel extends Model {
 
 		if ($description)
 			$ugb->description = $description;
+
+		if ($premium)
+			$ugb->premium = ($premium == "yes") ? 1 : 0;
 
 		if ($postForPerms) {
 			$pm = PermissionsModel::getInstance();

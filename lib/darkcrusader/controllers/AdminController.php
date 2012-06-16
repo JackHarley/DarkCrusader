@@ -156,7 +156,7 @@ class AdminController extends Controller {
 							}
 							else {
 
-								$ugm->updateUserGroup($_GET["id"], $_POST["group_name"], $_POST["description"], $_POST);
+								$ugm->updateUserGroup($_GET["id"], $_POST["group_name"], $_POST["description"], $_POST["premium"], $_POST);
 
 								$this->alert("success", "Group updated successfully");
 							}
@@ -181,7 +181,7 @@ class AdminController extends Controller {
 							}
 							else {
 
-								$ugm->addUserGroup($_POST["group_name"], $_POST["description"], $_POST);
+								$ugm->addUserGroup($_POST["group_name"], $_POST["description"], $_POST["premium"], $_POST);
 								$this->alert("success", "Group added successfully");
 							}
 						break;

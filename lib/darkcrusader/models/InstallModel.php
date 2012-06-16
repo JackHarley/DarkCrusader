@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 4;
+	const maxDbVersion = 5;
 
 	/**
 	 * Checks if the DB is installed
@@ -417,6 +417,22 @@ class InstallModel extends Model {
 	}
 
 	/**
+	 * Migrate the database to version 5
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion5($pdo, $user, $pass) {
+		$pdo->pdo->query("ALTER TABLE users ADD `premium_until` datetime NOT NULL");
+		$pdo->pdo->query("ALTER TABLE user_groups ADD `premium` tinyint(1) NOT NULL");
+
+		return true;
+	}
+
+	/**
 	 * Preload data
 	 *
 	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
@@ -433,7 +449,7 @@ class InstallModel extends Model {
 
 		// Create the Root Admin user group
 		$pbs = $pm->getAllPermissions();
-		$ugm->addUserGroup("root_admin", "Root Admin", false, $pbs);
+		$ugm->addUserGroup("root_admin", "Root Admin", "yes", false, $pbs);
 
 		// Create the User user group
 		$pbs = $pm->getPermissions(array(
@@ -444,7 +460,7 @@ class InstallModel extends Model {
 			"access_locality_stats",
 			"access_personal_bank")
 		);
-		$ugm->addUserGroup("user", "User", false, $pbs);
+		$ugm->addUserGroup("user", "User", "no", false, $pbs);
 
 		// Create the Member user group
 		$pbs = $pm->getPermissions(array(
@@ -458,7 +474,7 @@ class InstallModel extends Model {
 			"access_faction_stats",
 			"access_locality_stats")
 		);
-		$ugm->addUserGroup("member", "Member", false, $pbs);
+		$ugm->addUserGroup("member", "Member", "no", false, $pbs);
 
 		// Create the Guest user group
 		$pbs = $pm->getPermissions(array(
@@ -469,11 +485,11 @@ class InstallModel extends Model {
 			"access_locality_stats",
 			"access_personal_bank")
 		);
-		$ugm->addUserGroup("guest", "Guest", false, $pbs);
+		$ugm->addUserGroup("guest", "Guest", "no", false, $pbs);
 
 		// Create the Banned user group
 		$pbs = array();
-		$ugm->addUserGroup("banned", "Banned", false, $pbs);
+		$ugm->addUserGroup("banned", "Banned", "no", false, $pbs);
 
 		// Create the admin user
 		$query = new Query("SELECT");
