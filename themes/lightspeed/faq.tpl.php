@@ -24,7 +24,14 @@
 
 <h3>What benefits does premium give me?</h3>
 <p>
-	Premium gives you a more advanced personal bank (coming soon) and exclusive market discounts (coming soon)
+	<ul>
+		<li>Local storage of personal bank transactions (much faster loading)</li>
+		<li>Time period selection for personal bank (coming soon)</li>
+		<li>Market seller overview allows you to see an overview of your top customers</li>
+		<li>Exclusive handy utilities such as a ship build tester and colony setup tester (coming soon)</li>
+		<li>Exclusive market discounts from participating SWAT/FIRE members (coming soon)</li>
+		<li>Tonnes of other new features that are in the works</li>
+	</ul>
 </p>
 
 <h3>What is my "Site Bank Account" and what is it for?</h3>

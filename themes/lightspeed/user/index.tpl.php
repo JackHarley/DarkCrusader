@@ -47,7 +47,7 @@ Overview
 
 	<br />
 	
-	Premium gives you a number of exclusive features on the site, including a better personal bank and exclusive market discounts
+	Premium gives you a number of exclusive features on the site, including a better personal bank and market features. Check the FAQ for a full list of premium features.
 </p>
 
 {% if activeUser.group.premium != 1 %}
