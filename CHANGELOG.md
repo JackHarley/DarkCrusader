@@ -1,5 +1,11 @@
 # Changelog
 
+1.0.011
+--------------
+* Premium
+* New market features for premium members
+* Local storage of transactions for premium members
+
 1.0.010-1
 --------------
 * Bug fixes
