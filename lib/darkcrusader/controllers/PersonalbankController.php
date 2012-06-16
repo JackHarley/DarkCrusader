@@ -10,6 +10,7 @@ namespace darkcrusader\controllers;
 
 use darkcrusader\controllers\Controller;
 use darkcrusader\models\PersonalBankModel;
+use darkcrusader\models\PremiumPersonalBankModel;
 use darkcrusader\models\UserModel;
 use hydrogen\view\View;
 
@@ -21,17 +22,32 @@ class PersonalbankController extends Controller {
 		$this->checkAuth("access_personal_bank");
 		$this->checkForValidCharacterAndAPIKey();
 
-		$bm = PersonalBankModel::getInstance();
 		$um = UserModel::getInstance();
 		$user = $um->getActiveUser();
+
+		if ($um->checkIfUserIsPremium($user->id)) {
+			$bm = PremiumPersonalBankModel::getInstance();
+			$bm->updateDB($user->id);
+
+			$latestTransactions = $bm->getLatestTransactions($user->id, 10);
+			$incomeGraph = $bm->generateTransactionTypesGraph($user->id, "forever", "in");
+			$expenditureGraph = $bm->generateTransactionTypesGraph($user->id, "forever", "out");
+			View::setVar("richestMoment", $bm->getRichestMoment($user->id));
+		}
+		else {
+			$bm = PersonalBankModel::getInstance();
+
+			$latestTransactions = $bm->getLatestTransactions($user->id, 30, 10);
+			$incomeGraph = $bm->generateTransactionTypesGraph($user->id, 30, "in");
+			$expenditureGraph = $bm->generateTransactionTypesGraph($user->id, 30, "out");
+		}
 
 		View::load('personal_bank/index', array(
 			"character" => $um->getDefaultCharacter($user->id)->character_name,
 			"bankBalance" => $bm->getCurrentBankBalance($user->id),
-			"latestTransactions" => $bm->getLatestTransactions($user->id, 30, 10),
-			"incomeGraph" => $bm->generateTransactionTypesGraph($user->id, 30, "in"),
-			"expenditureGraph" => $bm->generateTransactionTypesGraph($user->id, 30, "out"),
-			//"richestMoment" => $bm->getRichestMoment($user->id)
+			"latestTransactions" => $latestTransactions,
+			"incomeGraph" => $incomeGraph,
+			"expenditureGraph" => $expenditureGraph
 		));
 	}
 

@@ -21,7 +21,9 @@
 			<li><a href="{% url /index.php/info %}">swat info</a></li>
 			<li><a href="{% url /index.php/scans %}">scans</a></li>
 			<li><a href="{% url /index.php/stats %}">stats</a></li>
+			<li><a href="{% url /index.php/market %}">market</a></li>
 			<li><a href="{% url /index.php/faq %}">faq</a></li>
+			
 			{% if exists userCanAccessFactionBank %}
 				<li><a href="{% url /index.php/factionbank %}">faction bank</a></li>
 			{% endif %}

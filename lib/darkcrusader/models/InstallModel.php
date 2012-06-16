@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 5;
+	const maxDbVersion = 6;
 
 	/**
 	 * Checks if the DB is installed
@@ -433,6 +433,23 @@ class InstallModel extends Model {
 	}
 
 	/**
+	 * Migrate the database to version 6
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion6($pdo, $user, $pass) {
+		$pm = PermissionsModel::getInstance();
+		$pm->createPermission("market", "access_market_seller_overview", "Access market seller overview");
+		$pm->createPermission("market", "access_market", "Access market features");
+
+		return true;
+	}
+
+	/**
 	 * Preload data
 	 *
 	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
@@ -458,7 +475,9 @@ class InstallModel extends Model {
 			"access_system_stats",
 			"access_faction_stats",
 			"access_locality_stats",
-			"access_personal_bank")
+			"access_personal_bank",
+			"access_market_seller_overview",
+			"access_market")
 		);
 		$ugm->addUserGroup("user", "User", "no", false, $pbs);
 
@@ -472,7 +491,9 @@ class InstallModel extends Model {
 			"access_player_stats",
 			"access_system_stats",
 			"access_faction_stats",
-			"access_locality_stats")
+			"access_locality_stats",
+			"access_market_seller_overview",
+			"access_market")
 		);
 		$ugm->addUserGroup("member", "Member", "no", false, $pbs);
 
@@ -482,8 +503,7 @@ class InstallModel extends Model {
 			"access_player_stats",
 			"access_system_stats",
 			"access_faction_stats",
-			"access_locality_stats",
-			"access_personal_bank")
+			"access_locality_stats")
 		);
 		$ugm->addUserGroup("guest", "Guest", "no", false, $pbs);
 
