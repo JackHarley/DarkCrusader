@@ -1,10 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>SWAT/FIRE -> {% block pageTitle %}{% endblock %}</title>
-<link rel="stylesheet" type="text/css" href="{% viewurl /style.css %}" media="screen" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>SWAT/FIRE -> {% block pageTitle %}{% endblock %}</title>
+	<link rel="stylesheet" type="text/css" href="{% viewurl /style.css %}" media="screen" />
 </head>
+
 <body>
 <!-- begin wrap -->
 <div id="wrap">
@@ -16,10 +18,10 @@
 		<ul>
 			<li><a href="{% url /index.php %}">home</a></li>
 			<li><a href="http://forums.tacticalresponseteam.in">forums</a></li>
-			<li><a href="{% url /index.php/info %}">info</a></li>
+			<li><a href="{% url /index.php/info %}">swat info</a></li>
 			<li><a href="{% url /index.php/scans %}">scans</a></li>
 			<li><a href="{% url /index.php/stats %}">stats</a></li>
-
+			<li><a href="{% url /index.php/faq %}">faq</a></li>
 			{% if exists userCanAccessFactionBank %}
 				<li><a href="{% url /index.php/factionbank %}">faction bank</a></li>
 			{% endif %}
@@ -27,7 +29,7 @@
 			<li><a href="{% url /index.php/personalbank %}">personal bank</a> </li>
 
 			{% if exists userIsAdmin %}
-				<li><a href="{% url /index.php/admin %}">ACP</a></li>
+				<li><a href="{% url /index.php/admin %}">acp</a></li>
 			{% endif %}
 
 			{% if empty activeUser.user %}
@@ -68,7 +70,17 @@
 					<div class="pagecontent">
 						<p>
 							Site Bank Balance: {{activeUser.balance|numberformat}}c<br />
+							Premium: 
+							{% if exists userIsPremium %}
+								<span style="color:lime">Yes</span>
+							{% else %}
+								<span style="color:red">No</span>
+							{% endif %}
 							<br />
+							<br />
+							See <a href="{% url /index.php/faq %}">the FAQ</a> for more info on premium and the site bank<br />
+							<br />
+							<a href="{% url /index.php/user %}">Account Settings</a><br />
 							<a href="{% url /index.php/user/characters %}">Manage Characters</a>
 						</p>
 					</div>
@@ -96,6 +108,7 @@
 		</div>
 		<!-- end sidebar -->
 	</div>
+	<!-- end page -->
 
 	<div id="footer">
 	</div>

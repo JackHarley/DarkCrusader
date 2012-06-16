@@ -19,6 +19,9 @@ use darkcrusader\user\exceptions\NoSuchUserException;
 use darkcrusader\user\exceptions\PasswordIncorrectException;
 use darkcrusader\user\exceptions\CannotSetCharacterAsDefaultWithoutAPIKeyException;
 use darkcrusader\user\exceptions\CharacterIsAlreadyLinkedException;
+use darkcrusader\user\exceptions\UserDoesNotHaveSufficientFundsException;
+
+use darkcrusader\exceptions\FormIncorrectlyFilledOutException;
 
 use darkcrusader\oe\exceptions\APIKeyInvalidException;
 
@@ -28,14 +31,28 @@ class UserController extends Controller {
 	 * User Index
 	 */
 	public function index() {
-		View::load("user/overview");
-	}
+		$um = UserModel::getInstance();
 
-	/**
-	 * Settings
-	 */
-	public function settings() {
-		View::load("user/settings");
+		$user = $um->getActiveUser();
+
+		// if we have a submitted form, they've just purchased premium
+		if ($_POST["submit"]) {
+			try {
+				$um->subscribeUserToPremium($user->id, $_POST["duration"]);
+			}
+			catch (UserDoesNotHaveSufficientFundsException $e) {
+				$this->alert('error', "Sorry, you do not have sufficient credits in your site bank account to do this. Please see the FAQ for information on adding credits to your site bank account.");
+			}
+			catch (FormIncorrectlyFilledOutException $e) {
+				$this->alert("error", "You did not choose a valid option, please try again");
+			}
+		}
+
+		$this->initializeViewVariables();
+
+		View::load("user/index", array(
+			"linkedCharacters" => $um->getLinkedCharacters($user->id)
+		));
 	}
 
 	/**

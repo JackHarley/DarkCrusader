@@ -14,7 +14,8 @@ class UserBean extends SQLBean {
 		'username',
 		'group_id',
 		'passhash',
-		'balance'
+		'balance',
+		'premium_until'
 	);
 	
 	protected static $beanMap = array(

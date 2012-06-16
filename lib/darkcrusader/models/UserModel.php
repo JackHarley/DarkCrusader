@@ -25,6 +25,9 @@ use darkcrusader\user\exceptions\NoSuchUserException;
 use darkcrusader\user\exceptions\PasswordIncorrectException;
 use darkcrusader\user\exceptions\CannotSetCharacterAsDefaultWithoutAPIKeyException;
 use darkcrusader\user\exceptions\CharacterIsAlreadyLinkedException;
+use darkcrusader\user\exceptions\UserDoesNotHaveSufficientFundsException;
+
+use darkcrusader\exceptions\FormIncorrectlyFilledOutException;
 
 use darkcrusader\oe\exceptions\APIKeyInvalidException;
 
@@ -629,6 +632,91 @@ class UserModel extends Model {
 			return $lcbs[0];
 		else
 			return false;
+	}
+
+	/**
+	 * Subscribes a user to premium for the duration specified
+	 * 
+	 * @param int $user user id
+	 * @param string $duration 'day', 'week', '30days' or 'lifetime'
+	 * @param boolean $isFree set to true to not charge the user for the extension
+	 */
+	public function subscribeUserToPremium($user, $duration="30days", $isFree=false) {
+		$user = $this->getUser($user);
+
+		$cost = array();
+		$cost["day"] = 5000;
+		$cost["week"] = 18000;
+		$cost["30days"] = 50000;
+		$cost["lifetime"] = 500000;
+
+		// check if user has the amount necessary and then subtract it
+		if (!$isFree) {
+			if ($user->balance < $cost[$duration])
+				throw new UserDoesNotHaveSufficientFundsException;
+
+			$user->balance -= $cost[$duration];
+		}
+
+		// add premium subscription
+
+		// if we have a date in which premium ends, use it as the time to add to
+		if ($user->premium_until) {
+			$timePremiumEnds = strtotime($user->premium_until);
+
+			// if the date is in the past, use the current time
+			if ($timePremiumEnds < time())
+				$timePremiumEnds = time();
+		}
+		else {
+			$timePremiumEnds = time();
+		}
+
+		// now add to it and convert it back into a mysql date
+		switch ($duration) {
+			case "day":
+				$timePremiumEnds += (60 * 60 * 24);
+			break;
+			case "week":
+				$timePremiumEnds += (60 * 60 * 24 * 7);
+			break;
+			case "30days": // used instead of month to avoid "JULY HAD 31 DAYS WHYD I ONLY GET 30 DAYS"
+				$timePremiumEnds += (60 * 60 * 24 * 30);
+			break;
+			case "lifetime": // 100 years, that should do everyone for life ;p
+				$timePremiumEnds += (60 * 60 * 24 * 30 * 12 * 100);
+			break;
+			default:
+				throw new FormIncorrectlyFilledOutException;
+			break;
+		}
+
+		$user->premium_until = date("Y-m-d H:i:s", $timePremiumEnds);
+
+		// apply the changes
+		$user->update();
+
+	}
+
+	/**
+	 * Checks if a user is premium
+	 * 
+	 * @param int $user user id to check
+	 * @return boolean true if user is premium, otherwise false
+	 */
+	public function checkIfUserIsPremium($user) {
+		$user = $this->getUser($user);
+
+		if ($user->group->premium == 1)
+			return true;
+
+		if ($user->premium_until) {
+			$timeEnds = mktime($user->premium_until);
+			if ($timeEnds > time())
+				return true;
+		}
+
+		return false;
 	}
 
     /**

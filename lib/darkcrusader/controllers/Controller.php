@@ -167,6 +167,28 @@ class Controller extends \hydrogen\controller\Controller {
 
 		View::setVar("alerts", $alerts);
 	}
+
+	/**
+	 * Sets up some basic view vars about the active user and other things
+	 * Usually only manually run in a controller if there's been a change to the active user and
+	 * the view needs to have the latest info
+	 */
+	public function initializeViewVariables() {
+	    $um = UserModel::getInstance();
+	    $activeUser = $um->getActiveUser(false);
+	    if ($activeUser->username)
+	        View::setVar("activeUser", $activeUser);
+	    View::setVar("siteName", Config::getVal("general", "site_name"));
+	    View::setVar("siteBankCharacterName", Config::getRequiredVal("general", "site_bank_character_name"));
+	    if (Config::getVal("general", "google_analytics_code"))
+	        View::setVar("googleAnalyticsCode", Config::getVal("general", "google_analytics_code"));
+	    if ($activeUser->permissions->hasPermission("access_admin_panel"))
+	        View::setVar("userIsAdmin", "yes");
+	    if ($activeUser->permissions->hasPermission("access_faction_bank"))
+	        View::setVar("userCanAccessFactionBank", "yes");
+	    if ($um->checkIfUserIsPremium($activeUser->id))
+	        View::setVar("userIsPremium", "yes");
+	}
 }
 
 ?>
