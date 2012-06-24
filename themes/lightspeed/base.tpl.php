@@ -99,6 +99,14 @@
 					</ul>
 				</li>
 				<li>
+					<h2>Galaxy Maps</h2>
+					<ul>
+						<li><a href="{% url /index.php/maps/colonised %}">Colonised Systems and Stations</a></li>
+						<li><a href="{% url /index.php/maps/government %}">Government Systems</a></li>
+						<li><a href="{% url /index.php/maps %}">See More Options...</a></li>
+					</ul>
+				</li>
+				<li>
 					<h2>Attention!</h2>
 					<div class="pagecontent">
 						<p>	
