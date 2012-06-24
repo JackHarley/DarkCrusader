@@ -1,5 +1,11 @@
 # Changelog
 
+1.0.012
+--------------
+* The refresh system stats cronjob now scrapes the following new pieces of info: x coord, y coord, hex colour, oe star id
+* For the x and y coords it scrapes a locally stored copy of Talon Karrde's full outer empires map (http://talonkarrde.com), as the galaxy viewer coords are inaccurate
+* 2 types of galaxy maps added with adjustable scales
+
 1.0.011
 --------------
 * Premium
