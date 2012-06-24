@@ -30,24 +30,27 @@
 			}
 			.systemdot {
 		        background: #000000;
-		        width: 4px;
-		        height: 4px;
+		        width: 4.5px;
+		        height: 4.5px;
 		        border-radius: 50%;
-		        display: block;
+		        float:left;
+		        margin-right:2px;
 			}
 			.stationsystemdot {
 				background: #000000;
 		        width: 9px;
 		        height: 9px;
 		        border-radius: 50%;
-		        display: block;
+		        float:left;
+		        margin-right:5px;
 			}
 			.playerownedstationsystemdot {
 				background: #000000;
 		        width: 13px;
 		        height: 13px;
 		        border-radius: 50%;
-		        display: block;
+		        float: left;
+		        margin-right:5px;
 			}
 		</style>
 	</head>
@@ -60,14 +63,16 @@
 			<div id="mapgalaxy">
 				{% for system in systems %}
 					{% if system.system.x %}
-						<span title="{{system.faction}}">
-							<div class="system" style="top: {% eval (top_padding + system.system.y) / scale %}px;left: {% eval (system.system.x - left_elimination) / scale %}px;">
-								{% if system.has_station == 1 %}
-									<div class="{% if system.faction != "Government" %}playerowned{% endif %}stationsystemdot" style="background: {{system.hex_colour}}"></div> {% if (system.faction != "Government") || (display_government_system_names) %}{{system.system.system_name}}{% endif %}
-								{% else %}
-									<div class="systemdot" style="background: {{system.hex_colour}}"></div>
-								{% endif %}
-							</div>
+						<span title="{{system.system.system_name}} ({{system.faction}})">
+							<a href="{% url /index.php/systems %}?name={{system.system.system_name}}" target="_blank">
+								<div class="system" style="top: {% eval (top_padding + system.system.y) / scale %}px;left: {% eval (system.system.x - left_elimination) / scale %}px;">
+									{% if system.has_station == 1 %}
+										<div class="{% if system.faction != "Government" %}playerowned{% endif %}stationsystemdot" style="background: {{system.hex_colour}}"></div> {% if (system.faction != "Government") || (display_government_system_names) %}{{system.system.system_name}}{% endif %}
+									{% else %}
+										<div class="systemdot" style="background: {{system.hex_colour}}"></div>
+									{% endif %}
+								</div>
+							</a>
 						</span>
 					{% endif %}
 				{% endfor %}
