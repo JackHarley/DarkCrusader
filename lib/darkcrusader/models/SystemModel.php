@@ -285,10 +285,10 @@ class SystemModel extends Model {
 		
 		$working = explode('<div id="GView" class="GView">', $html);
 		$working = explode('<div id="dpad"', $working[1]);
-		$working = explode('<center>', $working[0]);
+		$working = explode('<div class="', $working[0]);
 		unset($working[0]);
 		$systemsHTMLArray = $working;
-		
+
 		$q = new Query("DELETE");
 		$q->from("systems");
 		$q->where("quadrant = ?", $quadrant);
@@ -307,8 +307,12 @@ class SystemModel extends Model {
 			$workingSystemName = explode('</font></span></center></div>', $workingSystemName[1]);
 			$systemName = $workingSystemName[0];
 			
+			$workingStarID = explode('"><center><span', $systemHTML);
+			$starID = str_replace("Star", "", $workingStarID[0]);
+
 			$systemBean = new SystemBean;
 			$systemBean->system_name = $systemName;
+			$systemBean->oe_star_id = $starID;
 			$systemBean->quadrant = $quadrant;
 			$systemBean->sector = $sector;
 			$systemBean->region = $region;
@@ -326,6 +330,45 @@ class SystemModel extends Model {
 					}
 				}
 			}
+		}
+	}
+
+	public function scrapeSystemLocationsFromTalon() {
+		$html = file_get_contents(__DIR__ . "/../../../fullmap.html");
+
+		$working = explode("<!--div.Star1 { position:absolute; top:854; Left:5738; }-->", $html);
+		$working = explode("</style>", $working[1]);
+		$working = explode("\n", $working[0]);
+		unset($working[0]);
+		unset($working[20001]);
+		unset($working[20002]);
+		unset($working[20003]);
+		$systemsHTMLArray = $working;
+
+		foreach($systemsHTMLArray as $systemHTML) {
+
+			$workingStarID = explode(" }", $systemHTML);
+			$starID = str_replace("div.Star", "", $workingStarID[0]);
+
+			$q = new Query("SELECT");
+			$q->where("oe_star_id = ?", $starID);
+			$sbs = SystemBean::select($q);
+			$sb = $sbs[0];
+
+			if (!$sb)
+				continue;
+
+			$workingX = explode("left:", $systemHTML);
+			$workingX = explode(";", $workingX[1]);
+			$x = $workingX[0];
+
+			$workingY = explode("top:", $systemHTML);
+			$workingY = explode(";", $workingY[1]);
+			$y = $workingY[0];
+
+			$sb->x = $x;
+			$sb->y = $y;
+			$sb->update();
 		}
 	}
 	
@@ -427,6 +470,37 @@ class SystemModel extends Model {
 		$latestSystemStatsSet = $latestSystemStatsSets[0];
 
 		return $latestSystemStatsSet;
+	}
+
+	/**
+	 * Gets all the system stats beans for any systems which are owned by a faction/
+	 * ibdependent/government
+	 * 
+	 * @return array array of SystemStatsBeans
+	 */
+	public function getColonisedSystemsLatestStats() {
+
+		$q = new Query("SELECT");
+		$q->where("faction != ?", "None");
+		$q->where("stats_set = ?", $this->getLatestSystemStatsSetCached()->id);
+
+		$ssbs = SystemStatsBean::select($q, true);
+		return $ssbs;
+	}
+
+	/**
+	 * Gets all the system stats beans for any systems which are owned by Government
+	 * 
+	 * @return array array of SystemStatsBeans
+	 */
+	public function getGovernmentSystemsLatestStats() {
+
+		$q = new Query("SELECT");
+		$q->where("faction = ?", "Government");
+		$q->where("stats_set = ?", $this->getLatestSystemStatsSetCached()->id);
+
+		$ssbs = SystemStatsBean::select($q, true);
+		return $ssbs;
 	}
 		
 }

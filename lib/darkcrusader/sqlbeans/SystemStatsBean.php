@@ -20,7 +20,8 @@ class SystemStatsBean extends SQLBean {
 		'faction',
 		'has_station',
 		'system_id',
-		'stats_set'
+		'stats_set',
+		'hex_colour'
 	);
 	
 	protected static $beanMap = array(

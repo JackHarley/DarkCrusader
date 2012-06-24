@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 6;
+	const maxDbVersion = 7;
 
 	/**
 	 * Checks if the DB is installed
@@ -445,6 +445,24 @@ class InstallModel extends Model {
 		$pm = PermissionsModel::getInstance();
 		$pm->createPermission("market", "access_market_seller_overview", "Access market seller overview");
 		$pm->createPermission("market", "access_market", "Access market features");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 7
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion7($pdo, $user, $pass) {
+		$pdo->pdo->query("ALTER TABLE systems ADD `oe_star_id` int(11) unsigned NOT NULL");
+		$pdo->pdo->query("ALTER TABLE systems ADD `x` int(10) unsigned NOT NULL");
+		$pdo->pdo->query("ALTER TABLE systems ADD `y` int(10) unsigned NOT NULL");
+		$pdo->pdo->query("ALTER TABLE system_stats ADD `hex_colour` varchar(7) NOT NULL");
 
 		return true;
 	}
