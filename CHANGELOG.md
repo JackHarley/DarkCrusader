@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.013
+--------------
+* Usability improvements for maps
+
 1.0.012
 --------------
 * The refresh system stats cronjob now scrapes the following new pieces of info: x coord, y coord, hex colour, oe star id
