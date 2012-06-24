@@ -23,6 +23,7 @@
 			<li><a href="{% url /index.php/stats %}">stats</a></li>
 			<li><a href="{% url /index.php/market %}">market</a></li>
 			<li><a href="{% url /index.php/faq %}">faq</a></li>
+			<li><a href="{% url /index.php/maps %}">maps</a></li>
 			
 			{% if exists userCanAccessFactionBank %}
 				<li><a href="{% url /index.php/factionbank %}">faction bank</a></li>

@@ -19,10 +19,13 @@ class SystemBean extends SQLBean {
 	protected static $fields = array(
 		'id',
 		'system_name',
+		'oe_star_id',
 		'quadrant',
 		'sector',
 		'region',
-		'locality'
+		'locality',
+		'x',
+		'y'
 	);
 	
 	public $objects_scanned = 0;

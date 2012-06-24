@@ -16,9 +16,16 @@ use hydrogen\database\Query;
 
 $q = new Query("SELECT");
 $systems = SystemBean::select($q);
-if (count($systems) < 20000) {
+if ((count($systems) < 20000) || (!$systems[0]->oe_star_id)) {
 	echo "Doing first time scrape...";
 	SystemModel::getInstance()->scrapeAllLocalities();
+	echo "done!\n";
+}
+
+if ((!$systems[0]->x) || (!$systems[0]->y)) {
+	echo "Getting all system locations...";
+	SystemModel::getInstance()->scrapeSystemLocationsFromTalon();
+	echo "done!\n";
 }
 
 $statsSet = new SystemStatsSetBean;
@@ -65,6 +72,10 @@ for($q=1;$q<5;$q++) {
 					$workingSystemName = explode('</font></span></center></div>', $workingSystemName[1]);
 					$systemName = $workingSystemName[0];
 					
+					$workingColour = explode('<font color="', $systemHTML);
+					$workingColour = explode('" face=', $workingColour[1]);
+					$colour = $workingColour[0];
+
 					$query = new Query("SELECT");
 					$query->where("system_name = ?", $systemName);
 					$systemBeans = SystemBean::select($query);
@@ -76,17 +87,21 @@ for($q=1;$q<5;$q++) {
 						$systemStatsBean->stats_set = $statsSet->id;
 						$systemStatsBean->faction = $faction;
 						$systemStatsBean->has_station = $hasStation;
+						$systemStatsBean->hex_colour = $colour;
 						$systemStatsBean->insert();
 					}
 				}
+
+				echo "done!\n";
 			}
 		}
 	}
 }
 
 // clear cache
+echo "\nClearing cache...";
 RECacheManager::getInstance()->clearAll();
-echo "\nClearing cache...done!\n";
+echo "done!\n";
 
-echo "\nAll stats scraped successfully\n";
+echo "\nAll stats scraped successfully!\n";
 ?>
