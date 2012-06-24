@@ -289,15 +289,6 @@ class SystemModel extends Model {
 		unset($working[0]);
 		$systemsHTMLArray = $working;
 
-		$q = new Query("DELETE");
-		$q->from("systems");
-		$q->where("quadrant = ?", $quadrant);
-		$q->where("sector = ?", $sector);
-		$q->where("region = ?", $region);
-		$q->where("locality = ?", $locality);
-		$stmt = $q->prepare();
-		$stmt->execute();
-
 		foreach($systemsHTMLArray as $systemHTML) {
 			$workingFaction = explode('<span title="', $systemHTML);
 			$workingFaction = explode('"><img src="images/tiny_star.png"', $workingFaction[1]);
@@ -310,14 +301,23 @@ class SystemModel extends Model {
 			$workingStarID = explode('"><center><span', $systemHTML);
 			$starID = str_replace("Star", "", $workingStarID[0]);
 
-			$systemBean = new SystemBean;
+			$q = new Query("SELECT");
+			$q->where("oe_star_id = ?", $starID);
+			$sbs = SystemBean::select($q);
+
+			$systemBean = ($sbs[0]) ? $sbs[0] : new SystemBean;
+
 			$systemBean->system_name = $systemName;
 			$systemBean->oe_star_id = $starID;
 			$systemBean->quadrant = $quadrant;
 			$systemBean->sector = $sector;
 			$systemBean->region = $region;
 			$systemBean->locality = $locality;
-			$systemBean->insert();
+			
+			if (!$sbs[0])
+				$systemBean->insert();
+			else
+				$systemBean->update();
 		}
 	}
 	
