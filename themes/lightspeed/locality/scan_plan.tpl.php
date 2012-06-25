@@ -9,10 +9,8 @@
 	Simply follow the instructions below, if you want you can use the checkboxes to mark as you complete a step
 
 <p>
-	<ul>
-		{% for instruction in instructions %}
-			<li><input type="checkbox" name="{{forloop.counter}}" /> {{instruction}}</li>
-		{% endfor %}
-	</ul>
+	{% for instruction in instructions %}
+		<input type="checkbox" name="{{forloop.counter}}" id="{{forloop.counter}}" /> <label for="{{forloop.counter}}">{{instruction}}</a><br />
+	{% endfor %}
 </p>
 {% endblock %}
