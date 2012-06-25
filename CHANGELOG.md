@@ -1,5 +1,10 @@
 # Changelog
 
+1.0.015
+--------------
+* Make the scan plan results look better and allow the checkbox to be ticked if you click on the instruction text
+* Added a link to the system pages to view a system on the map, which will make it appear with a border around it
+
 1.0.014
 --------------
 * Bug fix for if the first time scrape is run a second time, it would previously invalidate all relationships by deleting and inserting instead of updating
