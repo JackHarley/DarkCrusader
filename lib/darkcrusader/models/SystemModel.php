@@ -67,9 +67,29 @@ class SystemModel extends Model {
 		$q->where("sector = ?", $sector);
 		$q->where("region = ?", $region);
 		$q->where("locality = ?", $locality);
-		$q->orderby("system_name", "ASC");
+		$q->orderby("y", "ASC");
 
 		return SystemBean::select($q, true);
+	}
+
+	/**
+	 * Get all the non government systems in a locality
+	 *
+	 * @param int $quadrant quadrant
+	 * @param int $sector sector
+	 * @param int $region region
+	 * @param int $locality locality 
+	 * @return array array of SystemBeans
+	 */
+	public function getNonGovernmentSystemsInLocality__3600_systems($quadrant, $sector, $region, $locality) {
+		$systems = $this->getSystemsInLocalityCached($quadrant, $sector, $region, $locality);
+
+		foreach($systems as $id => $system) {
+			if ($system->stats->faction == "Government")
+				unset($systems[$id]);
+		}
+
+		return $systems;
 	}
 
 	/**
@@ -489,6 +509,21 @@ class SystemModel extends Model {
 	}
 
 	/**
+	 * Gets all the system stats beans for any systems which have a station
+	 * 
+	 * @return array array of SystemStatsBeans
+	 */
+	public function getStationSystemsLatestStats() {
+
+		$q = new Query("SELECT");
+		$q->where("has_station = ?", 1);
+		$q->where("stats_set = ?", $this->getLatestSystemStatsSetCached()->id);
+
+		$ssbs = SystemStatsBean::select($q, true);
+		return $ssbs;
+	}
+
+	/**
 	 * Gets all the system stats beans for any systems which are owned by Government
 	 * 
 	 * @return array array of SystemStatsBeans
@@ -501,6 +536,90 @@ class SystemModel extends Model {
 
 		$ssbs = SystemStatsBean::select($q, true);
 		return $ssbs;
+	}
+
+	/**
+	 * Gets an array of SystemBeans which have, as far as we know, a station in them
+	 */
+	public function getStationSystems__3600_systemstats() {
+		$q = new Query("SELECT");
+		$q->where("has_station = ?", 1);
+		$q->where("stats_set = ?", $this->getLatestSystemStatsSetCached()->id);
+
+		$ssbs = SystemStatsBean::select($q, true);
+
+		$sbs = array();
+
+		foreach($ssbs as $ssb) {
+			$sbs[] = $ssb->system;
+		}
+
+		return $sbs;
+	}
+
+	/**
+	 * Gets the distance between 2 systems in lightyears
+	 * 
+	 * @param int $systemOne first system id
+	 * @param int $systemTwo second system id
+	 * OR
+	 * @param int $systemOneX first system x coord
+	 * @param int $systemOneY first system y coord
+	 * @param int $systemTwoX second system x coord
+	 * @param int $systemTwoY second system y coord
+	 */
+	public function getDistanceBetweenSystems($systemOne, $systemTwo, $systemOneX=false, $systemOneY=false, $systemTwoX=false, $systemTwoY=false) {
+		if ((!$systemOneX) || (!$systemOneY)) {
+			$system = $this->getSystem($systemOne);
+			$systemOneX = $system->x;
+			$systemOneY = $system->y;
+		}
+
+		if ((!$systemTwoX) || (!$systemTwoY)) {
+			$system = $this->getSystem($systemTwo);
+			$systemTwoX = $system->x;
+			$systemTwoY = $system->y;
+		}
+
+		// use pyhtagoras theorem, dist = sqrt(horizontaldistance^2 + verticaldistance^2)
+		$x = $systemTwoX - $systemOneX;
+		$y = $systemTwoY - $systemOneY;
+		$distance = sqrt(($x*$x) + ($y*$y));
+
+		return ceil($distance);
+	}
+
+	/**
+	 * Gets the closest station system to the given system
+	 * 
+	 * @param int $system system id
+	 * OR
+	 * @param int $systemX system x coord
+	 * @param int $systemY system y coord
+	 */
+	public function getNearestStationSystemToSystem($system, $systemX, $systemY) {
+		if ((!$systemX) || (!$systemY)) {
+			$system = $this->getSystem($system);
+			$systemX = $system->x;
+			$systemY = $system->y;
+		}
+
+		// get all systems with a station
+		$stationSystems = $this->getStationSystemsCached();
+
+		$closestStationSystemDistance = 40000; // double of the entire universe lol
+
+		foreach($stationSystems as $stationSystem) {
+			$distance = $this->getDistanceBetweenSystems(false, false, $systemX, $systemY, $stationSystem->x, $stationSystem->y);
+
+			if ($distance < $closestStationSystemDistance) {
+				$closestStationSystem = $stationSystem;
+				$closestStationSystemDistance = $distance;
+			}
+		}
+
+		return $closestStationSystem;
+
 	}
 		
 }

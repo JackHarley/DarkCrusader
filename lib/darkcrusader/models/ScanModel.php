@@ -255,5 +255,57 @@ class ScanModel extends Model{
 
 		return $scans;
 	}
+
+	public function createScanningRouteForLocality($q, $s, $r, $l, $startLocation, $fuelCapacity, $fuelConsumptionPerLightyear, $displaySystemsAlreadyScannedByUser=false) {
+
+		$systems = SystemModel::getInstance()->getNonGovernmentSystemsInLocality($q, $s, $r, $l);
+
+		if (!$displaySystemsAlreadyScannedByUser) {
+			$user = UserModel::getInstance()->getActiveUser();
+
+			foreach($systems as $id => $system) {
+				$scans = $system->scans;
+
+				foreach($scans as $scan) {
+					if ($scan->submitter_id == $user->id) {
+						unset($systems[$id]);
+					}
+				}
+			}
+		}
+
+		$fuelInLightyears = $fuelCapacity / $fuelConsumptionPerLightyear;
+
+		$sm = SystemModel::getInstance();
+
+		$startSystem = $sm->getSystem(false, $startLocation);
+		$currentLocation = $startSystem;
+
+		$instructions = array();
+
+		// now write instructions for the route
+		foreach ($systems as $nextSystem) {
+
+			$fuelInLightyearsAfterJump = $fuelInLightyears - $sm->getDistanceBetweenSystems(false, false, $currentLocation->x, $currentLocation->y, $nextSystem->x, $nextSystem->y);
+
+			$nearestStationSystemToNextSystem = $sm->getNearestStationSystemToSystem(false, $nextSystem->x, $nextSystem->y);
+			$fuelNecessaryToGetToClosestStation = $sm->getDistanceBetweenSystems(false, false, $nextSystem->x, $nextSystem->y, $nearestStationSystemToNextSystem->x, $nearestStationSystemToNextSystem->y);
+
+			if ($fuelInLightyearsAfterJump > $fuelNecessaryToGetToClosestStation) {
+				$currentLocation = $nextSystem;
+				$fuelInLightyears = $fuelInLightyearsAfterJump;
+				$instructions[] = "Jump to " . $nextSystem->system_name . " and scan all systems there (" . $fuelInLightyears * $fuelConsumptionPerLightyear . " fuel remaining)";
+			}
+			else {
+				$nearestStationSystem = $sm->getNearestStationSystemToSystem(false, $currentLocation->x, $currentLocation->y);
+				$currentLocation = $nearestStationSystem;
+				$fuelInLightyears = $fuelCapacity / $fuelConsumptionPerLightyear; // refuel
+				$instructions[] = "Refuel at " . $nearestStationSystem->system_name . " (" . $fuelInLightyears * $fuelConsumptionPerLightyear . " fuel remaining)";
+			}
+
+		}
+
+		return $instructions;
+	}
 }
 ?>
