@@ -9,6 +9,7 @@ namespace darkcrusader\sqlbeans;
 use hydrogen\sqlbeans\SQLBean;
 
 use darkcrusader\models\SystemModel;
+use darkcrusader\models\ScanModel;
 
 class SystemBean extends SQLBean {
 
@@ -34,16 +35,27 @@ class SystemBean extends SQLBean {
 	protected static $beanMap = array(
 	);
 
-	public $stats;
+	public $Stats;
 	public function get_stats() {
-		if (!$this->stats)
-			$this->stats = SystemModel::getInstance()->getSystemStats($this->id);
+		if (!$this->Stats)
+			$this->Stats = SystemModel::getInstance()->getSystemStats($this->id);
 
-		return $this->stats;
+		return $this->Stats;
 	}
 
 	public function get_location() {
 		return $this->quadrant . ":" . $this->sector . ":" . $this->region . ":" . $this->locality;
+	}
+
+	public $Scans;
+	public function get_scans() {
+		if (!$this->Scans)
+			$this->Scans = ScanModel::getInstance()->getScansForSystem($this->id);
+
+		if (!is_array($this->Scans))
+			$this->Scans = array();
+
+		return $this->Scans;
 	}
 }
 ?>

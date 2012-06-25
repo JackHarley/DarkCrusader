@@ -18,7 +18,7 @@ class MapsController extends Controller {
 		View::load('maps/index');
 	}
 
-	public function colonised($scale=5) {
+	public function colonised($scale=7) {
 		View::load('maps/map', array(
 			"systems" => SystemModel::getInstance()->getColonisedSystemsLatestStats(),
 			"scale" => $scale,
@@ -39,6 +39,18 @@ class MapsController extends Controller {
 			"display_government_system_names" => true,
 			"top_padding" => 100,
 			"left_elimination" => 4500
+		));
+	}
+
+	public function stations($scale=8) {
+		View::load('maps/map', array(
+			"systems" => SystemModel::getInstance()->getStationSystemsLatestStats(),
+			"scale" => $scale,
+			"width" => 10000,
+			"height" => 10000,
+			"display_government_system_names" => true,
+			"top_padding" => 600,
+			"left_elimination" => 0
 		));
 	}
 }

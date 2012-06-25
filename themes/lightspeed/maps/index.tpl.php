@@ -18,7 +18,8 @@
 <p>
 	Maps:
 	<ul>
-		<li><a href="{% url /index.php/maps/colonised/7 %}">All Colonised Systems and Stations on a 1:7 Scale (Recommended)</a></li>
+		<li><a href="{% url /index.php/maps/colonised/7 %}">All Colonised Systems and Stations on a 1:7 Scale</a></li>
+		<li><a href="{% url /index.php/maps/stations/8 %}">All Stations on a 1:8 Scale</a></li>
 		<li><a href="{% url /index.php/maps/government/2 %}">All Government Systems on a 1:2 Scale (Recommended for New Players)</a></li>
 		<li><a href="{% url /index.php/maps/government/1 %}">All Government Systems on a 1:1 Scale (Recommended for New Players)</a></li>
 	</ul>
