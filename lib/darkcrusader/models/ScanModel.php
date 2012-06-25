@@ -302,8 +302,8 @@ class ScanModel extends Model{
 				$fuelInLightyears = $fuelCapacity / $fuelConsumptionPerLightyear; // refuel
 				$instructions[] = "Refuel at " . $nearestStationSystem->system_name . " (" . $fuelInLightyears * $fuelConsumptionPerLightyear . " fuel remaining)";
 
-				$currentLocation = $nextSystem;
 				$fuelInLightyearsAfterJump = $fuelInLightyears - $sm->getDistanceBetweenSystems(false, false, $currentLocation->x, $currentLocation->y, $nextSystem->x, $nextSystem->y);
+				$currentLocation = $nextSystem;
 				$fuelInLightyears = $fuelInLightyearsAfterJump;
 				$instructions[] = "Jump to " . $nextSystem->system_name . " and scan all systems there (" . $fuelInLightyears * $fuelConsumptionPerLightyear . " fuel remaining)";
 			}
