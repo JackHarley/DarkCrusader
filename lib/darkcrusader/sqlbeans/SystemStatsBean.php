@@ -37,6 +37,7 @@ class SystemStatsBean extends SQLBean {
 		)
 	);
 
+	public $system;
 	public function get_system() {
 		return $this->getMapped('system');
 	}

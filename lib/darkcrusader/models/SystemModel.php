@@ -430,17 +430,11 @@ class SystemModel extends Model {
 	 */
 	public function getSystemStats($system) {
 		
-		// Get latest stats set
-		$query = new Query("SELECT");
-		$query->orderby("time", "DESC");
-		$query->limit(1);
-		$statsSets = SystemStatsSetBean::select($query);
-		
 		// Get system stats
 		$query = new Query("SELECT");
 		$query->where("system_id = ?", $system);
-		$query->where("stats_set = ?", $statsSets[0]->id);
-		$systemStatsBeans = SystemStatsBean::select($query);
+		$query->where("stats_set = ?", $this->getLatestSystemStatsSetCached()->id);
+		$systemStatsBeans = SystemStatsBean::select($query, true);
 		$systemStatsBean = $systemStatsBeans[0];
 
 		// To keep DB size down, we only store stats for systems with a non standard faction
@@ -448,10 +442,13 @@ class SystemModel extends Model {
 		// system would have
 		if (!$systemStatsBean) {
 			$systemStatsBean = new SystemStatsBean;
+			$systemStatsBean->id = rand(100000000,100000000000000); // random id
+			$systemStatsBean->hex_colour = "#ffffff";
 			$systemStatsBean->has_station = 0;
 			$systemStatsBean->faction = "None";
 			$systemStatsBean->system_id = $system;
 			$systemStatsBean->stats_set = $statsSets[0]->id;
+			$systemStatsBean->system = $this->getSystem($system);
 		}
 
 		return $systemStatsBean;

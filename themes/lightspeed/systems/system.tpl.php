@@ -9,7 +9,8 @@
 <p>
 	Faction: {{system.stats.faction}}<br />
 	Location: <a href="{% url /index.php/locality %}?q={{system.quadrant}}&s={{system.sector}}&r={{system.region}}&l={{system.locality}}">{{system.location}}</a><br />
-	Station? {% if system.stats.has_station == 1%}Yes{% else %}No{% endif %}
+	Station? {% if system.stats.has_station == 1%}Yes{% else %}No{% endif %}<br />
+	<a href="{% url /index.php/maps/colonised/7 %}/{{system.system_name}}">View {{system.system_name}} on the galaxy map</a>
 </p>
 
 {% if exists scans %}

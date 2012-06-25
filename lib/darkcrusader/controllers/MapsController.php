@@ -18,9 +18,16 @@ class MapsController extends Controller {
 		View::load('maps/index');
 	}
 
-	public function colonised($scale=7) {
+	public function colonised($scale=7, $special=false) {
+		$sm = SystemModel::getInstance();
+
+		if ($special) {
+			$system = $sm->getSystem(false, $special);
+			View::setVar("specialSystem", $sm->getSystemStats($system->id));
+		}
+
 		View::load('maps/map', array(
-			"systems" => SystemModel::getInstance()->getColonisedSystemsLatestStats(),
+			"systems" => $sm->getColonisedSystemsLatestStats(),
 			"scale" => $scale,
 			"width" => 10000,
 			"height" => 10000,
@@ -30,9 +37,16 @@ class MapsController extends Controller {
 		));
 	}
 
-	public function government($scale=2) {
+	public function government($scale=2, $special=false) {
+		$sm = SystemModel::getInstance();
+
+		if ($special) {
+			$system = $sm->getSystem(false, $special);
+			View::setVar("specialSystem", $sm->getSystemStats($system->id));
+		}
+
 		View::load('maps/map', array(
-			"systems" => SystemModel::getInstance()->getGovernmentSystemsLatestStats(),
+			"systems" => $sm->getGovernmentSystemsLatestStats(),
 			"scale" => $scale,
 			"width" => 4000,
 			"height" => 3000,
@@ -42,9 +56,16 @@ class MapsController extends Controller {
 		));
 	}
 
-	public function stations($scale=8) {
+	public function stations($scale=8, $special=false) {
+		$sm = SystemModel::getInstance();
+
+		if ($special) {
+			$system = $sm->getSystem(false, $special);
+			View::setVar("specialSystem", $sm->getSystemStats($system->id));
+		}
+
 		View::load('maps/map', array(
-			"systems" => SystemModel::getInstance()->getStationSystemsLatestStats(),
+			"systems" => $sm->getStationSystemsLatestStats(),
 			"scale" => $scale,
 			"width" => 10000,
 			"height" => 10000,
