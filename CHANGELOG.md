@@ -1,5 +1,12 @@
 # Changelog
 
+1.0.014
+--------------
+* Bug fix for if the first time scrape is run a second time, it would previously invalidate all relationships by deleting and inserting instead of updating
+* Scan route/plan generator
+* Added a stations only map
+* Fixed an alignment bug with maps
+
 1.0.013
 --------------
 * Usability improvements for maps
