@@ -46,9 +46,7 @@ class SiteBankModel extends Model {
 
 			$secondsSinceUpdate = $timeNow - $timeThen;
 
-			$daysSinceUpdateApprox = round($secondsSinceUpdate / (3600 * 24));
-
-			$daysToGet = $daysSinceUpdateApprox + 1; // add 1 for good luck
+			$daysToGet = ceil($secondsSinceUpdate / (3600 * 24));
 		}
 
 		$siteBankAccessKey = Config::getRequiredVal("general", "site_bank_api_access_key");
