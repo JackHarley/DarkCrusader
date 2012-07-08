@@ -47,9 +47,7 @@ class PremiumPersonalBankModel extends PersonalBankModel {
 
 			$secondsSinceUpdate = $timeNow - $timeThen;
 
-			$daysSinceUpdateApprox = round($secondsSinceUpdate / (3600 * 24));
-
-			$daysToGet = $daysSinceUpdateApprox + 1; // add 1 for good luck
+			$daysToGet = ceil($secondsSinceUpdate / (3600 * 24));
 		}
 
 		$transactions = OuterEmpiresModel::getInstance()->getPlayerBankTransactions($user, $daysToGet);
