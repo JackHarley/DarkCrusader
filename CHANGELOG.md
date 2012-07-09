@@ -1,5 +1,13 @@
 # Changelog
 
+1.0.016
+--------------
+* Hack a fix to make scan routes work again
+* Fixed a bug with the scan route planner that was causing it to miss certain systems
+* Use ceil for getting the number of days we need to scrape to update bank records. More accurate than rounding and adding 1
+* Fixed maps so that links don't overflow
+* Can I Make It? utility added
+
 1.0.015
 --------------
 * Make the scan plan results look better and allow the checkbox to be ticked if you click on the instruction text
