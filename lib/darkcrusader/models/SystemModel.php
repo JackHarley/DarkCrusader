@@ -618,6 +618,48 @@ class SystemModel extends Model {
 		return $closestStationSystem;
 
 	}
+
+	/**
+	 * Checks if it is possible to make it to the specified system and then to a station
+	 * with your current fuel
+	 * 
+	 * @param string $currentSystem system currently in
+	 * @param string $destinationSystem system name you want to get to
+	 * @param int $fuel current amount of fuel
+	 * @param int $fuelConsumptionPerLightyear jump drive fuel consumption per ly
+	 * @return mixed station name if it is possible to make it to the system and then to 
+	 * a station, otherwise false
+	 */
+	public function canPlayerMakeItThereAndToStationWithFuel($currentSystem, $destinationSystem, $fuel, $fuelConsumptionPerLightyear=2) {
+		
+		// work out how much fuel will be left after the player gets to the destination system
+		$currentSystem = $this->getSystem(false, $currentSystem);
+		$destinationSystem = $this->getSystem(false, $destinationSystem);
+
+		$distance = $this->getDistanceBetweenSystems(false, false, $currentSystem->x, $currentSystem->y, $destinationSystem->x, $destinationSystem->y);
+		$fuelRequired = $distance * $fuelConsumptionPerLightyear;
+
+		$fuel = $fuel - $fuelRequired;
+
+		// now work out if we can make it to a station
+		$currentSystem = $destinationSystem; // we're at the destination now
+
+		// start by getting nearest station system
+		$nearestStationSystem = $this->getNearestStationSystemToSystem(false, $currentSystem->x, $currentSystem->y);
+
+		// find the fuel required
+		$distance = $this->getDistanceBetweenSystems(false, false, $currentSystem->x, $currentSystem->y, $nearestStationSystem->x, $nearestStationSystem->y);
+		$fuelRequired = $distance * $fuelConsumptionPerLightyear;
+
+		$fuel = $fuel - $fuelRequired;
+
+		if ($fuel > -1)
+			return $nearestStationSystem->system_name; // we can make it!
+		else
+			return false; // we can't :(
+
+	}
+
 		
 }
 ?>
