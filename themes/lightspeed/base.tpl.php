@@ -24,6 +24,7 @@
 			<li><a href="{% url /index.php/market %}">market</a></li>
 			<li><a href="{% url /index.php/faq %}">faq</a></li>
 			<li><a href="{% url /index.php/maps %}">maps</a></li>
+			<li><a href="{% url /index.php/utilities %}">utilities</a></li>
 			
 			{% if exists userCanAccessFactionBank %}
 				<li><a href="{% url /index.php/factionbank %}">faction bank</a></li>
@@ -81,8 +82,6 @@
 							{% endif %}
 							<br />
 							<br />
-							See <a href="{% url /index.php/faq %}">the FAQ</a> for more info on premium and the site bank<br />
-							<br />
 							<a href="{% url /index.php/user %}">Account Settings</a><br />
 							<a href="{% url /index.php/user/characters %}">Manage Characters</a>
 						</p>
@@ -90,21 +89,26 @@
 				</li>
 				{% endif %}
 				<li>
-					<h2>Statistics</h2>
+					<h2><a href="{% url /index.php/stats %}">Statistics</a></h2>
 					<ul>
-						<li><a href="{% url /index.php/players %}">Player Stats</a></li>
 						<li><a href="{% url /index.php/systems %}">System Stats</a></li>
 						<li><a href="{% url /index.php/factions %}">Faction Stats</a></li>
 						<li><a href="{% url /index.php/locality %}">Locality Stats</a></li>
 					</ul>
 				</li>
 				<li>
-					<h2>Galaxy Maps</h2>
+					<h2><a href="{% url /index.php/maps %}">Galaxy Maps</a></h2>
 					<ul>
 						<li><a href="{% url /index.php/maps/colonised %}">Colonised Systems and Stations</a></li>
 						<li><a href="{% url /index.php/maps/stations %}">All Stations</a></li>
 						<li><a href="{% url /index.php/maps/government %}">Government Systems</a></li>
 						<li><a href="{% url /index.php/maps %}">See More Options...</a></li>
+					</ul>
+				</li>
+				<li>
+					<h2><a href="{% url /index.php/utilities %}">Utilities</a></h2>
+					<ul>
+						<li><a href="{% url /index.php/utilities/canimakeit %}">Can I Make It?</a></li>
 					</ul>
 				</li>
 				<li>
