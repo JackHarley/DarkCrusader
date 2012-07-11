@@ -90,7 +90,7 @@
 							<span title="{{system.system.system_name}} ({{system.faction}})">
 								<a href="{% url /index.php/systems %}?name={{system.system.system_name}}" target="_blank">
 									{% if system.has_station == 1 %}
-										<div class="{% if system.faction != "Government" %}playerowned{% endif %}stationsystemdot" style="background: {{system.hex_colour}}"></div> <div class="systemname">{% if (system.faction != "Government") || (display_government_system_names) %}{{system.system.system_name}}{% endif %}</div>
+										<div class="{% if system.faction != "Government" %}playerowned{% endif %}stationsystemdot" style="background: {{system.hex_colour}}"></div> {% if (system.faction != "Government") || (display_government_system_names) %}<div class="systemname">{{system.system.system_name}}</div>{% endif %}
 									{% else %}
 										<div class="systemdot" style="background: {{system.hex_colour}}"></div> {% if (exists specialSystem) && (specialSystem.system.id == system.system.id) %}<div class="systemname">{{system.system.system_name}}</div>{% endif %}
 									{% endif %}
