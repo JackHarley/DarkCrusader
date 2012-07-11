@@ -31,8 +31,11 @@
 			.system {
 				position: absolute;
 				height: 18px;
+			}
+			.namedsystem {
+				position: absolute;
+				height: 18px;
 				width: 100px;
-				padding-right: 10px;
 			}
 			.specialsystem {
 				position: absolute;
@@ -81,12 +84,15 @@
 		<div id="mapwrapper">
 			<div id="mapheader">
 				<h2>OE Galaxy Map</h2>
-			</div>
+			</div>	
 			<div id="mapgalaxy">
 				{% set specialSystemOutputted "no" %}
 				{% for system in systems %}
 					{% if system.system.x %}
-						<div class="{% if (exists specialSystem) && (specialSystem.system.id == system.system.id) %}{% set specialSystemOutputted "yes" %}special{% endif %}system" style="top: {% eval (top_padding + system.system.y) / scale %}px;left: {% eval (system.system.x - left_elimination) / scale %}px;">
+						<div 
+							class="{% if (exists specialSystem) && (specialSystem.system.id == system.system.id) %}{% set specialSystemOutputted "yes" %}special{% else if ((exists specialSystem) && (specialSystem.system.id == system.system.id)) || ((system.faction == "Government") && (display_government_system_names)) || ((system.faction != "Government") && (system.has_station == 1)) %}named{% endif %}system" 
+							style="top: {% eval (top_padding + system.system.y) / scale %}px;left: {% eval (system.system.x - left_elimination) / scale %}px;"
+						>
 							<span title="{{system.system.system_name}} ({{system.faction}})">
 								<a href="{% url /index.php/systems %}?name={{system.system.system_name}}" target="_blank">
 									{% if system.has_station == 1 %}
@@ -102,8 +108,8 @@
 
 				{% if (exists specialSystem) && (specialSystemOutputted == "no") %}
 					{% if specialSystem.system.x %}
-						<span title="{{specialSystem.system.system_name}} ({{specialSystem.faction}})">
-							<div class="specialsystem" style="top: {% eval (top_padding + specialSystem.system.y) / scale %}px;left: {% eval (specialSystem.system.x - left_elimination) / scale %}px;">
+						<div class="specialsystem" style="top: {% eval (top_padding + specialSystem.system.y) / scale %}px;left: {% eval (specialSystem.system.x - left_elimination) / scale %}px;">
+							<span title="{{specialSystem.system.system_name}} ({{specialSystem.faction}})">
 								<a href="{% url /index.php/systems %}?name={{specialSystem.system.system_name}}" target="_blank">
 									{% if specialSystem.has_station == 1 %}
 										<div class="{% if specialSystem.faction != "Government" %}playerowned{% endif %}stationsystemdot" style="background: {{specialSystem.hex_colour}}"></div> <div class="systemname">{{specialSystem.system.system_name}}</div>
@@ -111,8 +117,8 @@
 										<div class="systemdot" style="background: {{specialSystem.hex_colour}}"></div> <div class="systemname">{{specialSystem.system.system_name}}</div>
 									{% endif %}
 								</a>
-							</div>
-						</span>
+							</span>
+						</div>
 					{% endif %}
 				{% endif %}
 			</div>
