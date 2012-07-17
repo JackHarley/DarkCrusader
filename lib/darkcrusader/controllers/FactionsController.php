@@ -18,7 +18,9 @@ class FactionsController extends Controller {
 	
 	public function index() {
 		if (!isset($_GET["name"])) {
-			View::load('factions/index');
+			View::load('factions/index', array(
+				"factions" => FactionModel::getInstance()->getFactionsCached()
+			));
 			return;
 		}
 
