@@ -225,5 +225,27 @@ class FactionModel extends Model {
 		
 		return $return;
 	}
+
+	/**
+	 * Gets an array of all the faction names we know about
+	 * 
+	 * @return array faction names
+	 */
+	public function getFactions__factions_3600() {
+		$q = new Query("SELECT");
+		$q->where("stats_set = ?", SystemModel::getInstance()->getLatestSystemStatsSetCached()->id);
+		$q->where("faction != ?", "None");
+
+		$ssbs = SystemStatsBean::select($q);
+
+		$factions = array();
+
+		foreach($ssbs as $ssb) {
+			if (!in_array($ssb->faction, $factions))
+				$factions[] = $ssb->faction;
+		}
+
+		return $factions;
+	}
 }
 ?>
