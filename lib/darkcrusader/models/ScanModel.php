@@ -256,7 +256,7 @@ class ScanModel extends Model{
 		return $scans;
 	}
 
-	public function createScanningRouteForLocality($q, $s, $r, $l, $startLocation, $fuelCapacity, $fuelConsumptionPerLightyear, $displaySystemsAlreadyScannedByUser=false) {
+	public function createScanningRouteForLocality($q, $s, $r, $l, $startLocation, $fuelCapacity, $fuelConsumptionPerLightyear, $displaySystemsAlreadyScannedByUser=false, $displaySystemsAlreadyScanned=true) {
 
 		$systems = SystemModel::getInstance()->getNonGovernmentSystemsInLocality($q, $s, $r, $l);
 
@@ -268,6 +268,18 @@ class ScanModel extends Model{
 
 				foreach($scans as $scan) {
 					if ($scan->submitter_id == $user->id) {
+						unset($systems[$id]);
+					}
+				}
+			}
+		}
+
+		if (!$displaySystemsAlreadyScanned) {
+			foreach($systems as $id => $system) {
+				$scans = $system->scans;
+
+				foreach($scans as $scan) {
+					if ($scan->id) {
 						unset($systems[$id]);
 					}
 				}

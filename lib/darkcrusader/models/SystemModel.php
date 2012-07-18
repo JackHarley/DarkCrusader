@@ -23,7 +23,44 @@ use darkcrusader\systems\exceptions\NoSuchSystemException;
 class SystemModel extends Model {
 	
 	protected static $modelID = "Sys";
-	
+	protected static $numberOfSystemsInGalaxy = 20000;
+
+	/**
+	 * Gets the number of colonised/inhabited systems (systems which are not owned by "None")
+	 * 
+	 * @return int number of colonised/inhabited systems
+	 */
+	public function getNumberOfColonisedSystems() {
+		$q = new Query("SELECT");
+		$q->where("stats_set = ?", $this->getLatestSystemStatsSetCached()->id);
+		$q->where("faction != ?", "None");
+
+		$ssbs = SystemStatsBean::select($q);
+		return count($ssbs);
+	}
+
+	/**
+	 * Gets an array of SystemBeans which are currently controlled by the given faction name
+	 * 
+	 * @param string @factionName faction name
+	 * @return array systems as SystemBeans
+	 */
+	public function getSystemsControlledByFaction($factionName) {
+		$q = new Query("SELECT");
+		$q->where("stats_set = ?", $this->getLatestSystemStatsSetCached()->id);
+		$q->where("faction = ?", $factionName);
+
+		$ssbs = SystemStatsBean::select($q, true);
+
+		$sbs = array();
+
+		foreach($ssbs as $ssb) {
+			$sbs[] = $ssb->system;
+		}
+
+		return $sbs;
+	}
+
 	/**
 	 * Gets the number of scanned objects in a system, if $user is specified,
 	 * only gets number of objects scanned by that user
@@ -269,9 +306,9 @@ class SystemModel extends Model {
 	}
 
 	/**
-	 * Generates the controlled systems pie chart/ring chart and stores it /graphs/controlledsystems.png
+	 * Generates the controlled systems by faction pie chart/ring chart and stores it /graphs/controlledsystems.png
 	 */
-	public function generateControlledSystemsGraph__3600_systemsgraph() {
+	public function generateControlledSystemsByFactionGraph__3600_systemsgraph() {
 		$bestFactions = $this->getFactionsWithNumberOfControlledSystemsCached();
 
 		$systems = array();
@@ -292,6 +329,32 @@ class SystemModel extends Model {
 		$GradientSettings = array("StartR"=>0,"StartG"=>191,"StartB"=>255,"Alpha"=>100,"Levels"=>50);
 		$myPicture->drawGradientArea(0,0,700,450,DIRECTION_VERTICAL,$GradientSettings);
 		$myPicture->drawText(350,45,"Breakdown of Colonised Systems",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
+
+		$pie = new \pPie($myPicture, $data);
+		$pie->draw2DPie(350,250,array("DrawLabels"=>TRUE,"WriteValues"=>PIE_VALUE_NATURAL,"LabelStacked"=>TRUE,"Border"=>TRUE,"Radius"=>135,"ValuePosition"=>PIE_VALUE_INSIDE));
+		
+		$myPicture->render(__DIR__ . "/../../../graphs/controlledsystemsbyfaction.png"); 
+
+	}
+
+	/**
+	 * Generates the controlled systems pie chart/ring chart and stores it /graphs/controlledsystems.png
+	 */
+	public function generateControlledSystemsGraph__3600_systemsgraph() {
+		$numberColonised = $this->getNumberOfColonisedSystems();
+		$numberUncolonised = self::$numberOfSystemsInGalaxy - $numberColonised;
+
+		$data = new \pData;
+		$data->addPoints(array($numberColonised, $numberUncolonised), "Systems");
+		$data->addPoints(array("Colonised", "Uncolonised"), "State");
+		$data->setSerieDescription("State", "State");
+		$data->setSerieDescription("Systems", "Systems");
+		$data->setAbscissa("State");
+
+		$myPicture = new \pImage(700,450,$data);
+		$GradientSettings = array("StartR"=>0,"StartG"=>191,"StartB"=>255,"Alpha"=>100,"Levels"=>50);
+		$myPicture->drawGradientArea(0,0,700,450,DIRECTION_VERTICAL,$GradientSettings);
+		$myPicture->drawText(350,45,"Breakdown of Systems",array("FontSize"=>20,"Align"=>TEXT_ALIGN_BOTTOMMIDDLE));
 
 		$pie = new \pPie($myPicture, $data);
 		$pie->draw2DPie(350,250,array("DrawLabels"=>TRUE,"WriteValues"=>PIE_VALUE_NATURAL,"LabelStacked"=>TRUE,"Border"=>TRUE,"Radius"=>135,"ValuePosition"=>PIE_VALUE_INSIDE));

@@ -19,15 +19,11 @@ use darkcrusader\systems\exceptions\NoSuchSystemException;
 class SystemsController extends Controller {
 	
 	public function index() {
+		$this->redirect("/index.php/systems/stats");
+	}
+
+	public function system() {
 		$this->checkAuth("access_system_stats");
-
-		if (!isset($_GET["name"])) {
-			$sm = SystemModel::getInstance();
-			$sm->generateControlledSystemsGraphCached();
-
-			View::load('systems/index');
-			return;
-		}
 
 		$sm = SystemModel::getInstance();
 
@@ -36,9 +32,10 @@ class SystemsController extends Controller {
 		}
 		catch (NoSuchSystemException $e) {
 			$this->alert("error", "No system by that name was found, please check your spelling and try again");
-			View::load('systems/index');
-			return;
+			$this->redirect("/index.php/stats");
 		}
+
+		$closestStationSystem = $sm->getNearestStationSystemToSystem(false, $system->x, $system->y);
 
 		$historicalStats = $sm->getHistoricalSystemStatsCached($system->id, 15);
 
@@ -52,8 +49,18 @@ class SystemsController extends Controller {
 
 		View::load('systems/system', array(
 			"system" => $system,
-			"historicalStats" => $historicalStats
+			"historicalStats" => $historicalStats,
+			"closestStationSystem" => $closestStationSystem
 		));
+	}
+
+	public function stats() {
+		$sm = SystemModel::getInstance();
+		$sm->generateControlledSystemsByFactionGraphCached();
+		$sm->generateControlledSystemsGraphCached();
+
+		View::load('systems/stats');
+		return;
 	}
 }
 ?>
