@@ -1,5 +1,18 @@
 # Changelog
 
+1.0.017
+--------------
+* Added a new option to the scan route planner
+* Restructed all of the statistics area of the site into a new stats & intel section
+* Moved out all the different stats & intel lookups on to the one page
+* Better, more standardised URLs (/factions/faction?name=FIRE)
+* Removed the old theme, it's ugly and I haven't been maintaining it anyway
+* Removed the swat info page, it was a waste of a page
+* Reanmed personal bank to finance manager
+* Added a new system breakdown pie chart
+* Made localities easier to lookup by using 4 dropdown boxes
+* Paved the way for the new intelligence features
+
 1.0.016
 --------------
 * Hack a fix to make scan routes work again
