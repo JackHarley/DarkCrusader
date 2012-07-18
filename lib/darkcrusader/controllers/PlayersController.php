@@ -18,5 +18,12 @@ class PlayersController extends Controller {
 
 		View::load('players/index');
 	}
+	
+	public function player() {
+		$this->checkAuth("access_site");
+
+		$this->redirect("/index.php/players/index");
+		//View::load('players/player');
+	}
 }
 ?>

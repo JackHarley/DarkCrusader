@@ -22,7 +22,7 @@
 		{% else %}
 			<tr>
 		{% endif %}
-			<td><a href="{% url /index.php/locality %}?q={{scan.scan.system.quadrant}}&s={{scan.scan.system.sector}}&r={{scan.scan.system.region}}&l={{scan.scan.system.locality}}">{{scan.scan.system.location}}</a></td>
+			<td><a href="{% url /index.php/localities/locality %}?q={{scan.scan.system.quadrant}}&s={{scan.scan.system.sector}}&r={{scan.scan.system.region}}&l={{scan.scan.system.locality}}">{{scan.scan.system.location}}</a></td>
 			<td>{{scan.scan.location_string|unescape}}</td>
 			<td>{{scan.resource_name}}</td>
 			<td>{{scan.resource_quality}}</td>

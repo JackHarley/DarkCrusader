@@ -35,19 +35,20 @@
 		<ul>
 			<li><a href="{% url /index.php %}">home</a></li>
 			<li><a href="http://forums.tacticalresponseteam.in">forums</a></li>
-			<li><a href="{% url /index.php/info %}">swat info</a></li>
-			<li><a href="{% url /index.php/scans %}">scans</a></li>
-			<li><a href="{% url /index.php/stats %}">stats</a></li>
+			<li><a href="{% url /index.php/stats %}">stats & intel</a></li>
 			<li><a href="{% url /index.php/market %}">market</a></li>
 			<li><a href="{% url /index.php/faq %}">faq</a></li>
 			<li><a href="{% url /index.php/maps %}">maps</a></li>
 			<li><a href="{% url /index.php/utilities %}">utilities</a></li>
-			
+			<li><a href="{% url /index.php/personalbank %}">finance manager</a> </li>
+
+			{% if exists userCanAccessScans %}
+				<li><a href="{% url /index.php/scans %}">scans</a></li>
+			{% endif %}
+
 			{% if exists userCanAccessFactionBank %}
 				<li><a href="{% url /index.php/factionbank %}">faction bank</a></li>
 			{% endif %}
-
-			<li><a href="{% url /index.php/personalbank %}">personal bank</a> </li>
 
 			{% if exists userIsAdmin %}
 				<li><a href="{% url /index.php/admin %}">acp</a></li>
@@ -105,14 +106,6 @@
 					</div>
 				</li>
 				{% endif %}
-				<li>
-					<h2><a href="{% url /index.php/stats %}">Statistics</a></h2>
-					<ul>
-						<li><a href="{% url /index.php/systems %}">System Stats</a></li>
-						<li><a href="{% url /index.php/factions %}">Faction Stats</a></li>
-						<li><a href="{% url /index.php/locality %}">Locality Stats</a></li>
-					</ul>
-				</li>
 				<li>
 					<h2><a href="{% url /index.php/maps %}">Galaxy Maps</a></h2>
 					<ul>

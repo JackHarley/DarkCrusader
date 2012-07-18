@@ -1,15 +1,18 @@
 {% extends base %}
 
-{% block pageTitle %}System Stats - {{system.system_name}}{% endblock %}
+{% block pageTitle %}Systems - {{system.system_name}}{% endblock %}
 
 {% block content %}
 
 <h2>System stats for {{system.system_name}}</h2>
 
 <p>
-	Faction: {{system.stats.faction}}<br />
-	Location: <a href="{% url /index.php/locality %}?q={{system.quadrant}}&s={{system.sector}}&r={{system.region}}&l={{system.locality}}">{{system.location}}</a><br />
-	Station? {% if system.stats.has_station == 1%}Yes{% else %}No{% endif %}<br />
+	<b>Faction:</b> <a href="{% url /index.php/factions/faction %}?name={{system.stats.faction}}">{{system.stats.faction}}</a><br />
+	<b>Location:</b> <a href="{% url /index.php/localities/locality %}?q={{system.quadrant}}&s={{system.sector}}&r={{system.region}}&l={{system.locality}}">{{system.location}}</a><br />
+	<b>Station?</b> {% if system.stats.has_station == 1 %}Yes{% else %}No{% endif %}<br />
+	{% if system.stats.has_station == 0 %}
+		<b>Closest Station System:</b> <a href="{% url /index.php/systems/system %}?name={{closestStationSystem.system_name}}">{{closestStationSystem.system_name}}</a><br />
+	{% endif %}
 	<a href="{% url /index.php/maps/colonised/7 %}/{{system.system_name}}">View {{system.system_name}} on the galaxy map</a>
 </p>
 

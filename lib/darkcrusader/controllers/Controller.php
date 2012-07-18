@@ -188,6 +188,8 @@ class Controller extends \hydrogen\controller\Controller {
 	        View::setVar("userCanAccessFactionBank", "yes");
 	    if ($um->checkIfUserIsPremium($activeUser->id))
 	        View::setVar("userIsPremium", "yes");
+	    if ($activeUser->permissions->hasPermission("access_scans"))
+	    	View::setVar("userCanAccessScans", "yes");
 	}
 }
 

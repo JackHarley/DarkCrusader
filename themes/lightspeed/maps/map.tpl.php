@@ -94,7 +94,7 @@
 							style="top: {% eval (top_padding + system.system.y) / scale %}px;left: {% eval (system.system.x - left_elimination) / scale %}px;"
 						>
 							<span title="{{system.system.system_name}} ({{system.faction}})">
-								<a href="{% url /index.php/systems %}?name={{system.system.system_name}}" target="_blank">
+								<a href="{% url /index.php/systems/system %}?name={{system.system.system_name}}" target="_blank">
 									{% if system.has_station == 1 %}
 										<div class="{% if system.faction != "Government" %}playerowned{% endif %}stationsystemdot" style="background: {{system.hex_colour}}"></div> {% if (system.faction != "Government") || (display_government_system_names) %}<div class="systemname">{{system.system.system_name}}</div>{% endif %}
 									{% else %}
@@ -110,7 +110,7 @@
 					{% if specialSystem.system.x %}
 						<div class="specialsystem" style="top: {% eval (top_padding + specialSystem.system.y) / scale %}px;left: {% eval (specialSystem.system.x - left_elimination) / scale %}px;">
 							<span title="{{specialSystem.system.system_name}} ({{specialSystem.faction}})">
-								<a href="{% url /index.php/systems %}?name={{specialSystem.system.system_name}}" target="_blank">
+								<a href="{% url /index.php/systems/system %}?name={{specialSystem.system.system_name}}" target="_blank">
 									{% if specialSystem.has_station == 1 %}
 										<div class="{% if specialSystem.faction != "Government" %}playerowned{% endif %}stationsystemdot" style="background: {{specialSystem.hex_colour}}"></div> <div class="systemname">{{specialSystem.system.system_name}}</div>
 									{% else %}
