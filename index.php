@@ -65,10 +65,12 @@ Controller::getInstance()->initializeViewVariables();
 // Any preserved alerts from redirect? If so display them and clear cookie
 if ($_COOKIE["alerts"]) {
     View::setVar("alerts", unserialize($_COOKIE["alerts"]));
-    setcookie("alerts", "null", time()-60*60*24*30*12*20); // expire it 20 years ago :)
+    setcookie("alerts", "null", time()-60*60*24*30*12*20, "/"); // expire it 20 years ago :)
 }
 
 // Check if there's any characters awaiting verification, if so let the user know they need to do so
+$um = UserModel::getInstance();
+$activeUser = $um->getActiveUser();
 if ($activeUser->username) {
     $characters = $um->getCharacterLinkRequests($activeUser->id);
     $c = Controller::getInstance();
