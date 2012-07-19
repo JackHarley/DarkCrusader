@@ -12,6 +12,7 @@ use darkcrusader\controllers\Controller;
 use hydrogen\view\View;
 
 use darkcrusader\models\FactionModel;
+use darkcrusader\models\PlayerModel;
 
 class StatsController extends Controller {
 	
@@ -23,7 +24,7 @@ class StatsController extends Controller {
 		View::load('stats', array(
 			"factions" => $factions,
 			"numberOfFactionsWeKnowOf" => count($factions),
-			"numberOfPlayersOnFile" => 0
+			"numberOfPlayersOnFile" => PlayerModel::getInstance()->getNumberOfPlayersOnFile()
 		));
 	}
 }

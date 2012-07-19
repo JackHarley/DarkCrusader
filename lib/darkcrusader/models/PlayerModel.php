@@ -12,92 +12,65 @@ namespace darkcrusader\models;
 use hydrogen\model\Model;
 
 use hydrogen\database\Query;
-use darkcrusader\sqlbeans\PlayerStatsSetBean;
-use darkcrusader\sqlbeans\PlayerXPStatsBean;
-use darkcrusader\sqlbeans\PlayerCreditStatsBean;
-use darkcrusader\sqlbeans\PlayerBountyStatsBean;
-use darkcrusader\sqlbeans\PlayerEmpireStatsBean;
+use darkcrusader\sqlbeans\PlayerBean;
 
 use darkcrusader\models\UserModel;
+
+use darkcrusader\players\exceptions\NoSuchPlayerException;
+use darkcrusader\players\exceptions\PlayerAlreadyExistsException;
 
 class PlayerModel extends Model {
 	
 	protected static $modelID = "player";
 	
-	public function getPlayerCurrentStats($playerName, $like=false) {
-		$query = new Query("SELECT");
-		$query->orderby("time", "DESC");
-		$query->limit(1);
-		
-		$statsSet = PlayerStatsSetBean::select($query);
-		
-		if ($like)
-			$playerName = '%' . $playerName . '%';
-			
-		$query = new Query("SELECT");
-		$query->where("stats_set = ?", $statsSet[0]->id);
-		if ($like)
-			$query->where("player_name LIKE ?", $playerName);
+	/**
+	 * Gets a player
+	 * 
+	 * @param string $playerName player name to get
+	 * @return PlayerBean player
+	 * @throws NoSuchPlayerException if no player by that name exists in our db
+	 */
+	public function getPlayer($playerName) {
+		$q = new Query("SELECT");
+		$q->where("player_name LIKE ?", $playerName);
+
+		$pbs = PlayerBean::select($q);
+
+		if ($pbs[0])
+			return $pbs[0];
 		else
-			$query->where("player_name = ?", $playerName);
-		$playerXP = PlayerXPStatsBean::select($query);
-		
-		
-		$query = new Query("SELECT");
-		$query->where("stats_set = ?", $statsSet[0]->id);
-		if ($like)
-			$query->where("player_name LIKE ?", $playerName);
-		else
-			$query->where("player_name = ?", $playerName);
-		$playerCredit = PlayerCreditStatsBean::select($query);
-		
-		$query = new Query("SELECT");
-		$query->where("stats_set = ?", $statsSet[0]->id);
-		if ($like)
-			$query->where("player_name LIKE ?", $playerName);
-		else
-			$query->where("player_name = ?", $playerName);
-		$playerEmpire = PlayerEmpireStatsBean::select($query);
-		
-		$query = new Query("SELECT");
-		$query->where("stats_set = ?", $statsSet[0]->id);
-		if ($like)
-			$query->where("player_name LIKE ?", $playerName);
-		else
-			$query->where("player_name = ?", $playerName);
-		$playerBounty = PlayerBountyStatsBean::select($query);
-		
-		if ($playerXP[0]->total_xp) {
-			$query = new Query("SELECT");
-			if ($like)
-				$query->where("player_name LIKE ?", $playerName);
-			else
-				$query->where("player_name = ?", $playerName);
-			$query->where("total_xp != ?", $playerXP[0]->total_xp);
-			$query->orderby("stats_set", "DESC");
-			$query->limit(1);
-			$latestXPChange = PlayerXPStatsBean::select($query, true);
-			if ($latestXPChange)
-				$latestXPChangeStatsSet = $latestXPChange[0]->getMapped("set");
-		}
-		
-		$return = array(
-			"player_name" => $playerXP[0]->player_name,
-			"current_rank" => $playerXP[0]->rank,
-			"total_xp" => number_format($playerXP[0]->total_xp),
-			"leaderboard_position_xp" => $playerXP[0]->leaderboard_position,
-			"latest_xp_change" => $latestXPChangeStatsSet->time,
-			
-			"leaderboard_position_credit" => $playerCredit[0]->leaderboard_position,
-			"credits" => number_format($playerCredit[0]->credits),
-			
-			"leaderboard_position_empire" => $playerEmpire[0]->leaderboard_position,
-			"colonies" => $playerEmpire[0]->colonies,
-			"population" => $playerEmpire[0]->population,
-			
-			"leaderboard_position_bounty" => $playerBounty[0]->leaderboard_position,
-			"bounty" => $playerBounty[0]->bounty);
-		
-		return $return;
+			throw new NoSuchPlayerException;
+
+	}
+
+	/**
+	 * Adds a player to our database (basically initialise them so that data can be associated)
+	 * Spelling and capitalization MUST be correct so as not to cause annoyances later on
+	 * 
+	 * @param string $playerName player name to add
+	 * @throws PlayerAlreadyExistsException if player already exists
+	 */
+	public function addPlayer($playerName) {
+		$q = new Query("SELECT");
+		$q->where("player_name LIKE ?", $playerName);
+		$pbs = PlayerBean::select($q);
+
+		if ($pbs[0])
+			throw new PlayerAlreadyExistsException;
+
+		$player = new PlayerBean;
+		$player->player_name = $playerName;
+		$player->insert();
+	}
+
+	/**
+	 * Gets the number of players we have on file
+	 * 
+	 * @return int number of players we have on file
+	 */
+	public function getNumberOfPlayersOnFile() {
+		$pbs = PlayerBean::select($q);
+		return count($pbs);
 	}
 }
+?>
