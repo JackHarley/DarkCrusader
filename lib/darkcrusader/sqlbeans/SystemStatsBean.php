@@ -37,12 +37,12 @@ class SystemStatsBean extends SQLBean {
 		)
 	);
 
-	public $StoredSystem;
+	public $System;
 	public function get_system() {
-		if (!$this->StoredSystem)
+		if (!$this->System)
 			return $this->getMapped('system');
 		else
-			return $this->StoredSystem;
+			return $this->System;
 	}
 
 	public function set_system($val, $func=false) {
