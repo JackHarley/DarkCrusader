@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 7;
+	const maxDbVersion = 8;
 
 	/**
 	 * Checks if the DB is installed
@@ -103,7 +103,7 @@ class InstallModel extends Model {
 			$tables = array(
 				'users', 'user_groups', 'permissions', 'group_permissions', 'database_version', 'faction_bank_transactions',
 				'intelligence', 'kill_on_sight_list', 'personal_bank_transactions', 'scans', 'scan_results', 'systems', 'system_stats',
-				'system_stats_sets', 'site_bank_transfers', 'character_link_requests', 'linked_characters', 
+				'system_stats_sets', 'site_bank_transfers', 'character_link_requests', 'linked_characters', 'players'
 			);
 			$tablestr = '`' . implode('`, `', $tables) . '`';
 
@@ -463,6 +463,27 @@ class InstallModel extends Model {
 		$pdo->pdo->query("ALTER TABLE systems ADD `x` int(10) unsigned NOT NULL");
 		$pdo->pdo->query("ALTER TABLE systems ADD `y` int(10) unsigned NOT NULL");
 		$pdo->pdo->query("ALTER TABLE system_stats ADD `hex_colour` varchar(7) NOT NULL");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 8
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion8($pdo, $user, $pass) {
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `players` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`player_name` varchar(32) NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
 
 		return true;
 	}
