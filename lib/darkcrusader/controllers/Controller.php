@@ -112,7 +112,7 @@ class Controller extends \hydrogen\controller\Controller {
 		}
 
 		if ($alerts)
-			setcookie("alerts", serialize($alerts), time()+30);
+			setcookie("alerts", serialize($alerts), time()+60*60*24*30*12, "/");
 
 		header('Location: ' . Config::getVal('general', 'app_url') . $path);
 		
@@ -174,22 +174,22 @@ class Controller extends \hydrogen\controller\Controller {
 	 * the view needs to have the latest info
 	 */
 	public function initializeViewVariables() {
-	    $um = UserModel::getInstance();
-	    $activeUser = $um->getActiveUser(false);
-	    if ($activeUser->username)
-	        View::setVar("activeUser", $activeUser);
-	    View::setVar("siteName", Config::getVal("general", "site_name"));
-	    View::setVar("siteBankCharacterName", Config::getRequiredVal("general", "site_bank_character_name"));
-	    if (Config::getVal("general", "google_analytics_code"))
-	        View::setVar("googleAnalyticsCode", Config::getVal("general", "google_analytics_code"));
-	    if ($activeUser->permissions->hasPermission("access_admin_panel"))
-	        View::setVar("userIsAdmin", "yes");
-	    if ($activeUser->permissions->hasPermission("access_faction_bank"))
-	        View::setVar("userCanAccessFactionBank", "yes");
-	    if ($um->checkIfUserIsPremium($activeUser->id))
-	        View::setVar("userIsPremium", "yes");
-	    if ($activeUser->permissions->hasPermission("access_scans"))
-	    	View::setVar("userCanAccessScans", "yes");
+		$um = UserModel::getInstance();
+		$activeUser = $um->getActiveUser(false);
+		if ($activeUser->username)
+			View::setVar("activeUser", $activeUser);
+		View::setVar("siteName", Config::getVal("general", "site_name"));
+		View::setVar("siteBankCharacterName", Config::getRequiredVal("general", "site_bank_character_name"));
+		if (Config::getVal("general", "google_analytics_code"))
+			View::setVar("googleAnalyticsCode", Config::getVal("general", "google_analytics_code"));
+		if ($activeUser->permissions->hasPermission("access_admin_panel"))
+			View::setVar("userIsAdmin", "yes");
+		if ($activeUser->permissions->hasPermission("access_faction_bank"))
+			View::setVar("userCanAccessFactionBank", "yes");
+		if ($um->checkIfUserIsPremium($activeUser->id))
+			View::setVar("userIsPremium", "yes");
+		if ($activeUser->permissions->hasPermission("access_scans"))
+			View::setVar("userCanAccessScans", "yes");
 	}
 }
 
