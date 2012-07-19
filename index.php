@@ -32,6 +32,7 @@ use darkcrusader\models\InstallModel;
 use darkcrusader\models\SiteBankModel;
 use darkcrusader\controllers\InstallController;
 use darkcrusader\controllers\Controller;
+use darkcrusader\oe\exceptions\APIQueryFailedException;
 
 // Error Reporting
 if (Config::getRequiredVal("general", "display_errors") == "On")
@@ -54,13 +55,10 @@ if ($im->checkIfDatabaseIsUpToDate() !== true) {
     }
 }
 
-// Get any new site bank transactions and so processing stuff
-$sbm = SiteBankModel::getInstance();
-$sbm->updateDB();
-$sbm->processAnyUnprocessedTransfers();
+$c = Controller::getInstance();
 
 // Set some vars for the base view
-Controller::getInstance()->initializeViewVariables();
+$c->initializeViewVariables();
 
 // Any preserved alerts from redirect? If so display them and clear cookie
 if ($_COOKIE["alerts"]) {
@@ -73,11 +71,21 @@ $um = UserModel::getInstance();
 $activeUser = $um->getActiveUser();
 if ($activeUser->username) {
     $characters = $um->getCharacterLinkRequests($activeUser->id);
-    $c = Controller::getInstance();
     foreach($characters as $character) {
         $c->alert("info", "You still need to verify your character " . $character->character_name . ". To verify it, simply type /transfercredits " . Config::getRequiredVal("general", "site_bank_character_name") . "," . $character->verification_amount . " into OE chat while logged in as " . $character->character_name . ". Alternatively, you can delete this link request from Character Management.");
     }
 }
+
+// Get any new site bank transactions and so processing stuff
+$sbm = SiteBankModel::getInstance();
+try {
+    $sbm->updateDB();
+}
+catch (APIQueryFailedException $e) {
+    $c->alert("warning", "OE API Query Failed, your site bank balance may not be completely up to date, please reload the page to update it. If you see this warning on every page please PM Jedi Jackian in game immediately");
+}
+
+$sbm->processAnyUnprocessedTransfers();
 
 // Add the dispatcher rules
 Dispatcher::addHomeMatchRule('\darkcrusader\controllers\HomeController', "index");
