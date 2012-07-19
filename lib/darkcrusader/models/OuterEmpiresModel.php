@@ -14,6 +14,7 @@ use hydrogen\config\Config;
 use darkcrusader\models\UserModel;
 use darkcrusader\bank\PersonalBankTransaction;
 use darkcrusader\character\OECharacter;
+use darkcrusader\oe\exceptions\APIQueryFailedException;
 
 class OuterEmpiresModel extends Model {
 	
@@ -42,10 +43,15 @@ class OuterEmpiresModel extends Model {
 		foreach ($parameters as $key => $value)
 			$query[$key] = $value;
 
-		if (!static::$soapInstance)
-			static::$soapInstance = new \SoapClient(static::$WSDL);
+		try {
+			if (!static::$soapInstance)
+				static::$soapInstance = new \SoapClient(static::$WSDL);
 
-		$result = static::$soapInstance->{$method}($query);
+			$result = static::$soapInstance->{$method}($query);
+		}
+		catch (\Exception $e) {
+			throw new APIQueryFailedException;
+		}
 
 		return $result;
 	}
