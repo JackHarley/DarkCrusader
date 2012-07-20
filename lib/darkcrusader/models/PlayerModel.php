@@ -59,11 +59,16 @@ class PlayerModel extends Model {
 		if ($pbs[0])
 			throw new PlayerAlreadyExistsException;
 
+		$q = new Query("SELECT");
+		$q->where("name = ?", "Neutral");
+		$msbs = MilitaryStatusBean::select($q);
+		$neutral = $msbs[0];
+
 		$player = new PlayerBean;
 		$player->player_name = $playerName;
 		$player->faction = "Unknown";
 		$player->rank = "Unknown";
-		$player->official_status = "Neutral";
+		$player->official_status_id = $neutral->id;
 		$player->insert();
 	}
 
