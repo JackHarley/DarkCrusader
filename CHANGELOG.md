@@ -1,5 +1,10 @@
 # Changelog
 
+1.0.019
+--------------
+* Coloured military statuses
+* Foolproofing the players system
+
 1.0.018
 --------------
 * Players :)
