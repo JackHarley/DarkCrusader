@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 8;
+	const maxDbVersion = 9;
 
 	/**
 	 * Checks if the DB is installed
@@ -484,6 +484,29 @@ class InstallModel extends Model {
 				PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
 		);
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 9
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion9($pdo, $user, $pass) {
+		$pdo->pdo->query("ALTER TABLE players ADD `rank` varchar(16) NOT NULL");
+		$pdo->pdo->query("ALTER TABLE players ADD `faction` varchar(48) NOT NULL");
+		$pdo->pdo->query("ALTER TABLE players ADD `official_status` varchar(32) NOT NULL");
+
+		$pm = PermissionsModel::getInstance();
+		$pm->createPermission("players", "access_player_statistics", "Access player information and statistics");
+		$pm->createPermission("players", "add_players", "Add players to database");
+		$pm->createPermission("players", "edit_players", "Edit player information");
+		$pm->createPermission("players", "edit_official_military_statuses", "Edit military status towards a player or faction (e.g. KoS, War, Neutral, etc)");
 
 		return true;
 	}

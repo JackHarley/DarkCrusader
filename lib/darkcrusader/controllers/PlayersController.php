@@ -15,6 +15,8 @@ use darkcrusader\players\exceptions\NoSuchPlayerException;
 use darkcrusader\players\exceptions\PlayerAlreadyExistsException;
 
 use darkcrusader\models\PlayerModel;
+use darkcrusader\models\FactionModel;
+use darkcrusader\models\UserModel;
 
 class PlayersController extends Controller {
 	
@@ -23,7 +25,7 @@ class PlayersController extends Controller {
 	}
 	
 	public function player() {
-		$this->checkAuth("access_site");
+		$this->checkAuth("access_player_statistics");
 
 		$playerName = $_GET["name"];
 
@@ -31,8 +33,12 @@ class PlayersController extends Controller {
 			$player = PlayerModel::getInstance()->getPlayer($playerName);
 		}
 		catch (NoSuchPlayerException $e) {
-			$this->redirect("/index.php/players/new?name=" . $playerName);
+			$this->alert("info", "The player " . $playerName . " does not exist in our database. You can add them below");
+			$this->redirect("/index.php/players/add?name=" . $playerName);
 		}
+
+		if ($this->checkAuth("edit_players", false))
+			View::setVar("canEditPlayers", "yes");
 
 		View::load("players/player", array(
 			"player" => $player
@@ -40,6 +46,11 @@ class PlayersController extends Controller {
 	}
 
 	public function add() {
+		$this->checkAuth(array(
+			"access_player_statistics",
+			"add_players"
+		));
+
 		if (!$_POST["submit"]) {
 			if ($_GET["name"])
 				View::setVar("playerName", $_GET["name"]);
@@ -52,12 +63,47 @@ class PlayersController extends Controller {
 				PlayerModel::getInstance()->addPlayer($_POST["name"]);
 			}
 			catch (PlayerAlreadyExistsException $e) {
-				$this->alert("error", "Player already exists!");
-				$this->redirect("/index.php/stats");
+				$this->alert("warning", "Player already exists, you can see their record below");
+				$this->redirect("/index.php/players/player?name=" . $_POST["name"]);
 			}
 
-			$this->alert("success", "Player added successfully, you can now look them up");
-			$this->redirect("/index.php/stats");
+			$this->alert("success", "Player added successfully");
+			$this->redirect("/index.php/players/player?name=" . $_POST["name"]);
+		}
+	}
+
+	public function edit() {
+		$this->checkAuth(array(
+			"access_player_statistics",
+			"edit_players"
+		));
+
+		if (!$_POST["submit"]) {
+			try {
+				$player = PlayerModel::getInstance()->getPlayer($_GET["name"]);
+			}
+			catch (NoSuchPlayerException $e) {
+				$this->alert("info", "The player " . $playerName . " does not exist in our database. You can add them below");
+				$this->redirect("/index.php/players/add?name=" . $_GET["name"]);
+			}
+
+			if ($this->checkAuth("edit_official_military_statuses", false))
+				View::setVar("canEditOfficialMilitaryStatuses", "yes");
+
+			View::load("players/edit", array(
+				"player" => $player,
+				"factions" => FactionModel::getInstance()->getFactionsCached(),
+				"ranks" => PlayerModel::getInstance()->getRanks(),
+				"statuses" => PlayerModel::getInstance()->getMilitaryStatuses()
+			));
+		}
+		else {
+			$user = UserModel::getInstance()->getActiveUser();
+
+			PlayerModel::getInstance()->updatePlayer($_GET["name"], $_POST["rank"], $_POST["faction"], $_POST["official_status"], $user->id);
+
+			$this->alert("success", "User updated successfully");
+			$this->redirect("/index.php/players/player?name=" . $_GET["name"]);
 		}
 	}
 }

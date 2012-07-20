@@ -32,7 +32,7 @@ class PlayerModel extends Model {
 	 */
 	public function getPlayer($playerName) {
 		$q = new Query("SELECT");
-		$q->where("player_name LIKE ?", $playerName);
+		$q->where("player_name LIKE ?", "%" . $playerName . "%");
 
 		$pbs = PlayerBean::select($q);
 
@@ -60,7 +60,38 @@ class PlayerModel extends Model {
 
 		$player = new PlayerBean;
 		$player->player_name = $playerName;
+		$player->faction = "Unknown";
+		$player->rank = "Unknown";
+		$player->official_status = "Neutral";
 		$player->insert();
+	}
+
+	/**
+	 * Updates player info in our database
+	 * 
+	 * @param string $playerName player name
+	 * @param string $rank rank
+	 * @param string $faction faction name
+	 * @param string $officialStatus official status
+	 * @param int $user user id that's doing the updating
+	 */
+	public function updatePlayer($playerName, $rank, $faction, $officialStatus, $user) {
+		$q = new Query("SELECT");
+		$q->where("player_name = ?", $playerName);
+		$pbs = PlayerBean::select($q);
+
+		$player = $pbs[0];
+
+		if ($rank)
+			$player->rank = $rank;
+
+		if ($faction)
+			$player->faction = $faction;
+
+		if ($officialStatus)
+			$player->official_status = $officialStatus;
+
+		$player->update();
 	}
 
 	/**
@@ -71,6 +102,35 @@ class PlayerModel extends Model {
 	public function getNumberOfPlayersOnFile() {
 		$pbs = PlayerBean::select($q);
 		return count($pbs);
+	}
+
+	public function getRanks() {
+		return array(
+			"Academy Cadet",
+			"Light Class A",
+			"Light Class B",
+			"Light Class C",
+			"Medium Class A",
+			"Medium Class B",
+			"Medium Class C",
+			"Heavy Class A",
+			"Heavy Class B",
+			"Heavy Class C",
+			"Heavy Class D",
+			"Heavy Class E",
+			"Elite"
+		);
+	}
+
+	public function getMilitaryStatuses() {
+		return array(
+			"Allied",
+			"Neutral",
+			"Kill Player on Sight",
+			"Kill Player + Colonies on Sight",
+			"Negotiated War",
+			"All Out War"
+		);
 	}
 }
 ?>
