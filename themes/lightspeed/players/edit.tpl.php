@@ -27,17 +27,17 @@
 
 	{% if exists canEditOfficialMilitaryStatuses %}
 		Official SWAT/FIRE Military Status:
-		<select name="official_status">
+		<select name="official_status_id">
 			{% for militaryStatus in statuses %}
-				<option {% if ! empty player.official_status %}
-							{% if player.official_status == militaryStatus %}
+				<option value="{{militaryStatus.id}}" {% if ! empty player.official_status.id %}
+							{% if player.official_status.id == militaryStatus.id %}
 								selected
 							{% endif %}
 						{% else %}
-							{% if militaryStatus == "Neutral" %}
+							{% if militaryStatus.name == "Neutral" %}
 								selected
 							{% endif %}
-						{% endif %}>{{militaryStatus}}</option>
+						{% endif %}>{{militaryStatus.name}}</option>
 			{% endfor %}
 		</select><br />
 		<br />
