@@ -100,13 +100,13 @@ class PlayersController extends Controller {
 				"player" => $player,
 				"factions" => FactionModel::getInstance()->getFactionsCached(),
 				"ranks" => PlayerModel::getInstance()->getRanks(),
-				"statuses" => PlayerModel::getInstance()->getMilitaryStatuses()
+				"statuses" => PlayerModel::getInstance()->getMilitaryStatusesCached()
 			));
 		}
 		else {
 			$user = UserModel::getInstance()->getActiveUser();
 
-			PlayerModel::getInstance()->updatePlayer($_GET["name"], $_POST["rank"], $_POST["faction"], $_POST["official_status"], $user->id);
+			PlayerModel::getInstance()->updatePlayer($_GET["name"], $_POST["rank"], $_POST["faction"], $_POST["official_status_id"], $user->id);
 
 			$this->alert("success", "User updated successfully");
 			$this->redirect("/index.php/players/player?name=" . $_GET["name"]);

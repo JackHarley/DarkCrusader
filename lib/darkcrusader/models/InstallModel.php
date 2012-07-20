@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 9;
+	const maxDbVersion = 11;
 
 	/**
 	 * Checks if the DB is installed
@@ -507,6 +507,57 @@ class InstallModel extends Model {
 		$pm->createPermission("players", "add_players", "Add players to database");
 		$pm->createPermission("players", "edit_players", "Edit player information");
 		$pm->createPermission("players", "edit_official_military_statuses", "Edit military status towards a player or faction (e.g. KoS, War, Neutral, etc)");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 10
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion10($pdo, $user, $pass) {
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `military_statuses` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`name` varchar(32) NOT NULL,
+				`hex_colour` varchar(7) NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$q = new Query("INSERT");
+		$q->intoTable("military_statuses");
+		$q->intoField("name");
+		$q->intoField("hex_colour");
+		$q->values("(?,?)", array("Allied", "#00FF26"));
+		$q->values("(?,?)", array("Peaceful", "#00D0FF"));
+		$q->values("(?,?)", array("Neutral", "#FFFF00"));
+		$q->values("(?,?)", array("Kill Player on Sight", "#FF0000"));
+		$q->values("(?,?)", array("Kill Player/Colonies on Sight", "#FF0000"));
+		$q->values("(?,?)", array("Negotiated War", "#FF0000"));
+		$q->values("(?,?)", array("All Out War", "#FF0000"));
+		$q->prepare()->execute();
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 11
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion11($pdo, $user, $pass) {
+		$pdo->pdo->query("ALTER TABLE players DROP COLUMN`official_status`");
+		$pdo->pdo->query("ALTER TABLE players ADD `official_status_id` bigint(20) unsigned NOT NULL");
 
 		return true;
 	}

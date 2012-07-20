@@ -13,6 +13,7 @@ use hydrogen\model\Model;
 
 use hydrogen\database\Query;
 use darkcrusader\sqlbeans\PlayerBean;
+use darkcrusader\sqlbeans\MilitaryStatusBean;
 
 use darkcrusader\models\UserModel;
 
@@ -34,7 +35,7 @@ class PlayerModel extends Model {
 		$q = new Query("SELECT");
 		$q->where("player_name LIKE ?", "%" . $playerName . "%");
 
-		$pbs = PlayerBean::select($q);
+		$pbs = PlayerBean::select($q, true);
 
 		if ($pbs[0])
 			return $pbs[0];
@@ -72,13 +73,13 @@ class PlayerModel extends Model {
 	 * @param string $playerName player name
 	 * @param string $rank rank
 	 * @param string $faction faction name
-	 * @param string $officialStatus official status
+	 * @param int $officialStatus official status id
 	 * @param int $user user id that's doing the updating
 	 */
 	public function updatePlayer($playerName, $rank, $faction, $officialStatus, $user) {
 		$q = new Query("SELECT");
 		$q->where("player_name = ?", $playerName);
-		$pbs = PlayerBean::select($q);
+		$pbs = PlayerBean::select($q, true);
 
 		$player = $pbs[0];
 
@@ -92,7 +93,7 @@ class PlayerModel extends Model {
 			$user = UserModel::getInstance()->getUser($user);
 
 			if ($user->permissions->hasPermission("edit_official_military_statuses"))
-				$player->official_status = $officialStatus;
+				$player->official_status_id = $officialStatus;
 		}
 
 		$player->update();
@@ -108,6 +109,11 @@ class PlayerModel extends Model {
 		return count($pbs);
 	}
 
+	/**
+	 * Gets an array of valid in game player ranks
+	 * 
+	 * @return array rank strings
+	 */
 	public function getRanks() {
 		return array(
 			"Academy Cadet",
@@ -126,15 +132,13 @@ class PlayerModel extends Model {
 		);
 	}
 
-	public function getMilitaryStatuses() {
-		return array(
-			"Allied",
-			"Neutral",
-			"Kill Player on Sight",
-			"Kill Player + Colonies on Sight",
-			"Negotiated War",
-			"All Out War"
-		);
+	/**
+	 * Gets an array of valid military statuses
+	 * 
+	 * @return array military status strings
+	 */
+	public function getMilitaryStatuses__3600_militarystatuses() {
+		return MilitaryStatusBean::select();
 	}
 }
 ?>
