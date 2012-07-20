@@ -10,6 +10,7 @@
 	Faction members can also see intelligence on players and systems.
 </p>
 
+{% if exists canAccessPlayerStatistics %}
 <h3>Players</h3>
 <p>
 	Players lets you see some basic information about different players, the players section relies entirely on input from our members so may not be 100% up to date.<br />
@@ -19,7 +20,9 @@
 		Lookup Player: <input type="text" name="name" /> <input type="submit" value="Lookup Player" />
 	</form>
 </p>
+{% endif %}
 
+{% if exists canAccessSystemStatistics %}
 <h3>Systems</h3>
 <p>
 	Systems lets you see the locality a system is in, the nearest station system and information on historical ownership of the system. You can also click on a link to see the system on our galaxy map.<br />
@@ -29,7 +32,9 @@
 		Lookup System: <input type="text" name="name" /> <input type="submit" value="Lookup System" />
 	</form>
 </p>
+{% endif %}
 
+{% if exists canAccessFactionStatistics %}
 <h3>Factions</h3>
 <p>
 	Factions allows you to see the number of stations and systems a faction controls, and a graph of that information over time. You can also see the members of the faction which have been enetred into our DB.<br />
@@ -38,7 +43,9 @@
 		Lookup Faction: <select name="name">{% for faction in factions %}<option>{{faction}}</option>{% endfor %}</select> <input type="submit" value="Lookup Faction" />
 	</form>
 </p>
+{% endif %}
 
+{% if exists canAccessLocalityStatistics %}
 <h3>Localities</h3>
 <p>
 	Localities allows you to see a list of systems in each locality and a few other pieces of info about the locality.<br />
@@ -69,5 +76,6 @@
 		<input type="submit" value="Lookup Loclity" />
 	</form>
 </p>
+{% endif %}
 
 {% endblock %}
