@@ -1,6 +1,6 @@
 {% extends base %}
 
-{% block pageTitle %}Players - New{% endblock %}
+{% block pageTitle %}Players -> Add{% endblock %}
 
 {% block content %}
 

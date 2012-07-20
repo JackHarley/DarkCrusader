@@ -1,6 +1,6 @@
 {% extends base %}
 
-{% block pageTitle %}Faction - {{faction.name}}{% endblock %}
+{% block pageTitle %}Faction -> {{faction.name}}{% endblock %}
 
 {% block content %}
 	<h2>{{faction.name}}</h2>

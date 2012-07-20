@@ -55,6 +55,8 @@ class SystemsController extends Controller {
 	}
 
 	public function stats() {
+		$this->checkAuth("access_system_stats");
+		
 		$sm = SystemModel::getInstance();
 		$sm->generateControlledSystemsByFactionGraphCached();
 		$sm->generateControlledSystemsGraphCached();

@@ -1,6 +1,6 @@
 {% extends base %}
 
-{% block pageTitle %}Systems - {{system.system_name}}{% endblock %}
+{% block pageTitle %}Systems -> {{system.system_name}}{% endblock %}
 
 {% block content %}
 
