@@ -1,5 +1,10 @@
 # Changelog
 
+1.0.018
+--------------
+* Players :)
+* Catch soap faults instead of letting them go all fatal
+
 1.0.017
 --------------
 * Added a new option to the scan route planner
