@@ -88,8 +88,12 @@ class PlayerModel extends Model {
 		if ($faction)
 			$player->faction = $faction;
 
-		if ($officialStatus)
-			$player->official_status = $officialStatus;
+		if ($officialStatus) {
+			$user = UserModel::getInstance()->getUser($user);
+
+			if ($user->permissions->hasPermission("edit_official_military_statuses"))
+				$player->official_status = $officialStatus;
+		}
 
 		$player->update();
 	}

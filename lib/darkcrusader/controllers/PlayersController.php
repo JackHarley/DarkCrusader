@@ -33,8 +33,14 @@ class PlayersController extends Controller {
 			$player = PlayerModel::getInstance()->getPlayer($playerName);
 		}
 		catch (NoSuchPlayerException $e) {
-			$this->alert("info", "The player " . $playerName . " does not exist in our database. You can add them below");
-			$this->redirect("/index.php/players/add?name=" . $playerName);
+			if ($this->checkAuth("add_players", false)) {
+				$this->alert("info", "The player " . $playerName . " does not exist in our database. You can add them below");
+				$this->redirect("/index.php/players/add?name=" . $playerName);
+			}
+			else {
+				$this->alert("info", "The player " . $playerName . " does not exist in our database, please contact a SWAT/FIRE member to get them added");
+				$this->redirect("/index.php/stats");
+			}
 		}
 
 		if ($this->checkAuth("edit_players", false))
