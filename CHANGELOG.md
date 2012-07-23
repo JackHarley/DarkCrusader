@@ -1,5 +1,13 @@
 # Changelog
 
+1.0.020
+--------------
+* Instead of doing a site bank update on every page load (slooooww) do one only when requested via the sidebar. I'll need to update the FAQ and premium page to reflect this.
+* Fixed some dead links and a typo
+* Added a map which displays systems with good 10/hour resources
+* Added IRC chat and updated example config
+* Added some additional methods to the OuterEmpiresModel for future use. They need fully implementing before use though
+
 1.0.019
 --------------
 * Coloured military statuses
