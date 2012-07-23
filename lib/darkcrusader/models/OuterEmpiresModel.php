@@ -211,5 +211,47 @@ class OuterEmpiresModel extends Model {
 		return $c;
 	}
 
+	/**
+	 * Gets faction members?
+	 * 
+	 * @param int $user user id
+	 * @param mixed $accessKey leave as boolean false to use access key for default character of user
+	 * specified, or optionally override the user and use the access key supplied
+	 * @return OECharacter character info
+	 */
+	public function getFactionMembers($user, $accessKey=false) {
+
+		if ($accessKey)
+			$userAccessKey = $accessKey;
+		else
+			$userAccessKey = UserModel::getInstance()->getDefaultCharacter($user)->api_key;
+
+		$response = $this->queryAPI("GetFactionMembers", array(), $userAccessKey);
+		$response = $response->GetFactionMembersResult;
+
+		print_r($response);
+	}
+
+	/**
+	 * Gets cargo inventory
+	 * 
+	 * @param int $user user id
+	 * @param mixed $accessKey leave as boolean false to use access key for default character of user
+	 * specified, or optionally override the user and use the access key supplied
+	 * @return 
+	 */
+	public function getCargoInventory($user, $accessKey=false) {
+
+		if ($accessKey)
+			$userAccessKey = $accessKey;
+		else
+			$userAccessKey = UserModel::getInstance()->getDefaultCharacter($user)->api_key;
+
+		$response = $this->queryAPI("GetCargoInventory", array(), $userAccessKey);
+		$response = $response->GetCargoInventoryResult;
+
+		print_r($response);
+	}
+
 }
 ?>
