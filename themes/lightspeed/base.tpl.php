@@ -42,6 +42,10 @@
 			<li><a href="{% url /index.php/utilities %}">utilities</a></li>
 			<li><a href="{% url /index.php/personalbank %}">finance manager</a> </li>
 
+			{% if exists userCanAccessChat %}
+				<li><a href="{% url /index.php/chat %}">irc chat</a></li>
+			{% endif %}
+
 			{% if exists userCanAccessScans %}
 				<li><a href="{% url /index.php/scans %}">scans</a></li>
 			{% endif %}
@@ -91,7 +95,7 @@
 					<h2>{{activeUser.username}}</h2>
 					<div class="pagecontent">
 						<p>
-							Site Bank Balance: {{activeUser.balance|numberformat}}c<br />
+							Site Bank: {{activeUser.balance|numberformat}}c <a href="{% url /index.php %}?dositebankupdate=1">[Update]</a><br />
 							Premium: 
 							{% if exists userIsPremium %}
 								<span style="color:lime">Yes</span>

@@ -76,16 +76,23 @@ if ($activeUser->username) {
     }
 }
 
-// Get any new site bank transactions and so processing stuff
-$sbm = SiteBankModel::getInstance();
-try {
-    $sbm->updateDB();
-}
-catch (APIQueryFailedException $e) {
-    $c->alert("warning", "OE API Query Failed, your site bank balance may not be completely up to date, please reload the page to update it. If you see this warning on every page please PM Jedi Jackian in game immediately");
-}
+if ($_GET["dositebankupdate"]) {
 
-$sbm->processAnyUnprocessedTransfers();
+    // Get any new site bank transactions and so processing stuff
+    $sbm = SiteBankModel::getInstance();
+    try {
+        $sbm->updateDB();
+    }
+    catch (APIQueryFailedException $e) {
+        $c->alert("warning", "Site bank balances update failed, please try again. If this problem persists contact an admin");
+        $failed = true;
+    }
+
+    $sbm->processAnyUnprocessedTransfers();
+
+    if (!$failed)
+        $c->alert("success", "All site bank balances updated successfully");
+}
 
 // Add the dispatcher rules
 Dispatcher::addHomeMatchRule('\darkcrusader\controllers\HomeController', "index");
