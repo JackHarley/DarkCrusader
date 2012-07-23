@@ -14,9 +14,8 @@
 	<ul>
 		<li><a href="{% url /index.php/scans/submit %}">Submit scan</a><br /></li>
 		<li><a href="{% url /index.php/scans/search %}">Search for a resource</a></li>
-		<li><a href="{% url /index.php/systems %}">Search for a system</a></li>
-		<li><a href="{% url /index.php/locality %}">Get locality information</a></li>
-		<li><a href="{% url /index.php/locality/scanplan %}">Create an optimized scan route for a locality</a></li>
+		<li><a href="{% url /index.php/stats %}">Search for a locality/system</a></li>
+		<li><a href="{% url /index.php/localities/scanplan %}">Create an optimized scan route for a locality</a></li>
 	</ul>
 </p>
 
