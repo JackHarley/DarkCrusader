@@ -239,7 +239,6 @@ class ScanModel extends Model{
 	 * @return array array of ScanResultBeans
 	 */
 	public function searchScansByResource($resource) {
-
 		$scans = array();
 		$qualities = array("good", "medium", "low", "na");
 
@@ -257,7 +256,6 @@ class ScanModel extends Model{
 	}
 
 	public function createScanningRouteForLocality($q, $s, $r, $l, $startLocation, $fuelCapacity, $fuelConsumptionPerLightyear, $displaySystemsAlreadyScannedByUser=false, $displaySystemsAlreadyScanned=true) {
-
 		$systems = SystemModel::getInstance()->getNonGovernmentSystemsInLocality($q, $s, $r, $l);
 
 		if (!$displaySystemsAlreadyScannedByUser) {
@@ -324,5 +322,33 @@ class ScanModel extends Model{
 
 		return $instructions;
 	}
+
+	/**
+	 * Gets scans with good 10 resources (not water/food)
+	 * 
+	 * @return array ScanBeans
+	 */
+	public function getScansWithGood10Resources() {
+		$q = new Query("SELECT");
+		$q->whereOpenGroup();
+		$q->where("resource_quality = ?", "Good");
+		$q->where("resource_quality = ?", "na", "OR");
+		$q->whereCloseGroup();
+		$q->where("resource_extraction_rate = ?", 10, "AND");
+		$q->where("resource_name != ?", "Food");
+		$q->where("resource_name != ?", "Water");
+
+		$srbs = ScanResultBean::select($q, true);
+
+		$sbs = array();
+		foreach($srbs as $srb) {
+			$sbs[] = $srb->scan;
+		}
+
+		unset($sbs[0]);
+
+		return $sbs;
+	}
+
 }
 ?>
