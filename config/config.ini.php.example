@@ -6,10 +6,23 @@
 [general]
 app_url = "http://tacticalresponseteam.in"
 site_name = "SWAT/FIRE"
+
+; oe api app key, youll need to get one from the devs
 oe_api_application_key = "vcbxcvbbcvx"
+
+; details the account you want people to transfer money to when they pay
+; for things (i.e. the site bank)
+site_bank_api_access_key = "dfasdf"
+site_bank_character_name = "Some Character"
 
 ; uncomment this and put in your google analytics user code to enable google analytics
 ;google_analytics_code = "UA-XXXXXXX-X"
+
+display_errors = "Off"
+
+[chat]
+private_channel = "thisisachannelonrizon"
+private_channel_key = "randomkey"
 
 [settings]
 default_group = 1

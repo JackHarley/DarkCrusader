@@ -190,6 +190,8 @@ class Controller extends \hydrogen\controller\Controller {
 			View::setVar("userIsPremium", "yes");
 		if ($activeUser->permissions->hasPermission("access_scans"))
 			View::setVar("userCanAccessScans", "yes");
+		if ($activeUser->permissions->hasPermission("access_private_chat"))
+			View::setVar("userCanAccessChat", "yes");
 	}
 }
 
