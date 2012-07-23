@@ -11,6 +11,7 @@ namespace darkcrusader\models;
 use hydrogen\model\Model;
 
 use darkcrusader\models\UserModel;
+use darkcrusader\models\ScanModel;
 
 use hydrogen\database\Query;
 use darkcrusader\sqlbeans\ScanBean;
@@ -721,6 +722,23 @@ class SystemModel extends Model {
 		else
 			return false; // we can't :(
 
+	}
+
+	/**
+	 * Gets the latest system stats for systems with Good 10 resources
+	 * 
+	 * @return array SystemStatsBeans
+	 */
+	public function getSystemsWithGood10ResourcesLatestStats__3600_scans() {
+		$scans = ScanModel::getInstance()->getScansWithGood10Resources();
+
+		$systemStats = array();
+
+		foreach($scans as $scan) {
+			$systemStats[] = $scan->system->stats;
+		}
+
+		return $systemStats;
 	}
 
 		
