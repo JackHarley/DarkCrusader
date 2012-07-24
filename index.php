@@ -72,7 +72,7 @@ $activeUser = $um->getActiveUser();
 if ($activeUser->username) {
     $characters = $um->getCharacterLinkRequests($activeUser->id);
     foreach($characters as $character) {
-        $c->alert("info", "You still need to verify your character " . $character->character_name . ". To verify it, simply type /transfercredits " . Config::getRequiredVal("general", "site_bank_character_name") . "," . $character->verification_amount . " into OE chat while logged in as " . $character->character_name . ". Alternatively, you can delete this link request from Character Management.");
+        $c->alert("info", "You still need to verify your character " . $character->character_name . ". To verify it, simply type /transfercredits " . Config::getRequiredVal("general", "site_bank_character_name") . "," . $character->verification_amount . " into OE chat while logged in as " . $character->character_name . ", then just click [Update] next to Site Bank in the sidebar. Alternatively, you can delete this link request from Character Management.");
     }
 }
 
