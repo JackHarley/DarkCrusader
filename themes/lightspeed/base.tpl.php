@@ -41,10 +41,7 @@
 			<li><a href="{% url /index.php/maps %}">maps</a></li>
 			<li><a href="{% url /index.php/utilities %}">utilities</a></li>
 			<li><a href="{% url /index.php/personalbank %}">finance manager</a> </li>
-
-			{% if exists userCanAccessChat %}
-				<li><a href="{% url /index.php/chat %}">irc chat</a></li>
-			{% endif %}
+			<li><a href="{% url /index.php/chat %}">irc chat</a></li>
 
 			{% if exists userCanAccessScans %}
 				<li><a href="{% url /index.php/scans %}">scans</a></li>

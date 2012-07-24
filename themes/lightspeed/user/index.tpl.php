@@ -6,7 +6,7 @@ Overview
 
 {% block content %}
 
-<h2>Account Details</h2>
+<h2>{{activeUser.username}}</h2>
 
 <ul>
 	<li>User Group: {{activeUser.group.description}}</li>
@@ -20,7 +20,7 @@ Overview
 	</li>
 </ul>
 
-<h2>Linked Characters - <a href="{% url /index.php/user/characters %}">Manage</a></h2>
+<h3>Linked Characters - <a href="{% url /index.php/user/characters %}">Manage</a></h3>
 
 {% if linkedCharacters|length < 1 %}
 	<p>You have no linked characters</p>
@@ -32,7 +32,7 @@ Overview
 	</ul>
 {% endif %}
 
-<h2>Premium</h2>
+<h3>Premium</h3>
 
 <p>
 	{% if exists userIsPremium %}
@@ -54,7 +54,7 @@ Overview
 	<h3>Subscribe/Extend Premium</h3>
 
 	<p>
-		You can add funds to your account by simply transferring credits to the OE account '{{siteBankCharacterName}}' from any of your linked characters, reload this page and you will see your site funds balance in the sidebar<br />
+		You can add funds to your account by simply transferring credits to the OE account '{{siteBankCharacterName}}' from any of your linked characters, then click the [Update] button in the sidebar to update the balance in the sidebar<br />
 		For example, to transfer 10,000c, you would type <i>/transfercredits {{siteBankCharacterName}},10000</i> into chat
 	</p>
 

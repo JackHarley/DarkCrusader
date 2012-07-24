@@ -21,6 +21,7 @@ site_bank_character_name = "Some Character"
 display_errors = "Off"
 
 [chat]
+public_channel = "outerempires"
 private_channel = "thisisachannelonrizon"
 private_channel_key = "randomkey"
 

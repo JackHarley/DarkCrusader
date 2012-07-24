@@ -12,7 +12,7 @@
 		This site was designed primarily as a members only utility site, but has quickly expanded into the one stop shop for OE statistics and we have plenty of new surprises planned for the site to give both members and non members help managing their OE life.
 	</p>
 	<p>
-		If you encounter a bug with the site, or have any suggestions for the site, please send an ingame message to Jedi Jackian, and I'll get back to you ASAP. <a href="http://forums.tacticalresponseteam.in/viewforum.php?f=14">You can see the latest site patches here</a>.
+		If you encounter a bug with the site, or have any suggestions for the site, please send an ingame message to Jedi Jackian, and I'll get back to you ASAP. <a href="http://forums.swatfire.com/viewforum.php?f=14">You can see the latest site patches here</a>.
 	</p>
 {% endblock %}
 

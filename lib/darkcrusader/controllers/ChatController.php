@@ -15,20 +15,25 @@ use hydrogen\config\Config;
 use darkcrusader\models\UserModel;
 
 class ChatController extends Controller {
-	
-	public function index() {
-		$this->redirect("/index.php/chat/secret");
-	}
 
-	public function secret() {
-		$this->checkAuth("access_private_chat");
+	public function index() {
+		$this->checkAuth("access_chat");
 
 		$user = UserModel::getInstance()->getActiveUser();
+		if ($user->username)
+			View::setVar("nickname", str_replace(" ", "", $user->username));
+
+		if ($this->checkAuth("access_private_chat", false)) {
+			View::load('chat', array(
+				"channelString" => Config::getRequiredVal("chat", "private_channel") . "%2C" . Config::getRequiredVal("chat", "public_channel") . "%20" . Config::getRequiredVal("chat", "private_channel_key"),
+				"connectString" => "irc.rizon.net and join #" . Config::getRequiredVal("chat", "public_channel") . " for public chat and #" . Config::getRequiredVal("chat", "private_channel") . " with the key " . Config::getRequiredVal("chat", "private_channel_key") . " for private SWAT/FIRE chat"
+			));
+			return;
+		}
 		
 		View::load('chat', array(
-			"nickname" => str_replace(" ", "", $user->username),
-			"channel" => Config::getRequiredVal("chat", "private_channel"),
-			"key" => Config::getRequiredVal("chat", "private_channel_key")
+			"channelString" => Config::getRequiredVal("chat", "public_channel"),
+			"connectString" => "irc.rizon.net and join #" . Config::getRequiredVal("chat", "public_channel")
 		));
 	}
 }

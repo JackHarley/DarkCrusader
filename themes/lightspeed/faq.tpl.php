@@ -43,7 +43,7 @@
 
 <h3>How do I add credits to my site bank account</h3>
 <p>
-	Simply transfer credits to {{siteBankCharacterName}} from any of your linked characters (<a href="{% url /index.php/user/characters %}">you can manage linked characters here</a>) and then reload this site, your balance will automatically update.
+	Simply transfer credits to {{siteBankCharacterName}} from any of your linked characters (<a href="{% url /index.php/user/characters %}">you can manage linked characters here</a>) and then press the [Update] button in the sidebar next to your Site Bank Balance.
 	For example, to add 1,000c to your site account, type this into OE chat: <i>/transfercredits {{siteBankCharacterName}},1000</i>
 </p>
 {% endblock %}
