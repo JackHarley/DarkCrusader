@@ -42,7 +42,7 @@ class ScanBean extends SQLBean {
 	public function get_location_string() {
 		$system = $this->getMapped("system");
 
-		$system_name = '<a href="' . Config::getVal("general", "app_url") . '/index.php/systems?name=' . $system->system_name . '">' . $system->system_name . '</a>';
+		$system_name = '<a href="' . Config::getVal("general", "app_url") . '/index.php/systems/system?name=' . $system->system_name . '">' . $system->system_name . '</a>';
 
 		$locationString = $system_name . " " . $this->planet_number;
 		
