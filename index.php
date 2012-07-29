@@ -39,14 +39,14 @@ if (Config::getRequiredVal("general", "display_errors") == "On")
     error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
 ini_set("display_errors", Config::getRequiredVal("general", "display_errors"));
 
-// If accessed from jjutilities, stuff
+// If accessed from jjutilities, change some config values so that we load jjutilities views instead of swatfire ones
 if ($_SERVER["HTTP_HOST"] == "jjutilities.co.cc") {
     Config::setVal("general", "site_name", "JJ Utilities");
     Config::setVal("general", "app_url", "http://jjutilities.co.cc");
     Config::setVal("view", "folder", "themes/jjutilities");
     Config::setVal("view", "url_path", "themes/jjutilities");
-    Config::setVal("general", "site_bank_character_name", "JJ Utilities");
-    Config::setVal("general", "site_bank_api_access_key", "fhgf");
+    Config::setVal("general", "site_bank_character_name", "Jedi Utilities");
+    Config::setVal("general", "site_bank_api_access_key", "7430009cc5");
 }
 
 // Check if db is not installed, if not, redirect user to install
