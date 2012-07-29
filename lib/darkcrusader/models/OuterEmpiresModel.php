@@ -39,7 +39,7 @@ class OuterEmpiresModel extends Model {
 			"AccessKey" => $accessKey,
 			"ApplicationKey" => $applicationKey,
 		);
-		
+
 		foreach ($parameters as $key => $value)
 			$query[$key] = $value;
 
