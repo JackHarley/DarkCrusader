@@ -711,6 +711,22 @@ class UserModel extends Model {
 		return false;
 	}
 
+	/**
+	 * Gets a user's clearance level (returns whichever is higher, user clearance, or user group
+	 * clearance)
+	 * 
+	 * @param int $user user id
+	 * @return int clearance level
+	 */
+	public function getClearanceLevel($user) {
+		$user = $this->getUser($user);
+
+		if ($user->group->clearance_level > $user->clearance_level)
+			return $user->group->clearance_level;
+		else
+			return $user->clearance_level;
+	}
+
     /**
      * _calculatePasswordHash
      * Get the password hash (to store in the database) for a specific password.

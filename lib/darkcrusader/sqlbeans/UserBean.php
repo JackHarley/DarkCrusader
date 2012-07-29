@@ -2,6 +2,7 @@
 namespace darkcrusader\sqlbeans;
 use hydrogen\sqlbeans\SQLBean;
 use darkcrusader\models\PermissionsModel;
+use darkcrusader\models\UserModel;
 
 class UserBean extends SQLBean {
 
@@ -38,5 +39,8 @@ class UserBean extends SQLBean {
 		return $this->permissions;
 	}
 
+	public function get_inherited_clearance_level() {
+		return UserModel::getInstance()->getClearanceLevel($this->id);
+	}
 }
 ?>

@@ -39,7 +39,17 @@ if (Config::getRequiredVal("general", "display_errors") == "On")
     error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
 ini_set("display_errors", Config::getRequiredVal("general", "display_errors"));
 
-// check if db is not installed, if not, redirect user to install
+// If accessed from jjutilities, stuff
+if ($_SERVER["HTTP_HOST"] == "jjutilities.co.cc") {
+    Config::setVal("general", "site_name", "JJ Utilities");
+    Config::setVal("general", "app_url", "http://jjutilities.co.cc");
+    Config::setVal("view", "folder", "themes/jjutilities");
+    Config::setVal("view", "url_path", "themes/jjutilities");
+    Config::setVal("general", "site_bank_character_name", "JJ Utilities");
+    Config::setVal("general", "site_bank_api_access_key", "fhgf");
+}
+
+// Check if db is not installed, if not, redirect user to install
 $im = InstallModel::getInstance();
 $ic = InstallController::getInstance();
 if ($im->checkIfDatabaseIsInstalled() !== true) {
