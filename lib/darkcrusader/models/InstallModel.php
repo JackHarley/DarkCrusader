@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 12;
+	const maxDbVersion = 14;
 
 	/**
 	 * Checks if the DB is installed
@@ -575,6 +575,37 @@ class InstallModel extends Model {
 		$pm = PermissionsModel::getInstance();
 		$pm->createPermission("chat", "access_chat", "Access public chat");
 		$pm->createPermission("chat", "access_private_chat", "Access private chat");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 13
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion13($pdo, $user, $pass) {
+		$pdo->pdo->query("ALTER TABLE faction_bank_transactions ADD `system_id` bigint(20) unsigned NOT NULL");
+		$pdo->pdo->query("ALTER TABLE faction_bank_transactions ADD `planet_numeral` varchar(4) NOT NULL");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 14
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion14($pdo, $user, $pass) {
+		$pdo->pdo->query("ALTER TABLE faction_bank_transactions ADD `description` varchar(128) NOT NULL");
 
 		return true;
 	}

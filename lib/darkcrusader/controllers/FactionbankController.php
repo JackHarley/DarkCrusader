@@ -63,5 +63,13 @@ class FactionbankController extends Controller {
 		$this->alert("success", $transactionsAdded . " transactions added to database successfully!");
 		$this->index();
 	}
+
+	public function transactions() {
+		$this->checkAuth("access_faction_bank");
+
+		View::load('faction_bank/transactions', array(
+			"transactions" => FactionBankModel::getInstance()->getLatestTransactions(500)
+		));
+	}
 }
 ?>

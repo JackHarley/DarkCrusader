@@ -13,6 +13,7 @@ use hydrogen\database\Query;
 use hydrogen\recache\RECacheManager;
 
 use darkcrusader\models\UserModel;
+use darkcrusader\models\SystemModel;
 use darkcrusader\sqlbeans\FactionBankTransactionBean;
 
 use darkcrusader\bank\exceptions\IncorrectTransactionLogPasteException;
@@ -152,13 +153,17 @@ class FactionBankModel extends Model {
 	 * 
 	 * @param string $type type of transaction, 'transfer' or 'join_fee'
 	 * @param string $direction transfer direction, 'in' or 'out'
+	 * @param string $description transaction description according to OE
 	 * @param int $amount transaction amount
 	 * @param int $balance bank balance after transaction
 	 * @param date YYYY-MM-DD HH MM SS $date date and time of transaction
 	 * @param string $player player name, if applicable
+	 * @param string $system system id, if applicable
+	 * @param string $planetNumeral planet numeral, e.g. III, if applicable
 	 * @param boolean $checkDuplicate if set to true, checks if transaction is duplicate before inserting
 	 */
-	public function addTransaction($type, $direction, $amount, $balance, $date, $player=false, $checkDuplicate=true) {
+	public function addTransaction($type, $direction, $description, $amount, $balance, $date, $player=false, 
+									$system=false, $planetNumeral=false, $checkDuplicate=true) {
 		if ($checkDuplicate) {
 			$q = new Query("SELECT");
 			$q->where("date = ?", $date);
@@ -174,11 +179,16 @@ class FactionBankModel extends Model {
 		$btb = new FactionBankTransactionBean;
 		$btb->type = $type;
 		$btb->direction = $direction;
+		$btb->description = $description;
 		$btb->amount = $amount;
 		$btb->balance = $balance;
 		$btb->date = $date;
-		if (($player) && (is_string($player)))
+		if ($player) 
 			$btb->player_name = $player;
+		if ($system)
+			$btb->system_id = $system;
+		if ($planetNumeral)
+			$btb->planet_numeral = $planetNumeral;
 
 		$btb->insert();
 
@@ -218,9 +228,9 @@ class FactionBankModel extends Model {
 			$datetime = $fields[0];
 			$oeType = $fields[1];
 
-			// if oe type is not 'faction', then the user probably pasted their own accidentally,
+			// if oe type is not 'faction' or 'station', then the user probably pasted their own accidentally,
 			// or else something else went horribly wrong with parsing
-			if ($oeType != "Faction")
+			if (($oeType != "Faction") && ($oeType != "Station"))
 				throw new IncorrectTransactionLogPasteException;
 
 			$description = $fields[2];
@@ -253,25 +263,56 @@ class FactionBankModel extends Model {
 				$type = "join_fee";
 				$direction = "out";
 				$player = $words[3] . " " . $words[4];
+				$system = false;
+				$planetNumeral = false;
 			}
-			else if ($words[2] == "to") {
+			else if (($words[1] == "transferred") && ($words[2] == "to")) {
 				$type = "transfer";
 				$direction = "in";
 				$player = $words[6] . " " . $words[7];
+				$system = false;
+				$planetNumeral = false;
 			}
-			else if ($words[2] == "from") {
+			else if (($words[1] == "transferred") && ($words[2] == "from")) {
 				$type = "transfer";
 				$direction = "out";
 				$player = $words[6] . " " . $words[7];
+				$system = false;
+				$planetNumeral = false;
 			}
+			else if ($words[3] == "fuel") {
+				$type = "fuel";
+				$direction = "in";
+				$player = false;
+				$system = $words[6];
+				$planetNumeral = $words[7];
+			}
+			else if ($words[0] == "Market") {
+				$type = "market";
+				$direction = "in";
+				$player = false;
+				$system = $words[4];
+				$planetNumeral = $words[5];
+			}
+
+			// if system, convert system name to a db id
+			if ($system) {
+				$system = SystemModel::getInstance()->getSystem(false, $system);
+				$systemId = $system->id;
+			}
+			else
+				$systemId = 0;
 
 			$result = $this->addTransaction(
 				$type,
 				$direction,
+				$description,
 				$amount,
 				$balance,
 				$datetime,
-				$player
+				$player,
+				$systemId,
+				$planetNumeral
 			);
 
 			if ($result === true)
