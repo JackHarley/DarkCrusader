@@ -42,7 +42,7 @@
 						
 						<td>{{transaction.type|capfirst}}</td>
 						<td>{% if ! empty transaction.player_name %}{{transaction.player_name}}{% else %}N/A{% endif %}</td>
-						<td>{% if ! empty transaction.system_id %}{{transaction.system.system_name}} {{transaction.planet_numeral}}{% else %}N/A{% endif %}</td>
+						<td>{% if transaction.system_id != 0 %}{{transaction.system.system_name}} {{transaction.planet_numeral}}{% else %}N/A{% endif %}</td>
 
 						{% if transaction.direction == "out" %}
 							<td><span style="color:red">-{{transaction.amount|numberformat}}c</span></td>
