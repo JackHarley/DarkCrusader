@@ -5,7 +5,12 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>JJ Utilities -> {% block pageTitle %}{% endblock %}</title>
 	<link rel="stylesheet" type="text/css" href="{% viewurl /style.css %}" media="screen" />
-
+	<link rel="icon" type="image/png" href="{% viewurl /images/colossusfavicon.png %}">
+	<link rel="apple-touch-icon" sizes="57x57" href="{% viewurl /images/apple-touch-icon-57x57.png %}" />
+	<link rel="apple-touch-icon" sizes="114x114" href="{% viewurl /images/apple-touch-icon-114x114.png %}" />
+	<link rel="apple-touch-icon" sizes="72x72" href="{% viewurl /images/apple-touch-icon-72x72.png %}" />
+	<link rel="apple-touch-icon" sizes="144x144" href="{% viewurl /images/apple-touch-icon-144x144.png %}" />
+	
 	<!-- google analytics -->
 	{% if ! exists userIsAdmin %}
 		{% if exists googleAnalyticsCode %}

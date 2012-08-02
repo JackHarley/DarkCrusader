@@ -26,7 +26,9 @@
 		<p>
 			<table cellpadding="0" border="0">
 				<tr>
+					<th>Type</th>
 					<th>Player</th>
+					<th>Station</th>
 					<th>Amount</th>
 					<th>Balance</th>
 				</tr>
@@ -38,8 +40,10 @@
 						<tr>
 					{% endif %}
 						
-						<td>{{transaction.player_name}}</td>
-						
+						<td>{{transaction.type|capfirst}}</td>
+						<td>{% if ! empty transaction.player_name %}{{transaction.player_name}}{% else %}N/A{% endif %}</td>
+						<td>{% if ! empty transaction.system_id %}{{transaction.system.system_name}} {{transaction.planet_numeral}}{% else %}N/A{% endif %}</td>
+
 						{% if transaction.direction == "out" %}
 							<td><span style="color:red">-{{transaction.amount|numberformat}}c</span></td>
 						{% else if transaction.direction == "in" %}
@@ -50,6 +54,8 @@
 					</tr>
 				{% endfor %}
 			</table>
+			<br />
+			<a href="{% url /index.php/factionbank/transactions %}">See More...</a>	
 		</p>
 	</div>
 </div>

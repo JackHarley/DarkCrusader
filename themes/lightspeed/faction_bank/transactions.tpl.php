@@ -1,11 +1,11 @@
 {% extends base %}
 
-{% block pageTitle %}Personal Bank{% endblock %}
+{% block pageTitle %}Faction Bank{% endblock %}
 
 {% block content %}
-<h2>Personal Bank</h2>
+<h2>Faction Bank</h2>
 
-<h3>Latest 300 Transactions</h3>
+<h3>Latest 500 Transactions</h3>
 
 <table cellpadding="0" border="0">
 	<tr>
@@ -23,7 +23,7 @@
 			<tr>
 		{% endif %}
 			<td width="100px">{{transaction.date|date:"d/m h:i"}}</td>
-			<td>{{transaction.type}}</td>
+			<td>{{transaction.type|capfirst}}</td>
 			<td>{{transaction.description}}</td>
 			
 			{% if transaction.direction == "out" %}
