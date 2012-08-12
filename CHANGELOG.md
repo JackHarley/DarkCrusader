@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.022
+--------------
+* Empire management
+
 1.0.021
 --------------
 * Tonnes of bug fixes and optimisations
