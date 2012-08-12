@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 14;
+	const maxDbVersion = 15;
 
 	/**
 	 * Checks if the DB is installed
@@ -611,6 +611,25 @@ class InstallModel extends Model {
 	}
 
 	/**
+	 * Migrate the database to version 15
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion15($pdo, $user, $pass) {
+		$pm = PermissionsModel::getInstance();
+		$pm->deletePermission("access_market_seller_overview");
+		$pm->deletePermission("access_market");
+		$pm->deletePermission("access_kos");
+		$pm->createPermission("empire", "access_empire", "Access empire management");
+
+		return true;
+	}
+
+	/**
 	 * Preload data
 	 *
 	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
@@ -637,8 +656,7 @@ class InstallModel extends Model {
 			"access_faction_stats",
 			"access_locality_stats",
 			"access_personal_bank",
-			"access_market_seller_overview",
-			"access_market")
+			"access_empire")
 		);
 		$ugm->addUserGroup("user", "User", "no", false, $pbs);
 
@@ -653,8 +671,7 @@ class InstallModel extends Model {
 			"access_system_stats",
 			"access_faction_stats",
 			"access_locality_stats",
-			"access_market_seller_overview",
-			"access_market")
+			"access_empire")
 		);
 		$ugm->addUserGroup("member", "Member", "no", false, $pbs);
 

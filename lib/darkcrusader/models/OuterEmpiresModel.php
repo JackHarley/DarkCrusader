@@ -14,6 +14,7 @@ use hydrogen\config\Config;
 use darkcrusader\models\UserModel;
 use darkcrusader\bank\PersonalBankTransaction;
 use darkcrusader\character\OECharacter;
+use darkcrusader\storeditems\StoredItem;
 use darkcrusader\oe\exceptions\APIQueryFailedException;
 
 class OuterEmpiresModel extends Model {
@@ -236,14 +237,14 @@ class OuterEmpiresModel extends Model {
 	}
 
 	/**
-	 * Gets cargo inventory
+	 * Gets stored items
 	 * 
 	 * @param int $user user id
 	 * @param mixed $accessKey leave as boolean false to use access key for default character of user
 	 * specified, or optionally override the user and use the access key supplied
-	 * @return 
+	 * @return array array of StoredItems
 	 */
-	public function getCargoInventory($user, $accessKey=false) {
+	public function getStoredItems($user, $accessKey=false) {
 
 		if ($accessKey)
 			$userAccessKey = $accessKey;
@@ -252,8 +253,39 @@ class OuterEmpiresModel extends Model {
 
 		$response = $this->queryAPI("GetCargoInventory", array(), $userAccessKey);
 		$response = $response->GetCargoInventoryResult;
+		$rawStoredItems = $response->CargoItems->CargoItem;
 
-		print_r($response);
+		$storedItems = array();
+		foreach($rawStoredItems as $rawStoredItem) {
+			$storedItem = new StoredItem;
+			$storedItem->location = $rawStoredItem->NameOfLocation;
+			$storedItem->description = $rawStoredItem->NameOfItem;
+			
+			switch ($rawStoredItem->ItemType) {
+				case "R":
+					$storedItem->type = "resource";
+				break;
+				case "S":
+					$storedItem->type = "scan";
+				break;
+				case "D":
+					$storedItem->type = "blueprint";
+				break;
+				case "SH":
+					$storedItem->type = "hull";
+				break;
+				case "C":
+					$storedItem->type = "cannisters";
+				break;
+
+			}
+			$storedItem->oeId = $rawStoredItem->ItemID;
+			$storedItem->quantity = $rawStoredItem->Quantity;
+
+			$storedItems[] = $storedItem;
+		}
+
+		return $storedItems;
 	}
 
 }

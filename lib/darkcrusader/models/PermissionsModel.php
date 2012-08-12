@@ -98,6 +98,29 @@ class PermissionsModel extends Model {
 	}
 
 	/**
+	 * Deletes a permission
+	 *
+	 * @param string permission name (access_site)
+	 */
+	public function deletePermission($name) {
+
+		$q = new Query("SELECT");
+		$q->where("name = ?", $name);
+		$pbs = PermissionBean::select($q);
+		$pb = $pbs[0];
+
+		if (!$pb->id)
+			return;
+		
+		$q = new Query("DELETE");
+		$q->from("group_permissions");
+		$q->where("permission_id = ?", $pb->id);
+		$q->prepare()->execute();
+
+		$pb->delete();
+	}
+
+	/**
 	 * Gets all permissions and returns as an array of PermissionBeans
 	 *
 	 * @return array array of PermissionBeans
