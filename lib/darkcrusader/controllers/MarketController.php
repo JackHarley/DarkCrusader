@@ -11,6 +11,7 @@ namespace darkcrusader\controllers;
 use darkcrusader\controllers\Controller;
 
 use darkcrusader\models\MarketModel;
+use darkcrusader\models\PremiumPersonalBankModel;
 use darkcrusader\models\UserModel;
 
 use hydrogen\view\View;
@@ -33,10 +34,14 @@ class MarketController extends Controller {
 		if (!$um->checkIfUserIsPremium($user->id))
 			$this->permissionDenied();
 
-		$topCustomers = MarketModel::getInstance()->getTopCustomers($user->id, 10);
+		$period = ($_GET["period"]) ? $_GET["period"] : "forever";
+
+		PremiumPersonalBankModel::getInstance()->updateDB($user->id);
+		$topCustomers = MarketModel::getInstance()->getTopCustomers($user->id, $period, 10);
 
 		View::load('market/seller', array(
-			"topCustomers" => $topCustomers
+			"topCustomers" => $topCustomers,
+			"period" => $period
 		));
 	}
 }

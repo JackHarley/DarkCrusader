@@ -6,11 +6,16 @@
 <h2>Seller Overview - All Time</h2>
 
 <p>
-	Time Period: 
-	<select name="period">
-		<option>All Time</option>
-	</select>
-	<input type="submit" name="submit" value="Go" />
+	<form method="get" action="">
+		Time Period:
+		<select name="period">
+			<option value="forever" {% if period == "forever" %}selected{% endif %}>All Time</option>
+			<option value="last30days" {% if period == "last30days" %}selected{% endif %}>Last 30 Days</option>
+			<option value="last7days" {% if period == "last7days" %}selected{% endif %}>Last 7 Days</option>
+			<option value="last24hours" {% if period == "last24hours" %}selected{% endif %}>Last 24 Hours</option>
+		</select>
+		<input type="submit" value="Go" />
+	</form>
 </p>
 
 <h3>Your Top 10 Customers Ordered By Total Credit Sales</h3>

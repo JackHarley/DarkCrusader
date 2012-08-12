@@ -66,9 +66,13 @@ class MarketModel extends Model {
 			$customers[$customerName]->numberOfIndividualSales++;
 		}
 
+		unset($btbs);
+
 		// order by total sales
 		$orderedCustomers = array();
-		while (count($customers) > 0) {
+		$timesToRun = count($customers);
+		for ($timesRun=0; $timesRun<$timesToRun; $timesRun++) {
+
 			$best = new MarketCustomer;
 
 			foreach($customers as $customer) {
@@ -78,8 +82,10 @@ class MarketModel extends Model {
 
 			}
 
-			$orderedCustomers[] = $best;
 			unset($customers[$best->name]);
+			$orderedCustomers[] = $best;
+
+			unset($best);
 		}
 
 		if ($limit) {
