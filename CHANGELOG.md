@@ -1,5 +1,11 @@
 # Changelog
 
+1.0.021
+--------------
+* Tonnes of bug fixes and optimisations
+* JJUtilities
+* IRC chat improvements
+
 1.0.020
 --------------
 * Instead of doing a site bank update on every page load (slooooww) do one only when requested via the sidebar. I'll need to update the FAQ and premium page to reflect this.
