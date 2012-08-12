@@ -11,7 +11,7 @@
 
 // Initialize
 session_start();
-date_default_timezone_set("Europe/Dublin"); 
+date_default_timezone_set("Europe/Dublin");
 
 // Include libraries
 require_once(__DIR__ . '/lib/hydrogen/hydrogen.inc.php');
@@ -86,10 +86,11 @@ if ($activeUser->username) {
     }
 }
 
-if ($_GET["dositebankupdate"]) {
+// Get any new site bank transactions and so processing stuff
+$sbm = SiteBankModel::getInstance();
 
-    // Get any new site bank transactions and so processing stuff
-    $sbm = SiteBankModel::getInstance();
+if ($_GET["dositebankupdate"]) {
+    
     try {
         $sbm->updateDB();
     }
@@ -98,11 +99,11 @@ if ($_GET["dositebankupdate"]) {
         $failed = true;
     }
 
-    $sbm->processAnyUnprocessedTransfers();
-
     if (!$failed)
         $c->alert("success", "All site bank balances updated successfully");
 }
+
+$sbm->processAnyUnprocessedTransfers();
 
 // Add the dispatcher rules
 Dispatcher::addHomeMatchRule('\darkcrusader\controllers\HomeController', "index");

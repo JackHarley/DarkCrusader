@@ -96,8 +96,11 @@ class OuterEmpiresModel extends Model {
 
 		$working = $this->queryAPI("GetTransactions", array("Days" => $days), $userAccessKey);
 		
+		if ($working->GetTransactionsResult->valid === false)
+			throw new APIQueryFailedException;
+
 		$transactions = $working->GetTransactionsResult->Transactions->Transaction;
-		
+
 		$bts = array();
 		foreach($transactions as $transaction) {
 			
