@@ -40,6 +40,7 @@
 		<ul>
 			<li><a href="{% url /index.php %}">home</a></li>
 			<li><a href="{% url /index.php/stats %}">stats & info</a></li>
+			<li><a href="{% url /index.php/empire %}">empire</a></li>
 			<li><a href="{% url /index.php/faq %}">faq</a></li>
 			<li><a href="{% url /index.php/maps %}">maps</a></li>
 			<li><a href="{% url /index.php/utilities %}">utilities</a></li>

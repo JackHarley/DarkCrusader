@@ -39,6 +39,14 @@ class UserBean extends SQLBean {
 		return $this->permissions;
 	}
 
+	protected $defaultCharacter;
+	public function get_default_character() {
+		if (!$this->defaultCharacter)
+			$this->defaultCharacter = UserModel::getInstance()->getDefaultCharacter($this->id);
+
+		return $this->defaultCharacter;
+	}
+
 	public function get_inherited_clearance_level() {
 		return UserModel::getInstance()->getClearanceLevel($this->id);
 	}
