@@ -30,8 +30,8 @@ class PersonalbankController extends Controller {
 			$bm->updateDB($user->id);
 
 			$latestTransactions = $bm->getLatestTransactions($user->id, 10);
-			//$incomeGraph = $bm->generateTransactionTypesGraph($user->id, "forever", "in");
-			//$expenditureGraph = $bm->generateTransactionTypesGraph($user->id, "forever", "out");
+			$incomeGraph = $bm->generateTransactionTypesGraph($user->id, "forever", "in");
+			$expenditureGraph = $bm->generateTransactionTypesGraph($user->id, "forever", "out");
 			View::setVar("richestMoment", $bm->getRichestMoment($user->id));
 		}
 		else {
