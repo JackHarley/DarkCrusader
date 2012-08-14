@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.023
+--------------
+* Colony management
+
 1.0.022
 --------------
 * Empire management
