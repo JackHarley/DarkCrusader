@@ -39,7 +39,7 @@
 
 <table border="0" cellpadding="0" width="100%">
 	<tr style="height:20px">
-		<th>Colony Name</th>
+		<th>Name</th>
 		<th>Location</th>
 		<th>Population</th>
 		<th>Worker Costs*</th>
@@ -66,7 +66,7 @@
 
 <table border="0" cellpadding="0" width="100%">
 	<tr style="height:20px">
-		<th>Colony Name</th>
+		<th>Name</th>
 		<th>Location</th>
 		<th>Population</th>
 		<th>Worker Costs*</th>
@@ -93,7 +93,7 @@
 
 <table border="0" cellpadding="0" width="100%">
 	<tr style="height:20px">
-		<th>Colony Name</th>
+		<th>Name</th>
 		<th>Location</th>
 		<th>Population</th>
 		<th>Worker Costs*</th>
@@ -118,7 +118,7 @@
 
 <table border="0" cellpadding="0" width="100%">
 	<tr style="height:20px">
-		<th>Colony Name</th>
+		<th>Name</th>
 		<th>Location</th>
 		<th>Population</th>
 		<th>Worker Costs*</th>
@@ -127,7 +127,7 @@
 
 	{% for colony in manufacturingColonies %}
 		<tr style="height:20px{% if forloop.counter0|divisibleby:2 %};background-color:#333333{% endif %}">
-			<td>{{colony.name}}</td>
+			<td><a href="{% url /index.php/empire/colonies/colony %}?id={{colony.id}}">{{colony.name}}</a></td>
 			<td>{{colony.location_string|unescape}}</td>
 			<td>{{colony.population|numberformat}}</td>
 			<td>{{colony.worker_costs_per_25_hours|numberformat}}c</td>
@@ -143,12 +143,39 @@
 <br />
 {% endif %}
 
+{% if ! empty defenseColonies %}
+<h3>Defense Colonies</h3>
+
+<table border="0" cellpadding="0" width="100%">
+	<tr style="height:20px">
+		<th>Name</th>
+		<th>Location</th>
+		<th>Station?</th>
+		<th>Population</th>
+		<th>Worker Costs*</th>
+	</tr>
+
+	{% for colony in defenseColonies %}
+		<tr style="height:20px{% if forloop.counter0|divisibleby:2 %};background-color:#333333{% endif %}">
+			<td><a href="{% url /index.php/empire/colonies/colony %}?id={{colony.id}}">{{colony.name}}</a></td>
+			<td>{{colony.location_string|unescape}}</td>
+			<td>{% if colony.system.stats.has_station == 1 %}Yes{% else %}No{% endif %}</td>
+			<td>{{colony.population|numberformat}}</td>
+			<td>{{colony.worker_costs_per_25_hours|numberformat}}c</td>
+		</tr>
+	{% endfor %}
+</table>
+
+<br />
+<br />
+{% endif %}
+
 {% if ! empty unclassifiedColonies %}
 <h3>Unclassified Colonies</h3>
 
 <table border="0" cellpadding="0" width="100%">
 	<tr style="height:20px">
-		<th>Colony Name</th>
+		<th>Name</th>
 		<th>Location</th>
 		<th>Population</th>
 		<th>Worker Costs*</th>
@@ -157,13 +184,13 @@
 
 	{% for colony in unclassifiedColonies %}
 		<tr style="height:20px{% if forloop.counter0|divisibleby:2 %};background-color:#333333{% endif %}"> 
-			<td>{{colony.name}}</td>
+			<td><a href="{% url /index.php/empire/colonies/colony %}?id={{colony.id}}">{{colony.name}}</a></td>
 			<td>{{colony.location_string|unescape}}</td>
 			<td>{{colony.population|numberformat}}</td>
 			<td>{{colony.worker_costs_per_25_hours|numberformat}}c</td>
 			<td>
 				<form method="post" action="{% url /index.php/empire/colonies/classify %}">
-					<select name="primary_activity"><option value="mining">Mining</option><option value="processing">Processing</option><option value="refining">Refining</option><option value="manufacturing">Manufacturing</option><option value="research">Research</option></select>
+					<select name="primary_activity"><option value="mining">Mining</option><option value="processing">Processing</option><option value="refining">Refining</option><option value="manufacturing">Manufacturing</option><option value="research">Research</option><option value="defense">Defense</option></select>
 					<input type="hidden" name="id" value="{{colony.id}}" />
 					<input type="submit" name="submit" value="Classify" />
 				</form>
