@@ -211,6 +211,16 @@ a img {
     width: 100%;
 }
 
+#left {
+	float: left;
+	width: 47.5%;
+}
+
+#right {
+	float: right;
+	width: 47.5%;
+}
+
 .alert-message .close {
     margin-top: -4px;
 }

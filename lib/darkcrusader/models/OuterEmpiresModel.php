@@ -15,6 +15,7 @@ use darkcrusader\models\UserModel;
 use darkcrusader\bank\PersonalBankTransaction;
 use darkcrusader\character\OECharacter;
 use darkcrusader\storeditems\StoredItem;
+use darkcrusader\colonies\Colony;
 use darkcrusader\oe\exceptions\APIQueryFailedException;
 
 class OuterEmpiresModel extends Model {
@@ -277,6 +278,12 @@ class OuterEmpiresModel extends Model {
 				case "C":
 					$storedItem->type = "cannisters";
 				break;
+				case "E":
+					$storedItem->type = "part";
+				break;
+				case "B":
+					$storedItem->type = "flatpack";
+				break;
 
 			}
 			$storedItem->oeId = $rawStoredItem->ItemID;
@@ -286,6 +293,65 @@ class OuterEmpiresModel extends Model {
 		}
 
 		return $storedItems;
+	}
+
+	/**
+	 * Gets colonies
+	 * 
+	 * @param int $user user id
+	 * @param mixed $accessKey leave as boolean false to use access key for default character of user
+	 * specified, or optionally override the user and use the access key supplied
+	 * @return array array of Colony's
+	 */
+	public function getColonies($user, $accessKey=false) {
+
+		if ($accessKey)
+			$userAccessKey = $accessKey;
+		else
+			$userAccessKey = UserModel::getInstance()->getDefaultCharacter($user)->api_key;
+
+		$response = $this->queryAPI("GetColonies", array(), $userAccessKey);
+		$response = $response->GetColoniesResult;
+		$rawColonies = $response->Colonies->Colony;
+
+		$colonies = array();
+		foreach($rawColonies as $rawColony) {
+
+			$colony = new Colony;
+			$colony->name = $rawColony->ColonyName;
+			$colony->location = $rawColony->ObjectName;
+			$colony->population = $rawColony->Pop;
+			$colony->maxPopulation = $rawColony->MaxPop;
+			$colony->morale = $rawColony->WellBeing;
+			$colony->power = $rawColony->Power;
+			$colony->freePower = $rawColony->PowerFree;
+			$colony->size = $rawColony->Size;
+			$colony->freeSize = $rawColony->SizeFree;
+			$colony->maxSize = $rawColony->MaxSize;
+			$colony->storageCapacity = $rawColony->StorageCapacity;
+			$colony->displayedSize = $rawColony->DisplaySize;
+
+			// convert date to mysql friendly YYYY-MM-DD HH MM SS
+			$dateAndTime = explode(" ", $rawColony->Established);
+			
+			$date = $dateAndTime[0];
+			$dayMonthAndYear = explode("/", $date);
+			$day = $dayMonthAndYear[0];
+			$month = $dayMonthAndYear[1];
+			$year = $dayMonthAndYear[2];
+			
+			$time = $dateAndTime[1];
+			$hourMinuteAndSecond = explode(":", $time);
+			$hour = $hourMinuteAndSecond[0];
+			$minute = $hourMinuteAndSecond[1];
+			$second = $hourMinuteAndSecond[2];
+			
+			$colony->dateEstablished = $year . "-" . $month . "-" . $day . " " . $hour . ":" . $minute . ":" . $second;
+
+			$colonies[] = $colony;
+		}
+
+		return $colonies;
 	}
 
 }

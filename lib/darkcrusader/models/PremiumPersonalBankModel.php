@@ -115,6 +115,76 @@ class PremiumPersonalBankModel extends PersonalBankModel {
 	}
 
 	/**
+	 * Get worker wages paid for a time period
+	 * 
+	 * @param int $user user id
+	 * @param string $period time period, 'forever', 'last24hours', 'last7days' or 'last30days'
+	 * @return int worker wages paid
+	 */
+	public function getWorkerCosts($user, $period="forever") {
+		$q = new Query("SELECT");
+		$q->where("direction = ?", "out");
+		$q->where("user_id = ?", $user);
+		$q->where("type = ?", "Colony");
+
+		switch($period) {
+			case "last24hours":
+				$q->where("date > DATE_SUB(NOW(), INTERVAL 1 DAY)");
+			break;
+			case "last7days":
+				$q->where("date > DATE_SUB(NOW(), INTERVAL 7 DAY)");
+			break;
+			case "last30days":
+				$q->where("date > DATE_SUB(NOW(), INTERVAL 30 DAY)");
+			break;
+		}
+
+		$btbs = PersonalBankTransactionBean::select($q);
+
+		$total = 0;
+		foreach($btbs as $btb) {
+			$total += $btb->amount;
+		}
+
+		return $total;
+	}
+
+	/**
+	 * Get market sales total for a time period
+	 * 
+	 * @param int $user user id
+	 * @param string $period time period, 'forever', 'last24hours', 'last7days' or 'last30days'
+	 * @return int total market sales
+	 */
+	public function getMarketSales($user, $period="forever") {
+		$q = new Query("SELECT");
+		$q->where("direction = ?", "in");
+		$q->where("user_id = ?", $user);
+		$q->where("type = ?", "Market");
+
+		switch($period) {
+			case "last24hours":
+				$q->where("date > DATE_SUB(NOW(), INTERVAL 1 DAY)");
+			break;
+			case "last7days":
+				$q->where("date > DATE_SUB(NOW(), INTERVAL 7 DAY)");
+			break;
+			case "last30days":
+				$q->where("date > DATE_SUB(NOW(), INTERVAL 30 DAY)");
+			break;
+		}
+
+		$btbs = PersonalBankTransactionBean::select($q);
+
+		$total = 0;
+		foreach($btbs as $btb) {
+			$total += $btb->amount;
+		}
+
+		return $total;
+	}
+
+	/**
 	 * Gets an associative array of types of transaction and the amount of credits each
 	 * type generated for the time period
 	 * 
