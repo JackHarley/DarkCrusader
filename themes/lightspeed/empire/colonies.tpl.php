@@ -25,7 +25,7 @@
 			<td>{{colony.population|numberformat}}</td>
 			<td>{{colony.worker_costs_per_25_hours|numberformat}}c</td>
 			<td>{% for resource in colony.resources %}{% if ! forloop.first %}, {% endif %}x{{resource.quantity}} {{resource.description}}{% endfor %}</td>
-			<td><span {% if colony.free_capacity == 0 %}style="color:red"{% endif %}>{{colony.free_capacity}}</span></td>
+			<td><span {% if colony.free_capacity < 100 %}style="color:red"{% else if colony.free_capacity < 500 %}style="color:yellow"{% endif %}>{{colony.free_capacity}}</span></td>
 		</tr>
 	{% endfor %}
 </table>
