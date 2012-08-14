@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 15;
+	const maxDbVersion = 17;
 
 	/**
 	 * Checks if the DB is installed
@@ -625,6 +625,71 @@ class InstallModel extends Model {
 		$pm->deletePermission("access_market");
 		$pm->deletePermission("access_kos");
 		$pm->createPermission("empire", "access_empire", "Access empire management");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 16
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion16($pdo, $user, $pass) {
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `colonies` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`name` varchar(16) NOT NULL,
+				`user_id` bigint(20) unsigned NOT NULL,
+				`system_id` bigint(20) unsigned NOT NULL,
+				`planet_numeral` varchar(4) NOT NULL,
+				`moon_number` tinyint unsigned NOT NULL,
+				`population` smallint unsigned NOT NULL,
+				`max_population` smallint unsigned NOT NULL,
+				`morale` smallint unsigned NOT NULL,
+				`power` smallint unsigned NOT NULL,
+				`free_power` smallint unsigned NOT NULL,
+				`size` tinyint unsigned NOT NULL,
+				`free_size` tinyint unsigned NOT NULL,
+				`max_size` tinyint unsigned NOT NULL,
+				`storage_capacity` mediumint unsigned NOT NULL,
+				`displayed_size` tinyint unsigned NOT NULL,
+				`primary_activity` varchar(32) NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 17
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion17($pdo, $user, $pass) {
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `stored_items` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`user_id` bigint(20) unsigned NOT NULL,
+				`location_type` varchar(8) NOT NULL,
+				`colony_id` bigint(20) unsigned NOT NULL,
+				`system_id` bigint(20) unsigned NOT NULL,
+				`planet_numeral` varchar(4) NOT NULL,
+				`ship_name` varchar(16) NOT NULL,
+				`description` varchar(160) NOT NULL,
+				`quantity` mediumint unsigned NOT NULL,
+				`type` varchar(16) NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
 
 		return true;
 	}
