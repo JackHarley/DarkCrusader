@@ -105,7 +105,8 @@ class EmpireController extends Controller {
 			"processingColonies" => $cm->getColonies($user->id, "processing"),
 			"refiningColonies" => $cm->getColonies($user->id, "refining"),
 			"manufacturingColonies" => $cm->getColonies($user->id, "manufacturing"),
-			"researchColonies" => $cm->getColonies($user->id, "research")
+			"researchColonies" => $cm->getColonies($user->id, "research"),
+			"defenseColonies" => $cm->getColonies($user->id, "defense")
 		));
 	}
 }
