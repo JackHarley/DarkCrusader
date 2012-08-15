@@ -41,6 +41,9 @@
 					<label class="form-label required">Password:</label>
 					<input type="password" class="large" name="password" />
 					
+					<label class="form-label required">Clearance Level:</label>
+					<input type="text" class="large" name="clearance_level" />
+
 					<label class="form-label required">User Group:</label>
 					
 					<select name="group">

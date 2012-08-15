@@ -15,6 +15,7 @@ use darkcrusader\players\exceptions\NoSuchPlayerException;
 use darkcrusader\players\exceptions\PlayerAlreadyExistsException;
 
 use darkcrusader\models\PlayerModel;
+use darkcrusader\models\IntelligenceModel;
 use darkcrusader\models\FactionModel;
 use darkcrusader\models\UserModel;
 
@@ -28,6 +29,9 @@ class PlayersController extends Controller {
 		$this->checkAuth("access_player_statistics");
 
 		$playerName = $_GET["name"];
+		$user = UserModel::getInstance()->getActiveUser();
+
+		$im = IntelligenceModel::getInstance();
 
 		try {
 			$player = PlayerModel::getInstance()->getPlayer($playerName);
@@ -43,11 +47,17 @@ class PlayersController extends Controller {
 			}
 		}
 
+		if ($_POST["submit"]) {
+			$im->addPlayerComment($user->id, $player->player_name, $_POST["classification"], $_POST["comment"]);
+			$this->alert("success", "Comment added successfully");
+		}
+
 		if ($this->checkAuth("edit_players", false))
 			View::setVar("canEditPlayers", "yes");
 
 		View::load("players/player", array(
-			"player" => $player
+			"player" => $player,
+			"comments" => $im->getPlayerComments($player->player_name, $user->clearance_level)
 		));
 	}
 

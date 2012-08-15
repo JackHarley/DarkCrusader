@@ -29,6 +29,8 @@
 								<input disabled type="text" class="form-field full" name="id" value="{{user.id}}" />
 								<label class="form-label required">Username:</label>
 								<input type="text" class="large" name="username" value="{{user.username}}" />
+								<label class="form-label required">Clearance Level:</label>
+								<input type="text" class="large" name="clearance_level" value="{{user.user_clearance_level}}" />
 								<label class="form-label required">User Group:</label>
 								<select name="group">
 									{% for group in groups %}

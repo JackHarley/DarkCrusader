@@ -44,9 +44,17 @@
 						<td>Username</td>
 						<td>{{user.username}}</td>
 					</tr>
-					<tr class="odd">
+					<tr class="even">
 						<td>Group</td>
 						<td>{{user.group.description}}</td>
+					</tr>
+					<tr class="odd">
+						<td>Clearance Level</td>
+						<td>{{user.user_clearance_level}}</td>
+					</tr>
+					<tr class="even">
+						<td>Inherited Clearance Level</td>
+						<td>{{user.clearance_level}}</td>
 					</tr>
 				</tbody>
 			</table>

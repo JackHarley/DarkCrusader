@@ -87,7 +87,7 @@ class AdminController extends Controller {
 								return;
 							}
 							else {
-								$um->addUser($_POST["username"], $_POST["password"], $_POST["group"]);
+								$um->addUser($_POST["username"], $_POST["password"], $_POST["clearance_level"], $_POST["group"]);
 								$this->alert("success", "User added successfully");
 							}
 
@@ -105,7 +105,7 @@ class AdminController extends Controller {
 								return;
 							}
 							else {
-								$um->updateUser($_GET["id"], $_POST["username"], false, $_POST["group"]);
+								$um->updateUser($_GET["id"], $_POST["username"], false, $_POST["clearance_level"], $_POST["group"]);
 								$this->alert("success", "User updated successfully");
 							}
 						break;
@@ -156,7 +156,7 @@ class AdminController extends Controller {
 							}
 							else {
 
-								$ugm->updateUserGroup($_GET["id"], $_POST["group_name"], $_POST["description"], $_POST["premium"], $_POST);
+								$ugm->updateUserGroup($_GET["id"], $_POST["group_name"], $_POST["description"], $_POST["premium"], $_POST["clearance_level"], $_POST);
 
 								$this->alert("success", "Group updated successfully");
 							}
@@ -181,7 +181,7 @@ class AdminController extends Controller {
 							}
 							else {
 
-								$ugm->addUserGroup($_POST["group_name"], $_POST["description"], $_POST["premium"], $_POST);
+								$ugm->addUserGroup($_POST["group_name"], $_POST["description"], $_POST["premium"], $_POST["clearance_level"], $_POST);
 								$this->alert("success", "Group added successfully");
 							}
 						break;

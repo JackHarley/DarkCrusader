@@ -11,6 +11,7 @@ Overview
 <ul>
 	<li>User Group: {{activeUser.group.description}}</li>
 	<li>Username: {{activeUser.username}}</li>
+	<li>Security Clearance Level: {{activeUser.clearance_level}}</li>
 	<li>Premium: 
 		{% if exists userIsPremium %}
 			<span style="color:lime">Subscribed</span>

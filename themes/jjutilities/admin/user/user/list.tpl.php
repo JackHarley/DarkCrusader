@@ -33,6 +33,8 @@
 				<th>ID</th>
 				<th>Username</th>
 				<th>Group</th>
+				<th>Clearance Level</th>
+				<th>Inherited Clearance</th>
 				<th>Actions</th>
 			</tr> 
 		</thead> 
@@ -42,6 +44,8 @@
 				<td>{{user.id}}</td>
 				<td>{{user.username}}</td>
 				<td>{{user.group.description}}</td>
+				<td>{{user.user_clearance_level}}</td>
+				<td>{{user.clearance_level}}</td>
 				<td>
 					<a HREF="{% url /index.php/admin/user/user/lookup %}?id={{user.id}}">Info</a> |
 					<a HREF="{% url /index.php/admin/user/user/del %}?id={{user.id}}">Delete</a> |

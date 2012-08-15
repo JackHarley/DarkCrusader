@@ -28,16 +28,18 @@ class UserGroupModel extends Model {
 	 * @param string $name unformatted group name e.g. root_admin
 	 * @param string $description formatted group name e.g. Root Admin
 	 * @param boolean $premium "yes" for unlimited premium, otherwise "no"
+	 * @param int $clearanceLevel intelligence clearance level
 	 * @param array $postForPerms $_POST array to iterate over for perms
 	 * @param array $pbs array of permission beans to grant
 	 * @return mixed boolean true if successful, error string
 	 *				 if failure
 	 */
-	public function addUserGroup($name, $description, $premium, $postForPerms=false, $pbs=false) {
+	public function addUserGroup($name, $description, $premium, $clearanceLevel, $postForPerms=false, $pbs=false) {
 		$ugb = new UserGroupBean;
 		$ugb->group_name = $name;
 		$ugb->description = $description;
 		$ugb->premium = ($premium == "yes") ? 1 : 0;
+		$ugb->group_clearance_level = $clearanceLevel;
 
 		$ugb->insert();
 
@@ -153,10 +155,11 @@ class UserGroupModel extends Model {
 	 * @param int $id user group ID
 	 * @param string $name unformatted group name e.g. root_admin
 	 * @param string $description formatted group name e.g. Root Admin
+	 * @param int $clearanceLevel intelligence clearance level
 	 * @param string $colour hex group colour
 	 * @param array $postForPerms $_POST array to iterate over for perms
 	 */
-	public function updateUserGroup($id, $groupName=false, $description=false, $premium=false, $postForPerms=false) {
+	public function updateUserGroup($id, $groupName=false, $description=false, $premium=false, $clearanceLevel=false, $postForPerms=false) {
 		$q = new Query("SELECT");
 		$q->where("id = ?", $id);
 
@@ -171,6 +174,9 @@ class UserGroupModel extends Model {
 
 		if ($premium)
 			$ugb->premium = ($premium == "yes") ? 1 : 0;
+
+		if ($clearanceLevel !== false)
+			$ugb->group_clearance_level = $clearanceLevel;
 
 		if ($postForPerms) {
 			$pm = PermissionsModel::getInstance();

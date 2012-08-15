@@ -12,7 +12,8 @@ class IntelligenceBean extends SQLBean {
 		'id',
 		'system_id',
 		'player_name',
-		'info',
+		'classification_level',
+		'comment',
 		'date_added',
 		'submitter_id'
 	);
@@ -28,11 +29,14 @@ class IntelligenceBean extends SQLBean {
 			'joinBean' => 'darkcrusader\sqlbeans\UserBean',
 			'foreignKey' => 'submitter_id'
 		),
-		'player' => array(
-			'joinType' => 'LEFT',
-			'joinBean' => 'darkcrusader\sqlbeans\UserBean',
-			'foreignKey' => 'submitter_id'
-		),
 	);
+
+	public function get_system() {
+		return $this->getMapped('system');
+	}
+
+	public function get_submitter() {
+		return $this->getMapped('submitter');
+	}
 }
 ?>
