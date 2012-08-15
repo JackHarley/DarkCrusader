@@ -36,6 +36,14 @@
 						<td>Group Description</td>
 						<td>{{group.description}}</td>
 					</tr>
+					<tr class="odd">
+						<td>Has Permanent Premium</td>
+						<td>{% if group.premium == 1 %}Yes{% else %}No{% endif %}</td>
+					</tr>
+					<tr class="even">
+						<td>Clearance Level</td>
+						<td>{{group.group_clearance_level}}</td>
+					</tr>
 
 				</tbody>
 			</table>

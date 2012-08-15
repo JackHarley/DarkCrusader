@@ -128,7 +128,7 @@ class UserModel extends Model {
 		if ($ubs[0])
 			throw new UsernameAlreadyRegisteredException;
 
-		$this->addUser($username, $password, $ugb->id);
+		$this->addUser($username, $password, 0, $ugb->id);
 	}
 
 	/**
@@ -255,7 +255,7 @@ class UserModel extends Model {
 
 			$ub = new \stdClass;
 			$ub->permissions = PermissionsModel::getInstance()->constructPermissionSet($ugb->getPermissions(), false);
-
+			$ub->clearance_level = 0;
 		}
 
 		static::$cachedActiveUser = $ub;
@@ -268,13 +268,15 @@ class UserModel extends Model {
 	 *
 	 * @param string $username username to register
 	 * @param string $password password to register
+	 * @param int $clearanceLevel intelligence clearance level
 	 * @param int $group user group id to register under
 	 */
-	public function addUser($username, $password, $groupID) {
+	public function addUser($username, $password, $clearanceLevel, $groupID) {
 		$ub = new UserBean;
 		$ub->username = $username;
 		$ub->passhash = $this->_calculatePasswordHash($password);
 		$ub->group_id = $groupID;
+		$ub->user_clearance_level = $clearanceLevel;
 		$ub->insert();
 	}
 
@@ -397,9 +399,10 @@ class UserModel extends Model {
 	 *
 	 * @param string $username new username
 	 * @param string $password new password
+	 * @param int $clearanceLevel intelligence clearance level
 	 * @param int $group user group id to register under
 	 */
-	public function updateUser($id, $username=false, $password=false, $groupID=false) {
+	public function updateUser($id, $username=false, $password=false, $clearanceLevel=false, $groupID=false) {
 
 		// Make the query for the user
 		$q = new Query("SELECT");
@@ -419,6 +422,8 @@ class UserModel extends Model {
 			$ub->passhash = $this->_calculatePasswordHash($password);
 		if ($groupID)
 			$ub->group_id = $groupID;
+		if ($clearanceLevel !== false)
+			$ub->user_clearance_level = $clearanceLevel;
 
 		$ub->update();
 
@@ -721,10 +726,10 @@ class UserModel extends Model {
 	public function getClearanceLevel($user) {
 		$user = $this->getUser($user);
 
-		if ($user->group->clearance_level > $user->clearance_level)
-			return $user->group->clearance_level;
+		if ($user->group->group_clearance_level > $user->user_clearance_level)
+			return $user->group->group_clearance_level;
 		else
-			return $user->clearance_level;
+			return $user->user_clearance_level;
 	}
 
     /**

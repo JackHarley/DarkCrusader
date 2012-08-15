@@ -22,6 +22,8 @@
 						<tr>
 							<th>ID</th>
 							<th>Group Name</th>
+							<th>Premium?</th>
+							<th>Clearance Level</th>
 							<th>Actions</th>
 						</tr>
 					</thead>
@@ -30,6 +32,8 @@
 						<tr class="{{forloop.counter0|evenorodd}}">
 							<td>{{group.id}}</td>
 							<td>{{group.description}}</td>
+							<td>{% if group.premium == 1 %}Yes{% else %}No{% endif %}</td>
+							<td>{{group.group_clearance_level}}</td>
 							<td>
 								<a class="button white" href="{% url /index.php/admin/user/group/lookup %}?id={{group.id}}">
 									Info

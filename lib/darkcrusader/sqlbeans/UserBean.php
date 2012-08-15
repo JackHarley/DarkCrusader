@@ -16,7 +16,8 @@ class UserBean extends SQLBean {
 		'group_id',
 		'passhash',
 		'balance',
-		'premium_until'
+		'premium_until',
+		'user_clearance_level'
 	);
 	
 	protected static $beanMap = array(
@@ -47,8 +48,12 @@ class UserBean extends SQLBean {
 		return $this->defaultCharacter;
 	}
 
-	public function get_inherited_clearance_level() {
-		return UserModel::getInstance()->getClearanceLevel($this->id);
+	public $clearanceLevel;
+	public function get_clearance_level() {
+		if (!$this->clearanceLevel)
+			$this->clearanceLevel =  UserModel::getInstance()->getClearanceLevel($this->id);
+
+		return $this->clearanceLevel;
 	}
 }
 ?>

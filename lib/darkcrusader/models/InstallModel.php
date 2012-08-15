@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 17;
+	const maxDbVersion = 19;
 
 	/**
 	 * Checks if the DB is installed
@@ -103,7 +103,8 @@ class InstallModel extends Model {
 			$tables = array(
 				'users', 'user_groups', 'permissions', 'group_permissions', 'database_version', 'faction_bank_transactions',
 				'intelligence', 'kill_on_sight_list', 'personal_bank_transactions', 'scans', 'scan_results', 'systems', 'system_stats',
-				'system_stats_sets', 'site_bank_transfers', 'character_link_requests', 'linked_characters', 'players'
+				'system_stats_sets', 'site_bank_transfers', 'character_link_requests', 'linked_characters', 'players', 'military_statuses',
+				'stored_items', 'colonies', 'intelligence'
 			);
 			$tablestr = '`' . implode('`, `', $tables) . '`';
 
@@ -695,6 +696,49 @@ class InstallModel extends Model {
 	}
 
 	/**
+	 * Migrate the database to version 18
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion18($pdo, $user, $pass) {
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `intelligence` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`submitter_id` bigint(20) unsigned NOT NULL,
+				`player_name` varchar(32) NOT NULL,
+				`system_id` bigint(20) unsigned NOT NULL,
+				`comment` mediumtext NOT NULL,
+				`type` varchar(32) NOT NULL,
+				`date_added` datetime NOT NULL,
+				`classification_level` tinyint unsigned NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 19
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion19($pdo, $user, $pass) {
+		$pdo->pdo->query("ALTER TABLE users ADD `user_clearance_level` tinyint unsigned NOT NULL");
+		$pdo->pdo->query("ALTER TABLE user_groups ADD `group_clearance_level` tinyint unsigned NOT NULL");
+
+		return true;
+	}
+
+	/**
 	 * Preload data
 	 *
 	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
@@ -711,7 +755,7 @@ class InstallModel extends Model {
 
 		// Create the Root Admin user group
 		$pbs = $pm->getAllPermissions();
-		$ugm->addUserGroup("root_admin", "Root Admin", "yes", false, $pbs);
+		$ugm->addUserGroup("root_admin", "Root Admin", "yes", 4, false, $pbs);
 
 		// Create the User user group
 		$pbs = $pm->getPermissions(array(
@@ -723,7 +767,7 @@ class InstallModel extends Model {
 			"access_personal_bank",
 			"access_empire")
 		);
-		$ugm->addUserGroup("user", "User", "no", false, $pbs);
+		$ugm->addUserGroup("user", "User", "no", 0, false, $pbs);
 
 		// Create the Member user group
 		$pbs = $pm->getPermissions(array(
@@ -738,7 +782,7 @@ class InstallModel extends Model {
 			"access_locality_stats",
 			"access_empire")
 		);
-		$ugm->addUserGroup("member", "Member", "no", false, $pbs);
+		$ugm->addUserGroup("member", "Member", "no", 1, false, $pbs);
 
 		// Create the Guest user group
 		$pbs = $pm->getPermissions(array(
@@ -748,11 +792,11 @@ class InstallModel extends Model {
 			"access_faction_stats",
 			"access_locality_stats")
 		);
-		$ugm->addUserGroup("guest", "Guest", "no", false, $pbs);
+		$ugm->addUserGroup("guest", "Guest", "no", 0, false, $pbs);
 
 		// Create the Banned user group
 		$pbs = array();
-		$ugm->addUserGroup("banned", "Banned", "no", false, $pbs);
+		$ugm->addUserGroup("banned", "Banned", "no", 0, false, $pbs);
 
 		// Create the admin user
 		$query = new Query("SELECT");
@@ -761,7 +805,7 @@ class InstallModel extends Model {
 		$ugbs = UserGroupBean::select($query);
 		$ugb = $ugbs[0];
 
-		$um->addUser($user, $pass, $ugb->id);
+		$um->addUser($user, $pass, 4, $ugb->id);
 		$q = new Query("SELECT");
 		$q->from("users");
 		$q->field("id");

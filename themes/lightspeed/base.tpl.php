@@ -98,6 +98,7 @@
 					<div class="pagecontent">
 						<p>
 							Site Bank: {{activeUser.balance|numberformat}}c <a href="{% url /index.php %}?dositebankupdate=1">[Update]</a><br />
+							Clearance Level: {{activeUser.clearance_level}}<br />
 							Premium: 
 							{% if exists userIsPremium %}
 								<span style="color:lime">Yes</span>
