@@ -1,5 +1,12 @@
 # Changelog
 
+1.0.024
+--------------
+* Intelligence comments on players
+* Security clearance levels
+* Bug fixes
+* Colony management fixes
+
 1.0.023
 --------------
 * Colony management
