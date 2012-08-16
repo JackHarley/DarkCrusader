@@ -15,6 +15,7 @@ use darkcrusader\models\ColoniesModel;
 use darkcrusader\models\PremiumPersonalBankModel;
 use darkcrusader\models\UserModel;
 use darkcrusader\models\StoredItemsModel;
+use darkcrusader\models\FactionResearchModel;
 
 use hydrogen\view\View;
 
@@ -34,7 +35,11 @@ class EmpireController extends Controller {
 
 		$user = UserModel::getInstance()->getActiveUser();
 
+		if (in_array($user->group->id, array(1,5,6,7,8)))
+			FactionResearchModel::getInstance()->updateDB($user->id);
+
 		$bm = PremiumPersonalBankModel::getInstance();
+		$bm->updateDB($user->id);
 
 		$workerWagesPastWeek = $bm->getWorkerCosts($user->id, "last7days");
 		$marketSalesPastWeek = $bm->getMarketSales($user->id, "last7days");

@@ -18,6 +18,8 @@ use darkcrusader\models\OuterEmpiresModel;
 use darkcrusader\models\ColoniesModel;
 use darkcrusader\models\SystemModel;
 
+use darkcrusader\user\exceptions\UserDoesNotHaveAConfiguredCharacterException;
+
 use darkcrusader\storeditems\StoredResource;
 
 use darkcrusader\sqlbeans\StoredItemBean;
@@ -68,7 +70,12 @@ class StoredItemsModel extends Model {
 	 */
 	public function updateDB($user) {
 
-		$storedItems = OuterEmpiresModel::getInstance()->getStoredItems($user);
+		$defaultCharacter = UserModel::getInstance()->getDefaultCharacter($user);
+		
+		if (!$defaultCharacter->api_key)
+			throw new UserDoesNotHaveAConfiguredCharacterException;
+
+		$storedItems = OuterEmpiresModel::getInstance()->getStoredItems(false, $defaultCharacter->api_key);
 
 		// clear db
 		$this->clearStoredItems($user);
@@ -184,6 +191,32 @@ class StoredItemsModel extends Model {
 		}
 
 		$sib->insert();
+
+	}
+
+	/**
+	 * Gets all researched blueprints which were researched by the user in question and stored
+	 * in their facilities
+	 * 
+	 * @param int $user user id
+	 * @return array array of StoredItemBeans
+	 */
+	public function getResearchedBlueprints($user) {
+		
+		$defaultCharacter = UserModel::getInstance()->getDefaultCharacter($user);
+		
+		if (!$defaultCharacter->api_key)
+			throw new UserDoesNotHaveAConfiguredCharacterException;
+		
+		$characterNoSpaces = str_replace(" ", "", $defaultCharacter->character_name);
+
+		$q = new Query("SELECT");
+		$q->where("type = ?", "blueprint");
+		$q->where("stored_items.description LIKE ?", "%" . $characterNoSpaces . "%");
+		$q->where("stored_items.user_id = ?", $user);
+
+		$sibs = StoredItemBean::select($q, true);
+		return $sibs;
 
 	}
 }
