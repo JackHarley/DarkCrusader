@@ -7,7 +7,8 @@
 
 <p>
 	Every 15 minutes, all faction members' stored items lists are scraped via their API keys and the blueprints found are added to this database. Therefore it is important that all members make sure they have their API keys inputted into the site. You can add yours in the Manage Characters area, there is a link in the sidebar.<br />
-	If your research has just dropped and you want to immediately start another round without waiting for the 15 minute scrape, simply load the Empire area and the blueprint will be scraped immediately.
+	If your research has just dropped and you want to immediately start another round without waiting for the 15 minute scrape, simply load the Empire area and the blueprint will be scraped immediately.<br />
+	Make sure your research colonies have Communications Arrays so that the site can see the blueprints in them.
 </p>
 
 <h3>Latest Member Blueprints</h3>
