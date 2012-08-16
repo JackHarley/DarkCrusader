@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.025
+--------------
+* Faction research
+
 1.0.024
 --------------
 * Intelligence comments on players
