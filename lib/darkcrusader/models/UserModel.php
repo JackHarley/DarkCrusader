@@ -732,6 +732,22 @@ class UserModel extends Model {
 			return $user->user_clearance_level;
 	}
 
+	/**
+	 * Gets all users in an array of user group ids
+	 * 
+	 * @param array $userGroups array of user group ids
+	 * @return array array of UserBeans
+	 */
+	public function getUsersInUserGroups($userGroups) {
+		$q = new Query("SELECT");
+		
+		foreach($userGroups as $userGroup) {
+			$q->where("group_id = ?", $userGroup, "OR");
+		}
+		
+		return UserBean::select($q, true);
+	}
+
     /**
      * _calculatePasswordHash
      * Get the password hash (to store in the database) for a specific password.

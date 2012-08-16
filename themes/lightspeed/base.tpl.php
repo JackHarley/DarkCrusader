@@ -45,7 +45,7 @@
 			<li><a href="{% url /index.php/faq %}">faq</a></li>
 			<li><a href="{% url /index.php/maps %}">maps</a></li>
 			<li><a href="{% url /index.php/utilities %}">utilities</a></li>
-			<li><a href="{% url /index.php/personalbank %}">finance manager</a> </li>
+			<li><a href="{% url /index.php/personalbank %}">finances</a> </li>
 			<li><a href="{% url /index.php/chat %}">irc chat</a></li>
 
 			{% if exists userCanAccessScans %}
@@ -54,6 +54,10 @@
 
 			{% if exists userCanAccessFactionBank %}
 				<li><a href="{% url /index.php/factionbank %}">faction bank</a></li>
+			{% endif %}
+
+			{% if exists userCanAccessFactionResearch %}
+				<li><a href="{% url /index.php/factionresearch %}">faction research</a></li>
 			{% endif %}
 
 			{% if exists userIsAdmin %}

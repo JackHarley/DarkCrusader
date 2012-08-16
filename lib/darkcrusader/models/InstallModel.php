@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 19;
+	const maxDbVersion = 22;
 
 	/**
 	 * Checks if the DB is installed
@@ -739,6 +739,61 @@ class InstallModel extends Model {
 	}
 
 	/**
+	 * Migrate the database to version 20
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion20($pdo, $user, $pass) {
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `faction_member_blueprints` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`submitter_id` bigint(20) unsigned NOT NULL,
+				`researcher_player_name` varchar(32) NOT NULL,
+				`research_mark` tinyint unsigned NOT NULL,
+				`description` varchar(200) NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 21
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion21($pdo, $user, $pass) {
+		$pdo->pdo->query("ALTER TABLE faction_member_blueprints ADD `date_added` datetime NOT NULL");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 22
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion22($pdo, $user, $pass) {
+		$pm = PermissionsModel::getInstance();
+		$pm->createPermission("research", "access_faction_research", "Access faction research");
+
+		return true;
+	}
+
+	/**
 	 * Preload data
 	 *
 	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
@@ -780,7 +835,8 @@ class InstallModel extends Model {
 			"access_system_stats",
 			"access_faction_stats",
 			"access_locality_stats",
-			"access_empire")
+			"access_empire",
+			"access_faction_research")
 		);
 		$ugm->addUserGroup("member", "Member", "no", 1, false, $pbs);
 

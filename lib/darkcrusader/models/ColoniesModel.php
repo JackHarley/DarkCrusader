@@ -116,6 +116,13 @@ class ColoniesModel extends Model {
 				}
 				return "idle";
 			break;
+			case "research":
+				foreach($storedItems as $storedItem) {
+					if ($storedItem->description == "Item Production Resources")
+						return "active";
+				}
+				return "idle";
+			break;
 		}
 
 		return "unknown";

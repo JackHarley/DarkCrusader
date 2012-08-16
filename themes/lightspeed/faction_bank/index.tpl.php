@@ -8,7 +8,7 @@
 <h3>Current Balance: <span style="color:aqua">{{bankBalance|numberformat}}c</span></h3>
 
 <div id="leftright">
-	<div id="left">
+	<div>
 
 		{% if exists isBankAdmin %}
 		<h3>Admin Options</h3>
@@ -20,7 +20,7 @@
 		{% endif %}
 	</div>
 
-	<div id="right">
+	<div>
 		<h3>Latest Transactions</h3>
 
 		<p>
