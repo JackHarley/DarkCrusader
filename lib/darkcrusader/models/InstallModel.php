@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 22;
+	const maxDbVersion = 23;
 
 	/**
 	 * Checks if the DB is installed
@@ -789,6 +789,24 @@ class InstallModel extends Model {
 	protected function _runMigrationToVersion22($pdo, $user, $pass) {
 		$pm = PermissionsModel::getInstance();
 		$pm->createPermission("research", "access_faction_research", "Access faction research");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 23
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion23($pdo, $user, $pass) {
+		$pdo->pdo->query("ALTER TABLE faction_member_blueprints MODIFY `description` varchar(255) NOT NULL");
+		$pdo->pdo->query("ALTER TABLE stored_items MODIFY `description` varchar(255) NOT NULL");
+		$pdo->pdo->query("TRUNCATE `faction_member_blueprints`");
+		$pdo->pdo->query("TRUNCATE `stored_items`");
 
 		return true;
 	}
