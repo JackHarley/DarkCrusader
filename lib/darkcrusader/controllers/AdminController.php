@@ -110,6 +110,13 @@ class AdminController extends Controller {
 							}
 						break;
 
+						case "impersonate":
+
+							$um->forceLogin($_GET["id"]);
+							$this->redirect("/index.php");
+
+						break;
+
 					} // end of switch
 
 					// list users (any return messages will have been set)
