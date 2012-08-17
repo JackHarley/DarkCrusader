@@ -22,7 +22,7 @@
 
 		{% for blueprint in latestBlueprints %}
 			<tr style="height:20px{% if forloop.counter0|divisibleby:2 %};background-color:#333333{% endif %}"> 
-				<td>{{blueprint.researcher_player_name}}</td>
+				<td><a href="{% url /index.php/factionresearch/researcher %}?name={{blueprint.researcher_player_name}}">{{blueprint.researcher_player_name}}</a></td>
 				<td>MK{{blueprint.research_mark}}</td>
 				<td>{{blueprint.description}}</td>
 			</tr>

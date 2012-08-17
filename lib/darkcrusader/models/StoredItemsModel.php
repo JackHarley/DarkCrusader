@@ -177,7 +177,7 @@ class StoredItemsModel extends Model {
 			$sib->planet_numeral = $planetid;
 		}
 		else {
-			$colony = ColoniesModel::getInstance()->getColony(false, $storedItem->location);
+			$colony = ColoniesModel::getInstance()->getColony(false, $storedItem->location, $user);
 
 			if ($colony->id) {
 				$sib->location_type = "colony";
