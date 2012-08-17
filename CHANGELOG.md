@@ -1,5 +1,10 @@
 # Changelog
 
+1.0.026
+--------------
+* Bug fixes and improvements for empire and research
+* Added ability for admins to debug as other users
+
 1.0.025
 --------------
 * Faction research
