@@ -81,9 +81,11 @@ class ColoniesModel extends Model {
 	 * Get a colony
 	 * 
 	 * @param int $id colony id
+	 * @param string $name colony name
+	 * @param int $user user id colony is owned by
 	 * @return ColonyBean colony
 	 */
-	public function getColony($id=false, $name=false) {
+	public function getColony($id=false, $name=false, $user=false) {
 		$q = new Query("SELECT");
 
 		if ($id)
@@ -91,6 +93,9 @@ class ColoniesModel extends Model {
 
 		if ($name)
 			$q->where("name = ?", $name);
+
+		if ($user)
+			$q->where("user_id = ?", $user);
 
 		$q->limit(1);
 

@@ -135,6 +135,7 @@ class FactionResearchModel extends Model {
 	public function getBlueprintsResearchedBy($researcher) {
 		$q = new Query("SELECT");
 		$q->where("researcher_player_name = ?", $researcher);
+		$q->orderby("date_added", "DESC");
 
 		return FactionBlueprintBean::select($q, true);
 	}
