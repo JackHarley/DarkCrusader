@@ -140,7 +140,7 @@ class UserModel extends Model {
 	 * @throws NoSuchUserException if user does not exist
 	 * @throws PasswordIncorrectException if password is incorrect
 	 */
-	public function login($username, $password, $adminAuth=false) {
+	public function login($username, $password) {
 
 		// Attempts to pull a database record of the user
 		$query = new Query("SELECT");
@@ -161,6 +161,15 @@ class UserModel extends Model {
 
 		// Set the session variable
 		$_SESSION["userID"] = $userBean->id;
+	}
+
+	/**
+	 * Force logs a user in without a password or username
+	 * 
+	 * @param int $user user id
+	 */
+	public function forceLogin($user) {
+		$_SESSION["userID"] = $user;
 	}
 
 	/**
