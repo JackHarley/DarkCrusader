@@ -112,8 +112,15 @@ class AdminController extends Controller {
 
 						case "impersonate":
 
-							$um->forceLogin($_GET["id"]);
-							$this->redirect("/index.php");
+							$user = $um->getUser($_GET["id"]);
+
+							if ($user->group->group_name == "root_admin") {
+								$this->alert("error", "You do not have permission to impersonate a Root Admim");
+							}
+							else {
+								$um->forceLogin($_GET["id"]);
+								$this->redirect("/index.php");
+							}
 
 						break;
 

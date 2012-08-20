@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 23;
+	const maxDbVersion = 24;
 
 	/**
 	 * Checks if the DB is installed
@@ -807,6 +807,31 @@ class InstallModel extends Model {
 		$pdo->pdo->query("ALTER TABLE stored_items MODIFY `description` varchar(255) NOT NULL");
 		$pdo->pdo->query("TRUNCATE `faction_member_blueprints`");
 		$pdo->pdo->query("TRUNCATE `stored_items`");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 24
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion24($pdo, $user, $pass) {
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `logged_actions` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`user_id` bigint(20) unsigned NOT NULL,
+				`acted_upon_user_id` bigint(20) unsigned NOT NULL,
+				`description` varchar(200) NOT NULL,
+				`type` varchar(32) NOT NULL,
+				`date` datetime NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
 
 		return true;
 	}

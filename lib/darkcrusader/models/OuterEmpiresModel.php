@@ -104,6 +104,9 @@ class OuterEmpiresModel extends Model {
 
 		$transactions = $working->GetTransactionsResult->Transactions->Transaction;
 
+		if (!is_array($transactions))
+			$transactions = array($transactions);
+
 		$bts = array();
 		foreach($transactions as $transaction) {
 			

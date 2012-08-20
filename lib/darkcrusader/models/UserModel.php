@@ -17,6 +17,7 @@ use darkcrusader\sqlbeans\UserGroupBean;
 use darkcrusader\sqlbeans\AutologinBean;
 use darkcrusader\sqlbeans\LinkedCharacterBean;
 use darkcrusader\sqlbeans\CharacterLinkRequestBean;
+use darkcrusader\sqlbeans\LoggedActionBean;
 
 use darkcrusader\permissions\PermissionSet;
 
@@ -47,6 +48,9 @@ class UserModel extends Model {
 	 *			 false if not.
 	 */
 	public function userIsLoggedIn() {
+		if ($_SESSION["forcedUserID"])
+			return true;
+
 		if ($_SESSION["userID"])
 			return true;
 
@@ -169,7 +173,18 @@ class UserModel extends Model {
 	 * @param int $user user id
 	 */
 	public function forceLogin($user) {
-		$_SESSION["userID"] = $user;
+		$originalUser = $this->getActiveUser();
+		$newUser = $this->getUser($user);
+
+		$lab = new LoggedActionBean;
+		$lab->type = "force_login";
+		$lab->user_id = $originalUser->id;
+		$lab->acted_upon_user_id = $user;
+		$lab->description = $originalUser->username . " forced logged in as " . $newUser->username;
+		$lab->set("date", "NOW()", true);
+		$lab->insert();
+
+		$_SESSION["forcedUserID"] = $user;
 	}
 
 	/**
@@ -220,6 +235,11 @@ class UserModel extends Model {
 		if ($this->userIsLoggedIn() === false)
 			return "Error! User is not logged in";
 
+		if ($_SESSION["forcedUserID"]) {
+			unset($_SESSION["forcedUserID"]);
+			return;
+		}
+
 		$user = $this->getActiveUser();
 
 		$query = new Query("DELETE");
@@ -247,9 +267,15 @@ class UserModel extends Model {
 
 		// Check if there's a user logged in
 		if ($this->userIsLoggedIn()) {
+
+			if ($_SESSION["forcedUserID"])
+				$userID = $_SESSION["forcedUserID"];
+			else
+				$userID = $_SESSION["userID"];
+
 			// Make the query for the user
 			$query = new Query("SELECT");
-			$query->where("users.id = ?", $_SESSION["userID"]);
+			$query->where("users.id = ?", $userID);
 			$query->limit(1);
 			$ubs = UserBean::select($query, true);
 			$ub = $ubs[0];
