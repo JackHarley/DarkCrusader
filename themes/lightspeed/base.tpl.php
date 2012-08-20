@@ -148,6 +148,7 @@
 	<!-- end page -->
 
 	<div id="footer">
+		Request took {{controller.totalRequestTime}} seconds
 	</div>
 	<!-- end footer -->
 </div>

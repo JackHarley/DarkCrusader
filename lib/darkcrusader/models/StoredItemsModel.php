@@ -80,8 +80,82 @@ class StoredItemsModel extends Model {
 		// clear db
 		$this->clearStoredItems($user);
 
-		foreach($storedItems as $storedItem) 
-			$this->addStoredItem($user, $storedItem);
+		$cm = ColoniesModel::getInstance();
+		$sm = SystemModel::getInstance();
+
+		$q = new Query("INSERT");
+		$q->intoTable("stored_items");
+		$q->intoField("description");
+		$q->intoField("type");
+		$q->intoField("quantity");
+		$q->intoField("user_id");
+		$q->intoField("location_type");
+		$q->intoField("system_id");
+		$q->intoField("planet_numeral");
+		$q->intoField("colony_id");
+		$q->intoField("ship_name");
+
+		foreach($storedItems as $storedItem) {
+
+			$systemID = 0;
+			$colonyID = 0;
+			$planetNumeral = "";
+			$shipName = "";
+
+			if (strpos($storedItem->location, "Station") !== false) {
+				$locationType = "station";
+
+				$planet = str_replace(" Station", "", $storedItem->location);
+				$planet = explode(" ", $planet);
+
+				// we're going to knock off the last term each time until we have only the system name left, and
+				// the planet numeral, and if applicable moon number, stored
+				$numberOfWords = count($planet);
+
+				// last word must be the planet numeral
+				$lastWord = $planet[($numberOfWords - 1)];
+				$planetid = $lastWord;
+				unset($planet[($numberOfWords - 1)]);
+				$numberOfWords--;
+
+				// we're left with the system name
+				$system = "";
+				foreach($planet as $word) {
+					$system .= $word . " ";
+				}
+				$system = trim($system);
+
+				$systemID = $sm->getSystem(false, $system, false)->id;
+				$planetNumeral = $planetid;
+			}
+			else {
+				$colony = $cm->getColony(false, $storedItem->location, $user, false);
+
+				if ($colony->id) {
+					$locationType = "colony";
+					$colonyID = $colony->id;
+				}
+				else {
+					$locationType = "ship";
+					$shipName = $storedItem->location;
+				}
+
+			}
+
+			$q->values("(?,?,?,?,?,?,?,?,?)", array(
+				$storedItem->description,
+				$storedItem->type,
+				$storedItem->quantity,
+				$user,
+				$locationType,
+				$systemID,
+				$planetNumeral,
+				$colonyID,
+				$shipName
+			));
+		}
+
+		$q->prepare()->execute();
 	}
 
 	/**
@@ -216,6 +290,7 @@ class StoredItemsModel extends Model {
 		$q->where("stored_items.user_id = ?", $user);
 
 		$sibs = StoredItemBean::select($q, true);
+
 		return $sibs;
 
 	}

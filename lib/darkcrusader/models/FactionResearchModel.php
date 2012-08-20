@@ -44,6 +44,7 @@ class FactionResearchModel extends Model {
 		$failed = 0;
 
 		foreach($members as $member) {
+
 			try {
 				$sim->updateDB($member->id);
 				$blueprints = $sim->getResearchedBlueprints($member->id);
@@ -52,11 +53,13 @@ class FactionResearchModel extends Model {
 				$failed++;
 			}
 
+			$fbbs = FactionBlueprintBean::select();
+			$descriptions = array();
+			foreach($fbbs as $fbb)
+				$descriptions[] = $fbb->description;
+
 			foreach($blueprints as $blueprint) {
-				$q = new Query("SELECT");
-				$q->where("description = ?", str_replace("BLUEPRINT : ", "", $blueprint->description));
-				$fbbs = FactionBlueprintBean::select($q);
-				if (!$fbbs[0]) {
+				if (!in_array(str_replace("BLUEPRINT : ", "", $blueprint->description), $descriptions)) {
 					$working = explode("BLUEPRINT : ", $blueprint->description);
 					$working = explode(".", $working[1]);
 					$researcherName = $working[0];

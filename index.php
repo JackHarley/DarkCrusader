@@ -9,6 +9,9 @@
  * All Rights Reserved
  */
 
+// Request begins
+define('START_REQUEST', microtime(true));
+
 // Initialize
 session_start();
 date_default_timezone_set("Europe/Dublin");

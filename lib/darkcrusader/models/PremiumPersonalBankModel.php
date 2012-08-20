@@ -323,12 +323,8 @@ class PremiumPersonalBankModel extends PersonalBankModel {
 		if ($checkDuplicate) {
 			$q = new Query("SELECT");
 			$q->where("date = ?", $date);
-			$q->where("amount = ?", $amount);
 			$q->where("balance = ?", $balance);
-			$q->where("direction = ?", $direction);
 			$q->where("user_id = ?", $user);
-			$q->where("type = ?", $type);
-			$q->where("description = ?", $description);
 
 			$btbs = PersonalBankTransactionBean::select($q);
 			if ($btbs[0])

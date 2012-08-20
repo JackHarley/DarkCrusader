@@ -45,6 +45,7 @@ class OuterEmpiresModel extends Model {
 		foreach ($parameters as $key => $value)
 			$query[$key] = $value;
 
+		$time = microtime(true);
 		try {
 			if (!static::$soapInstance)
 				static::$soapInstance = new \SoapClient(static::$WSDL);
