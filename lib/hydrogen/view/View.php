@@ -113,8 +113,10 @@ class View {
 	 * 		cache files.
 	 */
 	protected static function loadCachedIntoSandbox($viewName, $sandbox) {
-		$path = Config::getCachePath() . '/hydrogen/view/' .
-			$viewName . '.php';
+
+		$viewFolder = Config::getVal('view', 'folder');
+
+		$path = Config::getCachePath() . '/hydrogen/view/' . $viewFolder . '/' . $viewName . '.php';
 		try {
 			$sandbox->loadPHPFile($path);
 		}
