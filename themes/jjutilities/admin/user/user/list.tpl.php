@@ -50,7 +50,7 @@
 					<a HREF="{% url /index.php/admin/user/user/lookup %}?id={{user.id}}">Info</a> |
 					<a HREF="{% url /index.php/admin/user/user/del %}?id={{user.id}}">Delete</a> |
 					<a HREF="{% url /index.php/admin/user/user/edit %}?id={{user.id}}">Edit</a> |
-					<a HREF="{% url /index.php/admin/user/user/ban %}?id={{user.id}}">Ban</a>
+					<a HREF="{% url /index.php/admin/user/user/impersonate %}?id={{user.id}}">Impersonate</a>
 				</td>
 			</tr>
 			{% endfor %}
