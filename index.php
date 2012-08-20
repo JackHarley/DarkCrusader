@@ -112,6 +112,9 @@ $lab = new LoggedActionBean;
 $lab->user_id = $activeUser->id;
 $lab->type = "page_load";
 $lab->description = $activeUser->username . " accessed /index.php" . $_SERVER["PATH_INFO"];
+foreach($_GET as $key => $value)
+    $lab->description .= "?" . $key . '=' . $value;
+
 $lab->set("date", "NOW()", true);
 $lab->insert();
 
