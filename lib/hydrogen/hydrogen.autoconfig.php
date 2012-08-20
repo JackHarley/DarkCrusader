@@ -213,6 +213,6 @@ HydrogenEngine::addFilterNamespace('\darkcrusader\filters');
  ***  view.  It is recommended to leave this off during development to avoid
  ***  that hassle, but keep it on in production.
  ***/
-Config::setVal("view", "use_cache", false);
+Config::setVal("view", "use_cache", true);
 
 ?>

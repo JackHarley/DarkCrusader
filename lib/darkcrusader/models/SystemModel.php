@@ -461,9 +461,10 @@ class SystemModel extends Model {
 	 * 
 	 * @param int $id system id
 	 * @param string $name system name
+	 * @param boolean $joins set to true to get all joins
 	 * @return SystemBean system info
 	 */
-	public function getSystem($id=false, $name=false) {
+	public function getSystem($id=false, $name=false, $joins=true) {
 		if ((!$id) && (!$name))
 			throw new NoSuchSystemException;
 
@@ -476,7 +477,7 @@ class SystemModel extends Model {
 			$q->where("system_name = ?", $name);
 
 		$q->limit(1);
-		$sbs = SystemBean::select($q);
+		$sbs = SystemBean::select($q, $joins);
 		$sb = $sbs[0];
 
 		if (!$sb)

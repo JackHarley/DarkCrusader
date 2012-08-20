@@ -192,6 +192,31 @@ class Controller extends \hydrogen\controller\Controller {
 			View::setVar("userIsPremium", "yes");
 		if ($activeUser->permissions->hasPermission("access_scans"))
 			View::setVar("userCanAccessScans", "yes");
+		View::setVar("controller", $this);
+	}
+
+	/**
+	 * Gets the total request time since the start of the load
+	 * 
+	 * @return int time in seconds
+	 */
+	public function getTotalRequestTime() {
+		return microtime(true) - START_REQUEST;
+
+	}
+
+	public function __get($var) {
+		switch ($var) {
+			case "totalRequestTime":
+				return $this->getTotalRequestTime();
+			break;
+			case "requestStartTime":
+				return START_REQUEST;
+			break;
+			case "currentTime":
+				return microtime(true);
+			break;
+		}
 	}
 }
 

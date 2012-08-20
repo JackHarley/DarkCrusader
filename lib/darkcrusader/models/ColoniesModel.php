@@ -83,9 +83,10 @@ class ColoniesModel extends Model {
 	 * @param int $id colony id
 	 * @param string $name colony name
 	 * @param int $user user id colony is owned by
+	 * @param boolean $joins set to true to get all joins
 	 * @return ColonyBean colony
 	 */
-	public function getColony($id=false, $name=false, $user=false) {
+	public function getColony($id=false, $name=false, $user=false, $joins=true) {
 		$q = new Query("SELECT");
 
 		if ($id)
@@ -99,7 +100,7 @@ class ColoniesModel extends Model {
 
 		$q->limit(1);
 
-		$cbs = ColonyBean::select($q, true);
+		$cbs = ColonyBean::select($q, $joins);
 		return $cbs[0];
 	}
 
