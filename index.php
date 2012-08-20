@@ -36,6 +36,7 @@ use darkcrusader\models\SiteBankModel;
 use darkcrusader\controllers\InstallController;
 use darkcrusader\controllers\Controller;
 use darkcrusader\oe\exceptions\APIQueryFailedException;
+use darkcrusader\sqlbeans\LoggedActionBean;
 
 // Error Reporting
 if (Config::getRequiredVal("general", "display_errors") == "On")
@@ -91,7 +92,6 @@ if ($activeUser->username) {
 
 // Get any new site bank transactions and so processing stuff
 $sbm = SiteBankModel::getInstance();
-
 if ($_GET["dositebankupdate"]) {
     
     try {
@@ -107,6 +107,13 @@ if ($_GET["dositebankupdate"]) {
 }
 
 $sbm->processAnyUnprocessedTransfers();
+
+$lab = new LoggedActionBean;
+$lab->user_id = $activeUser->id;
+$lab->type = "page_load";
+$lab->description = $activeUser->username . " accessed /index.php" . $_SERVER["PATH_INFO"];
+$lab->set("date", "NOW()", true);
+$lab->insert();
 
 // Add the dispatcher rules
 Dispatcher::addHomeMatchRule('\darkcrusader\controllers\HomeController', "index");
