@@ -23,7 +23,6 @@ require_once(__DIR__ . '/lib/pChart/class/pData.class.php');
 require_once(__DIR__ . '/lib/pChart/class/pPie.class.php');
 require_once(__DIR__ . '/lib/pChart/class/pDraw.class.php');
 require_once(__DIR__ . '/lib/pChart/class/pImage.class.php');
-require_once(__DIR__ . '/lib/pChart/class/pCache.class.php');
 
 // Load classes
 use hydrogen\errorhandler\ErrorHandler;
@@ -108,15 +107,22 @@ if ($_GET["dositebankupdate"]) {
 
 $sbm->processAnyUnprocessedTransfers();
 
+if ($activeUser->id) {
 $lab = new LoggedActionBean;
-$lab->user_id = $activeUser->id;
-$lab->type = "page_load";
-$lab->description = $activeUser->username . " accessed /index.php" . $_SERVER["PATH_INFO"];
-foreach($_GET as $key => $value)
-    $lab->description .= "?" . $key . '=' . $value;
+    $lab->user_id = $_SESSION["userID"];
+    $lab->type = "page_load";
+    
+    $lab->description = $um->getUser($_SESSION["userID"])->username . " accessed /index.php" . $_SERVER["PATH_INFO"];
+    foreach($_GET as $key => $value)
+        $lab->description .= "?" . $key . '=' . $value;
 
-$lab->set("date", "NOW()", true);
-$lab->insert();
+    if ($_SESSION["forcedUserID"])
+        $lab->description .= " (as " . $activeUser->username . ")";
+
+
+    $lab->set("date", "NOW()", true);
+    $lab->insert();
+}
 
 // Add the dispatcher rules
 Dispatcher::addHomeMatchRule('\darkcrusader\controllers\HomeController', "index");

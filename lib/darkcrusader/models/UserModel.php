@@ -242,13 +242,14 @@ class UserModel extends Model {
 
 		$user = $this->getActiveUser();
 
+		unset($_SESSION["userID"]);
+		
 		$query = new Query("DELETE");
 		$query->from("autologin");
 		$query->where("user_id = ?", $user->id);
 		$stmt = $query->prepare();
 		$stmt->execute();
 
-		unset($_SESSION["userID"]);
 		return true;
 
 	}
