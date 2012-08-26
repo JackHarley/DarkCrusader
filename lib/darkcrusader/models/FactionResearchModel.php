@@ -73,6 +73,8 @@ class FactionResearchModel extends Model {
 					$this->addBlueprint($member->id, $blueprintDescription, $researcherName, $researchMark);
 				}
 			}
+
+			sleep(1);
 		}
 	}
 
