@@ -1,5 +1,11 @@
 # Changelog
 
+1.0.027
+--------------
+* Tonnes of optimisations to make things load faster
+* Stability improvements and bug fixes
+* Empire is now open to all, not just premium! :)
+
 1.0.026
 --------------
 * Bug fixes and improvements for empire and research
