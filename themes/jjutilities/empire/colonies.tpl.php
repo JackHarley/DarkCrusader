@@ -97,6 +97,7 @@
 		<th>Location</th>
 		<th>Population</th>
 		<th>Worker Costs*</th>
+		<th>Status</th>
 	</tr>
 
 	{% for colony in researchColonies %}
@@ -105,6 +106,10 @@
 			<td>{{colony.location_string|unescape}}</td>
 			<td>{{colony.population|numberformat}}</td>
 			<td>{{colony.worker_costs_per_25_hours|numberformat}}c</td>
+			<td>
+				{% if colony.status == "active" %}<span style="color:lime">Researching...</span>{% endif %}
+				{% if colony.status == "idle" %}<span style="color:yellow">Idle</span>{% endif %}
+			</td>
 		</tr>
 	{% endfor %}
 </table>
