@@ -15,6 +15,8 @@ use darkcrusader\models\PersonalBankModel;
 use darkcrusader\models\UserModel;
 use darkcrusader\models\OuterEmpiresModel;
 
+use darkcrusader\oe\exceptions\TooManyTransactionsToFetchException;
+
 use darkcrusader\sqlbeans\PersonalBankTransactionBean;
 
 class PremiumPersonalBankModel extends PersonalBankModel {
@@ -39,7 +41,7 @@ class PremiumPersonalBankModel extends PersonalBankModel {
 		$latestTransferKnown = $pbtbs[0];
 
 		if (!$latestTransferKnown) {
-			$daysToGet = 0; // fetch all (paul will be mad though)
+			throw new TooManyTransactionsToFetchException;
 		}
 		else {
 			$timeNow = time();

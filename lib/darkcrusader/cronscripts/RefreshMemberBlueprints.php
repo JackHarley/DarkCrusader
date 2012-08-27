@@ -7,8 +7,7 @@ ini_set("display_errors", "On");
 require_once(__DIR__ . '/../../hydrogen/hydrogen.inc.php');
 require_once(__DIR__ . '/../darkcrusader.inc.php');
 
-use darkcrusader\models\FactionResearchModel;
+\darkcrusader\models\UserModel::getInstance()->checkValidityOfAllOnFileAccessKeys();
+\darkcrusader\models\FactionResearchModel::getInstance()->updateDB();
 
-$frm = FactionResearchModel::getInstance();
-$frm->updateDB();
 ?>
