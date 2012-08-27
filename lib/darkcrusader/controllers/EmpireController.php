@@ -22,10 +22,13 @@ use hydrogen\view\View;
 class EmpireController extends Controller {
 	
 	public function checkAuth($permissions=array(), $endIfNoPermission=true) {
-		if (!UserModel::getInstance()->checkIfUserIsPremium(UserModel::getInstance()->getActiveUser()->id)) {
+		/*if (!UserModel::getInstance()->checkIfUserIsPremium(UserModel::getInstance()->getActiveUser()->id)) {
 			if ($endIfNoPermission)
 				$this->permissionDenied();
-		}
+		}*/
+		// no longer premium only :)
+		
+		$this->checkForValidCharacterAndAPIKey();
 
 		parent::checkAuth($permissions, $endIfNoPermission);
 	}
@@ -33,29 +36,33 @@ class EmpireController extends Controller {
 	public function index() {
 		$this->checkAuth("access_empire");
 
-		$user = UserModel::getInstance()->getActiveUser();
+		$um = UserModel::getInstance();
+		$user = $um->getActiveUser();
 
-		if (in_array($user->group->id, array(1,5,6,7,8)))
-			FactionResearchModel::getInstance()->updateDB($user->id);
+		if ($um->checkIfUserIsPremium($user->id)) {
+			$bm = PremiumPersonalBankModel::getInstance();
+			$bm->updateDB($user->id);
 
-		$bm = PremiumPersonalBankModel::getInstance();
-		$bm->updateDB($user->id);
+			$workerCostsLastWeek = $bm->getWorkerCosts($user->id, "last7days");
+			View::setVar("workerCostsLastWeek", $workerCostsLastWeek);
 
-		$workerWagesPastWeek = $bm->getWorkerCosts($user->id, "last7days");
-		$marketSalesPastWeek = $bm->getMarketSales($user->id, "last7days");
-		$profitPastWeek = $marketSalesPastWeek - $workerWagesPastWeek;
+			$marketSalesLastWeek = $bm->getMarketSales($user->id, "last7days");
+			View::setVar("marketSalesLastWeek", $marketSalesLastWeek);
 
-		View::load('empire/index', array(
-			"workerCostsLastWeek" => $workerWagesPastWeek,
-			"marketSalesLastWeek" => $marketSalesPastWeek,
-			"profitOrLossLastWeek" => $profitPastWeek
-		));
+			View::setVar("profitOrLossLastWeek", ($marketSalesLastWeek - $workerCostsLastWeek));
+		}
+
+		View::load('empire/index');
 	}
 
 	public function seller() {
 		$this->checkAuth("access_empire");
 
-		$user = UserModel::getInstance()->getActiveUser();
+		$um = UserModel::getInstance();
+		$user = $um->getActiveUser();
+
+		if (!$um->checkIfUserIsPremium($user->id))
+			$this->permissionDenied();
 
 		$period = ($_GET["period"]) ? $_GET["period"] : "forever";
 

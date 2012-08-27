@@ -17,6 +17,7 @@ use darkcrusader\character\OECharacter;
 use darkcrusader\storeditems\StoredItem;
 use darkcrusader\colonies\Colony;
 use darkcrusader\oe\exceptions\APIQueryFailedException;
+use darkcrusader\sqlbeans\LinkedCharacterBean;
 
 class OuterEmpiresModel extends Model {
 	
@@ -237,8 +238,6 @@ class OuterEmpiresModel extends Model {
 
 		$response = $this->queryAPI("GetFactionMembers", array(), $userAccessKey);
 		$response = $response->GetFactionMembersResult;
-
-		print_r($response);
 	}
 
 	/**
@@ -258,7 +257,13 @@ class OuterEmpiresModel extends Model {
 
 		$response = $this->queryAPI("GetCargoInventory", array(), $userAccessKey);
 		$response = $response->GetCargoInventoryResult;
+		
+		if ($response->valid == 0)
+			return array();
+
 		$rawStoredItems = $response->CargoItems->CargoItem;
+		if (!is_array($rawStoredItems))
+			$rawStoredItems = array($rawStoredItems);
 
 		$storedItems = array();
 		foreach($rawStoredItems as $rawStoredItem) {
@@ -316,7 +321,13 @@ class OuterEmpiresModel extends Model {
 
 		$response = $this->queryAPI("GetColonies", array(), $userAccessKey);
 		$response = $response->GetColoniesResult;
+
+		if ($response->valid == 0)
+			return array();
+
 		$rawColonies = $response->Colonies->Colony;
+		if (!is_array($rawColonies))
+			$rawColonies = array($rawColonies);
 
 		$colonies = array();
 		foreach($rawColonies as $rawColony) {
@@ -358,5 +369,28 @@ class OuterEmpiresModel extends Model {
 		return $colonies;
 	}
 
+	/**
+	 * Checks the validity of an API key
+	 * 
+	 * @param int $user user id
+	 * @param mixed $accessKey leave as boolean false to use access key for default character of user
+	 * specified, or optionally override the user and use the access key supplied
+	 * @return boolean true if key is valid, otherwise false
+	 */
+	public function checkAPIKey($user, $accessKey=false) {
+
+		if ($accessKey)
+			$userAccessKey = $accessKey;
+		else
+			$userAccessKey = UserModel::getInstance()->getDefaultCharacter($user)->api_key;
+
+		$response = $this->queryAPI("CheckAPIKey", array(), $userAccessKey);
+		$response = $response->CheckAPIKeyResult;
+
+		if ($response->messageOut != "Invalid Access Key")
+			return true;
+		else
+			return false;
+	}
 }
 ?>

@@ -135,7 +135,7 @@ class PersonalBankModel extends Model {
 			$credits[] = $type["credits"];
 			$types[] = $type["type"];
 		}
-
+		
 		$data = new \pData;
 		$data->addPoints($credits, "Credits");
 		$data->addPoints($types, "Types");

@@ -555,6 +555,9 @@ class UserModel extends Model {
 		// set linked character as default
 		$lcb->is_default = 1;
 		$lcb->update();
+
+		// clear user data we have
+		$this->deleteAllUserData($lcb->user_id);
 	}
 
 	/**
@@ -570,8 +573,21 @@ class UserModel extends Model {
 		$lcb = $lcbs[0];
 
 		// delete
-		if ($lcb)
+		if ($lcb) {
+			if ($lcb->is_default == 1) {
+				$this->deleteAllUserData($lcb->user_id);
+				
+				$q = new Query("SELECT");
+				$q->where("api_key != ?", "");
+				$q->where("user_id = ?", $lcb->user_id);
+				$q->where("id != ?", $lcb->id);
+				$potentialLcbs = LinkedCharacterBean::select($q);
+				if ($potentialLcbs[0])
+					$this->setDefaultCharacter($potentialLcbs[0]->id);
+			}
+
 			$lcb->delete();
+		}
 	}
 
 	/**
@@ -620,8 +636,9 @@ class UserModel extends Model {
 			if ($keyCharacterInfo->name != $characterName)
 				throw new APIKeyInvalidException;
 
-			$this->addLinkedCharacter($user, $characterName, $key, true);
+			$default = ($this->getDefaultCharacter($user)) ? false : true;
 
+			$this->addLinkedCharacter($user, $characterName, $key, $default);
 		}
 		else { // if no key, manual link request has to be done
 			// now add the link request to the db
@@ -665,6 +682,54 @@ class UserModel extends Model {
 			return $lcbs[0];
 		else
 			return false;
+	}
+
+	/**
+	 * Checks that all the API keys (access keys) we have on file our valid, if any are not, nuke them
+	 */
+	public function checkValidityOfAllOnFileAccessKeys() {
+		$oem = OuterEmpiresModel::getInstance();
+		$lcbs = LinkedCharacterBean::select();
+
+		foreach($lcbs as $lcb) {
+			if (!$oem->checkAPIKey(false, $lcb->api_key)) {
+				if ($lcb->is_default == 1) {
+					$this->deleteAllUserData($lcb->user_id);
+					
+					$q = new Query("SELECT");
+					$q->where("api_key != ?", "");
+					$q->where("user_id = ?", $lcb->user_id);
+					$q->where("id != ?", $lcb->id);
+					$potentialLcbs = LinkedCharacterBean::select($q);
+					if ($potentialLcbs[0])
+						$this->setDefaultCharacter($potentialLcbs[0]->id);
+				}
+			}
+
+			sleep(1);
+		}
+	}
+
+	/**
+	 * Deletes all scraped data we have for a user
+	 * 
+	 * @param int $user user id
+	 */
+	public function deleteAllUserData($user) {
+		$q = new Query("DELETE");
+		$q->from("personal_bank_transactions");
+		$q->where("user_id = ?", $user);
+		$q->prepare()->execute();
+
+		$q = new Query("DELETE");
+		$q->from("stored_items");
+		$q->where("user_id = ?", $user);
+		$q->prepare()->execute();
+
+		$q = new Query("DELETE");
+		$q->from("colonies");
+		$q->where("user_id = ?", $user);
+		$q->prepare()->execute();
 	}
 
 	/**
