@@ -48,7 +48,7 @@ class OuterEmpiresModel extends Model {
 			$query[$key] = $value;
 
 		$time = microtime(true);
-		try {
+		//try {
 			if (!static::$soapInstance)
 				static::$soapInstance = new \SoapClient(static::$WSDL);
 
@@ -62,11 +62,11 @@ class OuterEmpiresModel extends Model {
 			}
 			$log .= ", Request took $time seconds";
 			Log::info($log);
-			
-		}
-		catch (\Exception $e) {
-			throw new APIQueryFailedException;
-		}
+
+		//}
+		//catch (\Exception $e) {
+		//	throw new APIQueryFailedException;
+		//}
 
 		return $result;
 	}
