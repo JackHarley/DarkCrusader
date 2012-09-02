@@ -52,13 +52,17 @@ class OuterEmpiresModel extends Model {
 			if (!static::$soapInstance)
 				static::$soapInstance = new \SoapClient(static::$WSDL);
 
-			$log = "Calling $method with following parameters:";
+			$startTime = microtime(true);
+			$result = static::$soapInstance->{$method}($query);
+			$time = microtime(true) - $startTime;
+
+			$log = "Called $method with following parameters:";
 			foreach($query as $key => $value) {
-				$log .= " $key => $value";
+				$log .= " '$key' => '$value'";
 			}
+			$log .= ", Request took $time seconds";
 			Log::info($log);
 			
-			$result = static::$soapInstance->{$method}($query);
 		}
 		catch (\Exception $e) {
 			throw new APIQueryFailedException;
