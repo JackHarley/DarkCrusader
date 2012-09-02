@@ -3,6 +3,7 @@ if (!defined('STDIN'))
 	die("This is a cron job which is run from the CLI, it cannot be accessed via the web");
 error_reporting(E_ALL & ~E_NOTICE);
 ini_set("display_errors", "On");
+date_default_timezone_set('UTC');
 
 require_once(__DIR__ . '/../../hydrogen/hydrogen.inc.php');
 require_once(__DIR__ . '/../darkcrusader.inc.php');
