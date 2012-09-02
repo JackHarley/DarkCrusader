@@ -8,7 +8,15 @@ date_default_timezone_set("Europe/Dublin");
 require_once(__DIR__ . '/../../hydrogen/hydrogen.inc.php');
 require_once(__DIR__ . '/../darkcrusader.inc.php');
 
-\darkcrusader\models\UserModel::getInstance()->checkValidityOfAllOnFileAccessKeys();
-\darkcrusader\models\FactionResearchModel::getInstance()->updateDB();
+$um = \darkcrusader\models\UserModel::getInstance();
+$bm = \darkcrusader\models\PremiumPersonalBankModel::getInstance();
+
+$users = $um->getUserList();
+
+foreach($users as $user) {
+	if (($um->checkIfUserIsPremium($user->id)) && ($um->getDefaultCharacter($user->id))) {
+		$bm->updateDB($user->id, true);
+	}
+}
 
 ?>

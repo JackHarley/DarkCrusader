@@ -425,7 +425,6 @@ class UserModel extends Model {
 		return UserBean::select($q, true);
 	}
 
-
 	/**
 	 * updateUser
 	 * Updates the given user ID with the given

@@ -27,8 +27,10 @@ class PremiumPersonalBankModel extends PersonalBankModel {
 	 * Updates the DB with any new transactions for the specified user
 	 * 
 	 * @param int $user user id
+	 * @param boolean $force set to true to force the update to run, even if it could overload
+	 * the server
 	 */
-	public function updateDB($user) {
+	public function updateDB($user, $force=false) {
 
 		// work out how many days we need to get to ensure we update the db fully
 		$q = new Query("SELECT");
@@ -41,7 +43,12 @@ class PremiumPersonalBankModel extends PersonalBankModel {
 		$latestTransferKnown = $pbtbs[0];
 
 		if (!$latestTransferKnown) {
-			throw new TooManyTransactionsToFetchException;
+			if ($force) {
+				$daysToGet = 0;
+			}
+			else {
+				throw new TooManyTransactionsToFetchException;
+			}
 		}
 		else {
 			$timeNow = time();
@@ -52,10 +59,13 @@ class PremiumPersonalBankModel extends PersonalBankModel {
 			$daysToGet = ceil($secondsSinceUpdate / (3600 * 24));
 		}
 
+		if (($daysToGet > 7) && ($force == false))
+			throw new TooManyTransactionsToFetchException;
+		
 		$transactions = OuterEmpiresModel::getInstance()->getPlayerBankTransactions($user, $daysToGet);
-
+		$transactions = array_reverse($transactions);
+		
 		foreach($transactions as $transaction) {
-
 			// add to db with duplicate check enabled
 			$this->addTransaction(
 				$user, 
