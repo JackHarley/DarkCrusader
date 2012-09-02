@@ -18,6 +18,7 @@ use darkcrusader\storeditems\StoredItem;
 use darkcrusader\colonies\Colony;
 use darkcrusader\oe\exceptions\APIQueryFailedException;
 use darkcrusader\sqlbeans\LinkedCharacterBean;
+use hydrogen\log\Log;
 
 class OuterEmpiresModel extends Model {
 	
@@ -51,6 +52,12 @@ class OuterEmpiresModel extends Model {
 			if (!static::$soapInstance)
 				static::$soapInstance = new \SoapClient(static::$WSDL);
 
+			$log = "Calling $method with following parameters:";
+			foreach($query as $key => $value) {
+				$log .= " $key => $value";
+			}
+			Log::info($log);
+			
 			$result = static::$soapInstance->{$method}($query);
 		}
 		catch (\Exception $e) {
