@@ -19,6 +19,8 @@ use darkcrusader\models\FactionResearchModel;
 
 use hydrogen\view\View;
 
+use darkcrusader\oe\exceptions\TooManyTransactionsToFetchException;
+
 class EmpireController extends Controller {
 	
 	public function checkAuth($permissions=array(), $endIfNoPermission=true) {
@@ -28,9 +30,9 @@ class EmpireController extends Controller {
 		}*/
 		// no longer premium only :)
 		
-		$this->checkForValidCharacterAndAPIKey();
-
 		parent::checkAuth($permissions, $endIfNoPermission);
+
+		$this->checkForValidCharacterAndAPIKey();
 	}
 
 	public function index() {
@@ -41,7 +43,14 @@ class EmpireController extends Controller {
 
 		if ($um->checkIfUserIsPremium($user->id)) {
 			$bm = PremiumPersonalBankModel::getInstance();
-			$bm->updateDB($user->id);
+			
+			try {
+				$bm->updateDB($user->id);
+			}
+			catch (TooManyTransactionsToFetchException $e) {
+				View::load('personal_bank/full_update_required');
+				return;
+			}
 
 			$workerCostsLastWeek = $bm->getWorkerCosts($user->id, "last7days");
 			View::setVar("workerCostsLastWeek", $workerCostsLastWeek);
@@ -66,7 +75,14 @@ class EmpireController extends Controller {
 
 		$period = ($_GET["period"]) ? $_GET["period"] : "forever";
 
-		PremiumPersonalBankModel::getInstance()->updateDB($user->id);
+		try {
+			PremiumPersonalBankModel::getInstance()->updateDB($user->id);
+		}
+		catch (TooManyTransactionsToFetchException $e) {
+			View::load('personal_bank/full_update_required');
+			return;
+		}
+
 		$topCustomers = MarketModel::getInstance()->getTopCustomers($user->id, $period, 10);
 
 		View::load('empire/seller', array(

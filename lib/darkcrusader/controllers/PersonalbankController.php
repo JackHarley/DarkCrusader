@@ -16,6 +16,8 @@ use hydrogen\view\View;
 
 use darkcrusader\bank\exceptions\IncorrectTransactionLogPasteException;
 
+use darkcrusader\oe\exceptions\TooManyTransactionsToFetchException;
+
 class PersonalbankController extends Controller {
 	
 	public function index() {
@@ -27,7 +29,13 @@ class PersonalbankController extends Controller {
 
 		if ($um->checkIfUserIsPremium($user->id)) {
 			$bm = PremiumPersonalBankModel::getInstance();
-			$bm->updateDB($user->id);
+			
+			try {
+				$bm->updateDB($user->id);
+			}
+			catch (TooManyTransactionsToFetchException $e) {
+				View::load('personal_bank/full_update_required');
+			}
 
 			$latestTransactions = $bm->getLatestTransactions($user->id, 10);
 			$incomeGraph = $bm->generateTransactionTypesGraph($user->id, "forever", "in");
