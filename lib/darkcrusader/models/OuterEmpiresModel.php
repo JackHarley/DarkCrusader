@@ -24,7 +24,6 @@ class OuterEmpiresModel extends Model {
 	
 	protected static $modelID = "OE";
 	protected static $WSDL = "http://oeapi.outer-empires.com/OEAPI.asmx?WSDL";
-	protected static $soapInstance = false;
 	
 	protected static $quickCache = array();
 	
@@ -48,19 +47,24 @@ class OuterEmpiresModel extends Model {
 			$query[$key] = $value;
 		
 		try {
-			if (!static::$soapInstance)
-				static::$soapInstance = new \SoapClient(static::$WSDL);
+			$log = "Calling $method with following parameters:";
+			foreach($query as $key => $value) {
+				$log .= " '$key' => '$value'";
+			}
+			Log::debug($log);
+
+			$soapInstance = new \SoapClient(static::$WSDL);
 
 			$startTime = microtime(true);
-			$result = static::$soapInstance->{$method}($query);
+			$result = $soapInstance->{$method}($query);
 			$time = microtime(true) - $startTime;
 
-			$log = "Called $method with following parameters:";
+			$log = "Called $method successfully with following parameters:";
 			foreach($query as $key => $value) {
 				$log .= " '$key' => '$value'";
 			}
 			$log .= ", Request took $time seconds";
-			Log::info($log);
+			Log::debug($log);
 
 		}
 		catch (\Exception $e) {
