@@ -56,6 +56,7 @@ class TextFileEngine implements LogEngine {
 		if ($this->fp) {
 			if (@flock($this->fp, LOCK_EX)) {
 				@fwrite($this->fp, $str) && $success = true;
+				chmod($this->logfile, 0777);
 				@flock($this->fp, LOCK_UN);
 			}
 			@fclose($this->fp);

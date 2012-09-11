@@ -207,8 +207,9 @@ class ScanModel extends Model{
 					$dbquality = "good";
 				break;
 			}
-
-			$this->addScanResult($scanId, $resource, $dbquality, $rate);					  
+			
+			if (($resource) && ($dbquality) && ($rate))
+				$this->addScanResult($scanId, $resource, $dbquality, $rate);					  
 		}
 
 		RECacheManager::getInstance()->clearGroup("systemscans");
