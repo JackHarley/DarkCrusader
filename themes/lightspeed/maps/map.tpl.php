@@ -19,13 +19,13 @@
 			}
 			#mapgalaxy {
 				display: block;
-				height: {% eval height / scale %}px;
+				height: {% eval (height / scale) + top_padding %}px;
 				width: {% eval width / scale %}px;
 				margin: 0 auto;
 			}
 			#mapwrapper {
 				width: {% eval width / scale %}px;
-				height: {% eval height / scale %}px;
+				height: {% eval (height / scale) + top_padding %}px;
 				margin: 0 auto;
 			}
 			.system {

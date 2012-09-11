@@ -6,7 +6,7 @@
 <h2>IRC Chat</h2>
 
 <p>
-	Simply {% if ! exists nickname %}enter a nickname and {% endif %}click the Connect button below to connect to our secure IRC channel, if you are a signed in SWAT/FIRE member you will also be connected to our private #swatfire channel<br />
+	Simply click the Connect button below to connect to our secure IRC channel.<br />
 	<a 
 		target="_blank" 
 		{% if exists nickname %}
@@ -27,7 +27,7 @@
 		src="http://qchat.rizon.net/?prompt=1&channels={{channelString}}&uio=d4"
 	{% endif %}
 	width="100%" 
-	height="310"
+	height="360"
 >
 </iframe>
 {% endblock %}
