@@ -1,5 +1,14 @@
 # Changelog
 
+1.0.028
+--------------
+* New OE tab for faction members, access OE and chat in a sidebar at the same time
+* Idiot-proofing of site
+* Bug fixes
+* API request logging
+* Op Code Caching enabled, should make site faster
+* Made chat private only again, no one used the public one
+
 1.0.027
 --------------
 * Tonnes of optimisations to make things load faster
