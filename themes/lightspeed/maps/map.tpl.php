@@ -82,9 +82,13 @@
 
 	<body>
 		<div id="mapwrapper">
-			<div id="mapheader">
-				<h2>OE Galaxy Map</h2>
-			</div>	
+			
+			{% if ! exists no_title %}
+				<div id="mapheader">
+					<h2>OE Galaxy Map</h2>
+				</div>
+			{% endif %}
+
 			<div id="mapgalaxy">
 				{% set specialSystemOutputted "no" %}
 				{% for system in systems %}
