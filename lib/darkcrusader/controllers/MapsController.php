@@ -64,6 +64,9 @@ class MapsController extends Controller {
 			View::setVar("specialSystem", $sm->getSystemStats($system->id));
 		}
 
+		if ($_GET["notitle"])
+			View::setVar("no_title", "yes");
+
 		View::load('maps/map', array(
 			"systems" => $sm->getStationSystemsLatestStats(),
 			"scale" => $scale,
