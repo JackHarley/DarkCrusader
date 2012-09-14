@@ -39,6 +39,11 @@
 		<div style="height:5px"></div>
 		<ul>
 			<li><a href="{% url /index.php %}">home</a></li>
+
+			{% if exists userCanAccessChat %}
+				<li><a href="{% url /index.php/gameportal %}">oe</a></li>
+			{% endif %}
+
 			<li><a href="http://forums.tacticalresponseteam.in">forums</a></li>
 			<li><a href="{% url /index.php/stats %}">stats & intel</a></li>
 			<li><a href="{% url /index.php/empire %}">empire</a></li>
@@ -46,7 +51,10 @@
 			<li><a href="{% url /index.php/maps %}">maps</a></li>
 			<li><a href="{% url /index.php/utilities %}">utilities</a></li>
 			<li><a href="{% url /index.php/personalbank %}">finances</a> </li>
-			<li><a href="{% url /index.php/chat %}">irc chat</a></li>
+
+			{% if exists userCanAccessChat %}
+				<li><a href="{% url /index.php/chat %}">chat</a></li>
+			{% endif %}
 
 			{% if exists userCanAccessScans %}
 				<li><a href="{% url /index.php/scans %}">scans</a></li>
@@ -57,7 +65,7 @@
 			{% endif %}
 
 			{% if exists userCanAccessFactionResearch %}
-				<li><a href="{% url /index.php/factionresearch %}">faction research</a></li>
+				<li><a href="{% url /index.php/factionresearch %}">research</a></li>
 			{% endif %}
 
 			{% if exists userIsAdmin %}
