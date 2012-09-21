@@ -46,7 +46,7 @@ ErrorHandler::attachErrorPage();
 // If accessed from jjutilities, change some config values so that we load jjutilities views instead of swatfire ones
 if ($_SERVER["HTTP_HOST"] == "jjutilities.com") {
     Config::setVal("general", "site_name", "JJ Utilities");
-    Config::setVal("general", "app_url", "http://jjutilities.co.cc");
+    Config::setVal("general", "app_url", "http://jjutilities.com");
     Config::setVal("view", "folder", "themes/jjutilities");
     Config::setVal("view", "url_path", "themes/jjutilities");
     Config::setVal("general", "site_bank_character_name", "Jedi Utilities");
