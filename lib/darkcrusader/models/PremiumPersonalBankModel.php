@@ -233,12 +233,19 @@ class PremiumPersonalBankModel extends PersonalBankModel {
 			$types[$btb->type] += $btb->amount;
 		}
 
+		// strip any <=0 credit values from the types array, otherwise infinite loop
+		foreach($types as $type => $credits) {
+			if ($credits <= 0)
+				unset($types[$type]);
+		}
+
 		// sort types by amount of credits earned
 		$orderedTypes = array();
 		while (count($types) > 0) {
 			$best = array("type" => null, "credits" => 0);
 
 			foreach($types as $type => $credits) {
+
 				if ($credits > $best["credits"]) {
 					$best["type"] = $type;
 					$best["credits"] = $credits;

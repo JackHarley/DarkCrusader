@@ -32,6 +32,7 @@ class MarketModel extends Model {
 		$q = new Query("SELECT");
 		$q->where("direction = ?", "in"); // money in = sales
 		$q->where("type = ?", "Market");
+		$q->where("user_id = ?", $user);
 
 		switch($period) {
 			case "last24hours":
