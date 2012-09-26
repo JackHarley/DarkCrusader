@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 24;
+	const maxDbVersion = 26;
 
 	/**
 	 * Checks if the DB is installed
@@ -832,6 +832,63 @@ class InstallModel extends Model {
 				PRIMARY KEY (`id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
 		);
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 25
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion25($pdo, $user, $pass) {
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `skills` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`name` varchar(64) NOT NULL,
+				`description` varchar(200) NOT NULL,
+				`category_id` bigint(20) unsigned NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `skill_categories` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`name` varchar(64) NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `skill_prerequistes` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`skill_id` bigint(20) unsigned NOT NULL,
+				`prerequiste_skill_id` bigint(20) unsigned NOT NULL,
+				`prerequiste_skill_level` tinyint unsigned NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 26
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion26($pdo, $user, $pass) {
+		$pm = PermissionsModel::getInstance();
+		$pm->createPermission("skills", "access_skills", "Access skills");
 
 		return true;
 	}

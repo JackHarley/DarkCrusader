@@ -110,7 +110,7 @@ if ($_GET["dositebankupdate"]) {
 $sbm->processAnyUnprocessedTransfers();
 
 if ($activeUser->id) {
-$lab = new LoggedActionBean;
+    $lab = new LoggedActionBean;
     $lab->user_id = $_SESSION["userID"];
     $lab->type = "page_load";
     

@@ -16,6 +16,7 @@ use darkcrusader\bank\PersonalBankTransaction;
 use darkcrusader\character\OECharacter;
 use darkcrusader\storeditems\StoredItem;
 use darkcrusader\colonies\Colony;
+use darkcrusader\skills\Skill;
 use darkcrusader\oe\exceptions\APIQueryFailedException;
 use darkcrusader\sqlbeans\LinkedCharacterBean;
 use hydrogen\log\Log;
@@ -405,6 +406,41 @@ class OuterEmpiresModel extends Model {
 			return true;
 		else
 			return false;
+	}
+
+	/**
+	 * Get all skills
+	 * 
+	 * @param int $user user id
+	 * @param mixed $accessKey leave as boolean false to use access key for default character of user
+	 * specified, or optionally override the user and use the access key supplied
+	 * @return array array of Skill's
+	 */
+	public function getAllSkills($user, $accessKey=false) {
+		
+		if ($accessKey)
+			$userAccessKey = $accessKey;
+		else
+			$userAccessKey = UserModel::getInstance()->getDefaultCharacter($user)->api_key;
+
+		$response = $this->queryAPI("GetAllSkills", array(), $userAccessKey);
+		$response = $response->GetAllSkillsResult;
+
+		$rawSkills = $response->Skills->AllSkill;
+
+		$skills = array();
+		foreach($rawSkills as $rawSkill) {
+			$skill = new Skill;
+			$skill->name = $rawSkill->Name;
+			$skill->category = $rawSkill->SkillGroup;
+			$skill->description = $rawSkill->Description;
+			$skill->prerequiste = $rawSkill->PreReqSkill;
+			$skill->prerequisteLevel = $rawSkill->PreReqSkillLevel;
+
+			$skills[] = $skill;
+		}
+
+		return $skills;
 	}
 }
 ?>
