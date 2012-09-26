@@ -1,5 +1,11 @@
 # Changelog
 
+1.0.029
+--------------
+* Domain move to jjutilities.com
+* Skills added, only Jedi and OEDev Paul have access to the skills portion for now
+* Removed obsolete KoS bean
+
 1.0.028
 --------------
 * New OE tab for faction members, access OE and chat in a sidebar at the same time
