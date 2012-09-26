@@ -44,10 +44,11 @@
 				<li><a href="{% url /index.php/gameportal %}">oe</a></li>
 			{% endif %}
 
-			<li><a href="http://forums.tacticalresponseteam.in">forums</a></li>
+			<li><a href="http://forums.swatfire.com">forums</a></li>
+			<li><a href="{% url /index.php/faq %}">faq</a></li>
 			<li><a href="{% url /index.php/stats %}">stats & intel</a></li>
 			<li><a href="{% url /index.php/empire %}">empire</a></li>
-			<li><a href="{% url /index.php/faq %}">faq</a></li>
+			<li><a href="{% url /index.php/skills %}">skills</a></li>
 			<li><a href="{% url /index.php/maps %}">maps</a></li>
 			<li><a href="{% url /index.php/utilities %}">utilities</a></li>
 			<li><a href="{% url /index.php/personalbank %}">finances</a> </li>
@@ -66,10 +67,6 @@
 
 			{% if exists userCanAccessFactionResearch %}
 				<li><a href="{% url /index.php/factionresearch %}">research</a></li>
-			{% endif %}
-
-			{% if exists userIsAdmin %}
-				<li><a href="{% url /index.php/admin %}">acp</a></li>
 			{% endif %}
 
 			{% if empty activeUser.user %}
@@ -156,7 +153,10 @@
 	<!-- end page -->
 
 	<div id="footer">
-		Request took {{controller.totalRequestTime}} seconds
+		Request took {{controller.totalRequestTime}} seconds<br />
+		{% if exists userIsAdmin %}
+			<a href="{% url /index.php/admin %}">Admin Control Panel</a>
+		{% endif %}
 	</div>
 	<!-- end footer -->
 </div>

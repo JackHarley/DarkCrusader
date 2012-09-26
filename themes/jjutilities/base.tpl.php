@@ -39,16 +39,13 @@
 		<div style="height:5px"></div>
 		<ul>
 			<li><a href="{% url /index.php %}">home</a></li>
+			<li><a href="{% url /index.php/faq %}">faq</a></li>
 			<li><a href="{% url /index.php/stats %}">stats & info</a></li>
 			<li><a href="{% url /index.php/empire %}">empire</a></li>
-			<li><a href="{% url /index.php/faq %}">faq</a></li>
+			<li><a href="{% url /index.php/skills %}">skills</a></li>
 			<li><a href="{% url /index.php/maps %}">maps</a></li>
 			<li><a href="{% url /index.php/utilities %}">utilities</a></li>
-			<li><a href="{% url /index.php/personalbank %}">finance manager</a></li>
-
-			{% if exists userIsAdmin %}
-				<li><a href="{% url /index.php/admin %}">acp</a></li>
-			{% endif %}
+			<li><a href="{% url /index.php/personalbank %}">finances</a></li>
 
 			{% if empty activeUser.user %}
 				<li><a href="{% url /index.php/user/register %}">register</a></li>
@@ -124,7 +121,10 @@
 	<!-- end page -->
 
 	<div id="footer">
-		Request took {{controller.totalRequestTime}} seconds
+		Request took {{controller.totalRequestTime}} seconds<br />
+		{% if exists userIsAdmin %}
+			<a href="{% url /index.php/admin %}">Admin Control Panel</a>
+		{% endif %}
 	</div>
 	<!-- end footer -->
 </div>
