@@ -10,6 +10,9 @@
 	<link rel="apple-touch-icon" sizes="114x114" href="{% viewurl /images/apple-touch-icon-114x114.png %}" />
 	<link rel="apple-touch-icon" sizes="72x72" href="{% viewurl /images/apple-touch-icon-72x72.png %}" />
 	<link rel="apple-touch-icon" sizes="144x144" href="{% viewurl /images/apple-touch-icon-144x144.png %}" />
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+
+	{% block js %}{% endblock %}
 
 	<!-- google analytics -->
 	{% if ! exists userIsAdmin %}

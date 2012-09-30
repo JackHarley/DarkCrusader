@@ -38,12 +38,14 @@ class StoredItemsModel extends Model {
 	 */
 	public function getOccurencesOfResource($user, $resourceName, $minimumQuantity=0) {
 		$q = new Query("SELECT");
-		$q->where("description = ?", $resourceName);
+		$q->where("stored_items.description = ?", $resourceName);
 		$q->where("type = ?", "resource");
 		$q->where("location_type = ?", "colony");
 		$q->where("quantity > ?", $minimumQuantity);
+		$q->where("stored_items.user_id = ?", $user);
 
-		return StoredItemBean::select($q, true);
+		$sibs = StoredItemBean::select($q, true);
+		return $sibs;
 	}
 
 
