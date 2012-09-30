@@ -12,6 +12,7 @@ use darkcrusader\controllers\Controller;
 
 use darkcrusader\models\MarketModel;
 use darkcrusader\models\ColoniesModel;
+use darkcrusader\models\BlueprintsModel;
 use darkcrusader\models\PremiumPersonalBankModel;
 use darkcrusader\models\UserModel;
 use darkcrusader\models\StoredItemsModel;
@@ -24,12 +25,6 @@ use darkcrusader\oe\exceptions\TooManyTransactionsToFetchException;
 class EmpireController extends Controller {
 	
 	public function checkAuth($permissions=array(), $endIfNoPermission=true) {
-		/*if (!UserModel::getInstance()->checkIfUserIsPremium(UserModel::getInstance()->getActiveUser()->id)) {
-			if ($endIfNoPermission)
-				$this->permissionDenied();
-		}*/
-		// no longer premium only :)
-		
 		parent::checkAuth($permissions, $endIfNoPermission);
 
 		$this->checkForValidCharacterAndAPIKey();
@@ -136,6 +131,63 @@ class EmpireController extends Controller {
 			"researchColonies" => $cm->getColonies($user->id, "research"),
 			"defenseColonies" => $cm->getColonies($user->id, "defense")
 		));
+	}
+
+	public function manufacturing() {
+
+		$this->checkAuth("access_empire");
+
+		$sim = StoredItemsModel::getInstance();
+		$cm = ColoniesModel::getInstance();
+		$bm = BlueprintsModel::getInstance();
+
+		$user = UserModel::getInstance()->getActiveUser();
+
+		switch($act) {
+			case "blueprintresources":
+				for($i=1; isset($_POST["resourcename" . $i]); $i++) {
+					$bm->addBlueprintResource($_POST["blueprint"], $_POST["resourcename" . $i], $_POST["resourcequantity" . $i]);
+				}
+			break;
+		}
+
+		// step 3: show route to take
+		if ($_POST["submit2"]) {
+			$instructions = $cm->calculateOptimalManufacturingRoute($_POST["blueprint"], $_POST, $_POST["ship_storage_capacity"], $_POST["start_location"], $_POST["drop_off_location"]);
+			View::load('manufacturing/route', array(
+				"instructions" => $instructions
+			));
+		}
+		// step 2: choose colonies you're willing to collect from (IF RESOURCES FOR BP ARE UNKNOWN, PROMPT!),
+		//         manufacturing colony to dropoff at, ship storage capacity, start location
+		else if ($_POST["submit"]) {
+			
+			if ($resources = $bm->getBlueprintResources($_POST["blueprint"])) {
+				$resourceOccurences = array();
+				foreach($resources as $resource) {
+					$working = $sim->getOccurencesOfResource($user->id, $resource->description);
+
+					array_merge($resourceOccurences, $working);
+				}
+
+				View::load("manufacturing/route_settings", array(
+					"resourceOccurences" => $resourceOccurences,
+					"manufacturingColonies" => $cm->getColonies($user->id, "manufacturing"),
+					"blueprintDescription" => $_POST["blueprint"]
+				));
+			}
+			else {
+				View::load('manufacturing/blueprint_resources', array(
+					"blueprintDescription" => $_POST["blueprint"]
+				));
+			}
+		}
+		// step 1: pick blueprint
+		else {
+			View::load('manufacturing/select_blueprint', array(
+				"blueprints" => $sim->getStoredBlueprints($user->id)
+			));
+		}
 	}
 }
 ?>

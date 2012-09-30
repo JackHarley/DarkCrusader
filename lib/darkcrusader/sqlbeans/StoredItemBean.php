@@ -44,5 +44,9 @@ class StoredItemBean extends SQLBean {
 			'foreignKey' => 'colony_id'
 		),
 	);
+
+	public function get_blueprint_description() {
+		return str_replace("BLUEPRINT : ", "", $this->description);
+	}
 }
 ?>
