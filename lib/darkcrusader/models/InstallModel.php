@@ -20,7 +20,7 @@ use darkcrusader\permissions\PermissionSet;
 class InstallModel extends Model {
 
 	protected static $modelID = "install";
-	const maxDbVersion = 26;
+	const maxDbVersion = 27;
 
 	/**
 	 * Checks if the DB is installed
@@ -889,6 +889,30 @@ class InstallModel extends Model {
 	protected function _runMigrationToVersion26($pdo, $user, $pass) {
 		$pm = PermissionsModel::getInstance();
 		$pm->createPermission("skills", "access_skills", "Access skills");
+
+		return true;
+	}
+
+	/**
+	 * Migrate the database to version 27
+	 *
+	 * @param PDOEngine $pdo Copy of the PDO engine returned by the DatabaseEngineFactory
+	 * @param string $user username of initial user
+	 * @param string $pass password of initial user
+	 *
+	 * @return boolean true on success
+	 */
+	protected function _runMigrationToVersion27($pdo, $user, $pass) {
+		$pdo->pdo->query("
+			CREATE TABLE IF NOT EXISTS `blueprint_resources` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`submitter_id` bigint(20) unsigned NOT NULL,
+				`blueprint_description` varchar(255) NOT NULL,
+				`resource_name` varchar(16) NOT NULL,
+				`resource_quantity` smallint unsigned NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+		);
 
 		return true;
 	}

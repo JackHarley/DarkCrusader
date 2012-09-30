@@ -29,6 +29,26 @@ class StoredItemsModel extends Model {
 	protected static $modelID = "storeditems";
 
 	/**
+	 * Gets the occurences of a resource in a user's colonies
+	 * 
+	 * @param string $resourceName name of resource (e.g. Titanium, Phosphorus, Aluminium)
+	 * @param int $minimumQuantity the minimum quanity that has to eb in one place to return that location
+	 * @return array of ColonyBeans where the resource is found with 2 additional properties,
+	 * '$resource_name' and '$resource_quantity'
+	 */
+	public function getOccurencesOfResource($user, $resourceName, $minimumQuantity=0) {
+		$q = new Query("SELECT");
+		$q->where("description = ?", $resourceName);
+		$q->where("type = ?", "resource");
+		$q->where("location_type = ?", "colony");
+		$q->where("quantity > ?", $minimumQuantity);
+
+		return StoredItemBean::select($q, true);
+	}
+
+
+
+	/**
 	 * Gets the stored resources for a user and returns an array of
 	 * StoredResources
 	 * 
@@ -277,16 +297,29 @@ class StoredItemsModel extends Model {
 	 */
 	public function getResearchedBlueprints($user) {
 		
-		$defaultCharacter = UserModel::getInstance()->getDefaultCharacter($user);
-		
-		if (!$defaultCharacter->api_key)
-			throw new UserDoesNotHaveAConfiguredCharacterException;
-		
 		$characterNoSpaces = str_replace(" ", "", $defaultCharacter->character_name);
 
 		$q = new Query("SELECT");
 		$q->where("type = ?", "blueprint");
 		$q->where("stored_items.description LIKE ?", "%" . $characterNoSpaces . "%");
+		$q->where("stored_items.user_id = ?", $user);
+
+		$sibs = StoredItemBean::select($q, true);
+
+		return $sibs;
+
+	}
+
+	/**
+	 * Gets all stored blueprints in a user's possession
+	 * 
+	 * @param int $user user id
+	 * @return array array of StoredItemBeans
+	 */
+	public function getStoredBlueprints($user) {
+
+		$q = new Query("SELECT");
+		$q->where("type = ?", "blueprint");
 		$q->where("stored_items.user_id = ?", $user);
 
 		$sibs = StoredItemBean::select($q, true);
