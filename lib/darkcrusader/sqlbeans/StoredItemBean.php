@@ -48,5 +48,13 @@ class StoredItemBean extends SQLBean {
 	public function get_blueprint_description() {
 		return str_replace("BLUEPRINT : ", "", $this->description);
 	}
+
+	public function get_colony() {
+		return $this->getMapped("colony");
+	}
+
+	public function get_system() {
+		return $this->getMapped("system");
+	}
 }
 ?>

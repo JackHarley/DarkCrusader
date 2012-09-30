@@ -133,7 +133,7 @@ class EmpireController extends Controller {
 		));
 	}
 
-	public function manufacturing() {
+	public function manufacturing($act=false) {
 
 		$this->checkAuth("access_empire");
 
@@ -165,9 +165,9 @@ class EmpireController extends Controller {
 			if ($resources = $bm->getBlueprintResources($_POST["blueprint"])) {
 				$resourceOccurences = array();
 				foreach($resources as $resource) {
-					$working = $sim->getOccurencesOfResource($user->id, $resource->description);
+					$working = $sim->getOccurencesOfResource($user->id, $resource->resource_name);
 
-					array_merge($resourceOccurences, $working);
+					$resourceOccurences = array_merge($resourceOccurences, $working);
 				}
 
 				View::load("manufacturing/route_settings", array(
