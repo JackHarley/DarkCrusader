@@ -1,5 +1,9 @@
 # Changelog
 
+1.0.030
+--------------
+* Added manufacturing route planner, most complex feature I have ever coded
+
 1.0.029
 --------------
 * Domain move to jjutilities.com
