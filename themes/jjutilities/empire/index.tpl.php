@@ -23,7 +23,7 @@
 		<a href="{% url /index.php/empire/seller %}">See an overview of your market sales</a><br />
 	{% endif %}
 	<a href="{% url /index.php/empire/resources %}">See an overview of the resources you have stored around the galaxy</a><br />
-	<a href="{% url /index.php/empire/colonies %}">See an overview of your colonies</a>
+	<a href="{% url /index.php/empire/colonies %}">See an overview of your colonies</a><br />
 	<a href="{% url /index.php/empire/manufacturing %}">Plan a manufacturing route around your colonies</a>
 </p>
 
