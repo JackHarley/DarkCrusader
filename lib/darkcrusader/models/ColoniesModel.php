@@ -15,6 +15,7 @@ use hydrogen\database\Query;
 use darkcrusader\models\UserModel;
 use darkcrusader\models\OuterEmpiresModel;
 use darkcrusader\models\StoredItemsModel;
+use darkcrusader\models\BlueprintsModel;
 
 use darkcrusader\sqlbeans\ColonyBean;
 
@@ -111,8 +112,8 @@ class ColoniesModel extends Model {
 	 * @return string status, either idle, active or unknown
 	 */
 	public function getColonyStatus($id) {
-		$storedItems = StoredItemsModel::getInstance()->getStoredItemsInColony($id);
 		$colony = $this->getColony($id);
+		$storedItems = StoredItemsModel::getInstance()->getStoredItemsInColony($id, $colony->user_id);
 
 		switch ($colony->primary_activity) {
 			case "manufacturing":
@@ -141,8 +142,8 @@ class ColoniesModel extends Model {
 	 * @return int amount of space left in hangar
 	 */
 	public function getFreeCapacityInColony($id) {
-		$storedItems = StoredItemsModel::getInstance()->getStoredItemsInColony($id);
 		$colony = $this->getColony($id);
+		$storedItems = StoredItemsModel::getInstance()->getStoredItemsInColony($id, $colony->user_id);
 
 		$totalUsed = 0;
 		foreach($storedItems as $storedItem) {
@@ -225,6 +226,244 @@ class ColoniesModel extends Model {
 			$cb->update();
 		else
 			$cb->insert();
+	}
+
+	/**
+	 * Calculates an optimal manufacturing route based on the input given
+	 * 
+	 * @param 
+	 * @return array array of step by step instructions
+	 */
+	public function calculateOptimalManufacturingRoute($blueprintDescription, $coloniesToPickUpFrom, 
+		$fuelCapacity, $fuelPerLightyear=2, $shipCargoCapacity, $startSystem, $manufacturingColonyName, $user) {
+
+		// oh god this is going to be difficult
+		$sim = StoredItemsModel::getInstance();
+
+		// let's start by deciding how many we're going to make of the blueprint
+
+		// first, find out how many we COULD make with the resources at our disposal
+		$blueprintResources = BlueprintsModel::getInstance()->getBlueprintResources($blueprintDescription);
+
+		// go through each resource and see how many we could make if it was only that resource which was required
+		$amountWeCanMakeWithEachResource = array(); // resource name => amount we can make
+		foreach($blueprintResources as $blueprintResource) {
+
+			// find how much of the resource we have at our disposal
+			$resourceOccurences = $sim->getOccurencesOfResource($user, $blueprintResource->resource_name);
+
+			// we can only pick up from a colony/count the resource if it is in $coloniesToPickUpFrom or
+			// is the manufacturing colony
+			$totalResourcesAtDisposal = 0;
+			foreach($resourceOccurences as $resourceOccurence) {
+				if (($coloniesToPickUpFrom[$resourceOccurence->colony->name] == "yes") || ($resourceOccurence->colony->name == $manufacturingColonyName)) {
+					$totalResourcesAtDisposal += $resourceOccurence->quantity;
+				}
+			}
+
+			$amountWeCanMakeWithEachResource[$blueprintResource->resource_name] = (floor($totalResourcesAtDisposal / $blueprintResource->resource_quantity)); // divide amount we have by the amount needed for one item
+		}
+
+		// the lowest number is the maximum we can create (if we had unlimited storage space)
+		sort($amountWeCanMakeWithEachResource);
+		$maximumWeCanCreateWithResourcesAvailable = $amountWeCanMakeWithEachResource[0];
+
+		// ok, now we have to bring storage into the equation, namely the storage of our manufacturing colony
+		
+		// first work out the storage required for one item
+		$storageRequiredForOneItem = 0;
+		foreach($blueprintResources as $blueprintResource) {
+			$storageRequiredForOneItem += $blueprintResource->resource_quantity;
+		}
+
+		// now find out how much storage we have in our manufacturing facility
+		$manufacturingColony = $this->getColony(false, $manufacturingColonyName, $user);
+		$freeCapacity = $manufacturingColony->free_capacity;
+
+		// we're now going to find out if any of our required resources are already at the facility,
+		// if so, we can add the total amount back to our free storage
+		$blueprintResourcesStrings = array(); // resources strings so we can use in_array()
+		foreach($blueprintResources as $blueprintResource)
+			$blueprintResourcesStrings[] = $blueprintResource->resource_name;
+
+		$resourcesAtManufacturingColony = $manufacturingColony->resources;
+		foreach($resourcesAtManufacturingColony as $resourceAtManufacturingColony) {
+			if (in_array($resourceAtManufacturingColony->description, $blueprintResourcesStrings))
+				$freeCapacity += $resourceAtManufacturingColony->quantity;
+		}
+
+		// now work out how many we can fit in our colony at one time
+		$maximumWeCanCreateWithManufacturingColonyStorage = floor($freeCapacity / $storageRequiredForOneItem);
+
+		// finally we need to bring the final limiting factor into the equation, ship storage
+
+		// a lot of the work was done for us in the manufacturing colony storage check
+
+		// we're going to find out if any of our required resources are already at the facility,
+		// if so, we can add the total amount to our ship capacity since those resources don't need to be
+		// moved
+		foreach($resourcesAtManufacturingColony as $resourceAtManufacturingColony) {
+			if (in_array($resourceAtManufacturingColony->description, $blueprintResourcesStrings))
+				$shipCargoCapacity += $resourceAtManufacturingColony->quantity;
+		}
+
+		// now work out how many we can fit in our ship at one time
+		$maximumWeCanCreateWithShipStorage = floor($shipCargoCapacity / $storageRequiredForOneItem);
+
+		// our limit is whichever is lower (manufacturing colony storage, ship storage or resources available)
+		$limits = array(
+			$maximumWeCanCreateWithResourcesAvailable,
+			$maximumWeCanCreateWithShipStorage,
+			$maximumWeCanCreateWithManufacturingColonyStorage
+		);
+		sort($limits);
+
+		$itemsWeCanCreate = $limits[0];
+
+		// ok, now work out how much of each resource we need, then subtract the amount already at the manu
+		// colony to find how much we need to collect
+		$resourcesToCollect = array(); // resource name => amount to collect
+		foreach($blueprintResources as $blueprintResource) {
+			$resourcesToCollect[$blueprintResource->resource_name] = ($blueprintResource->resource_quantity * $itemsWeCanCreate);
+		}
+
+		foreach($resourcesAtManufacturingColony as $resourceAtManufacturingColony) {
+			if ($resourcesToCollect[$resourceAtManufacturingColony->description] > 0)
+				$resourcesToCollect[$resourceAtManufacturingColony->description] -= $resourceAtManufacturingColony->quantity;
+
+			if ($resourcesToCollect[$resourceAtManufacturingColony->description] < 0)
+				unset($resourcesToCollect[$resourceAtManufacturingColony->description]);
+		}
+
+		// work out all the possible places we could pick up from, for starters, limit it to only find
+		// occurences with all the resources we need
+		$resourceOccurencesOfWhatWeNeed = array(); // [key] => StoredItemBean
+		foreach($resourcesToCollect as $resource => $quantity) {
+			$resourceOccurences = $sim->getOccurencesOfResource($user, $resource, $quantity);
+
+			// quickly check if any of the occurences are in our manu colony, if so, eliminate
+			foreach($resourceOccurences as $id => $resourceOccurence) {
+				if ($resourceOccurence->colony->name == $manufacturingColonyName)
+					unset($resourceOccurences[$id]);
+			}
+
+			$resourceOccurencesOfWhatWeNeed = array_merge($resourceOccurencesOfWhatWeNeed, $resourceOccurences);
+		}
+
+		// if one of the resources is missing, run it again, this time without a limit for any resources
+		// in question
+		$resourcesChecklist = $resourcesToCollect;
+		foreach($resourcesChecklist as $resource => $quantity) {
+			foreach($resourceOccurencesOfWhatWeNeed as $resourceOccurenceOfWhatWeNeed) {
+				if ($resourceOccurenceOfWhatWeNeed->description == $resource)
+					unset($resourcesChecklist[$resource]);
+			}
+		}
+
+		foreach($resourcesChecklist as $resource => $quantity) {
+			$resourceOccurences = $sim->getOccurencesOfResource($user, $resource);
+
+			// quickly check if any of the occurences are in our manu colony, if so, eliminate
+			foreach($resourceOccurences as $id => $resourceOccurence) {
+				if ($resourceOccurence->colony->name == $manufacturingColonyName)
+					unset($resourceOccurences[$id]);
+			}
+
+			$resourceOccurencesOfWhatWeNeed = array_merge($resourceOccurencesOfWhatWeNeed, $resourceOccurences);
+		}
+
+		// now, the tricky part, we have to devise a route and instructions
+		$instructions = array(); // [key] => instruction (friendly)
+
+		// how to do it?
+		// go to each colony we know where resources are until we have the amount required of each resource
+		// then go to manu colony and drop off
+		// of course the tricky bit is optimising fuel stops, which is going to eb a pain in the neck
+		$sm = SystemModel::getInstance();
+
+		$fuelCapacityInLightyears = floor($fuelCapacity / $fuelPerLightyear);
+		$currentFuelInLightyears = $fuelCapacityInLightyears;
+
+		$currentLocation = $sm->getSystem(false, $startSystem);
+
+		// loop-edy-loop until we have everything done, at which point we'll break;
+		// all the places we (might) need to visit are in $resourceOccurencesOfWhatWeNeed
+		// and the total of each resource we need to collect is in $resourcesToCollect
+		// our current location is always in $currentLocation
+		// our current fuel in lightyears is always in $currentFuelInLightyears
+		// our fuel capacity in lightyears is in $fuelCapacityInLightyears
+		// our drop off point is $manufacturingColony
+		// let's go!
+
+		while(true) {
+
+			// find the closest colony to our current location
+			$resourceOccurencesSortedByDistance = array(); // distance in ly to current loc => resource occurence
+			foreach($resourceOccurencesOfWhatWeNeed as $id => $resourceOccurence) {
+				$distance = $sm->getDistanceBetweenSystems($currentLocation->id, $resourceOccurence->colony->system->id);
+
+				$resourceOccurencesSortedByDistance[$distance] = $resourceOccurence;
+				$resourceOccurencesSortedByDistance[$distance]->resourceId = $id;
+			}
+			ksort($resourceOccurencesSortedByDistance);
+
+			$nextResourceOccurence = current($resourceOccurencesSortedByDistance);
+			
+			if ($nextResourceOccurence->id) {
+				$nextSystem = $nextResourceOccurence->colony->system;
+
+				if ($nextResourceOccurence->quantity >= $resourcesToCollect[$nextResourceOccurence->description])
+					$amountToCollect = $resourcesToCollect[$nextResourceOccurence->description];
+				else
+					$amountToCollect = $nextResourceOccurence->quantity;
+
+				// check if we can make it there and then back to a station
+				$fuelInLightyearsAfterJump = $currentFuelInLightyears - $sm->getDistanceBetweenSystems($currentLocation->id, $nextSystem->id);
+
+				$nearestStationSystemToNextSystem = $sm->getNearestStationSystemToSystem($nextSystem->id);
+				$fuelNecessaryToGetToClosestStation = $sm->getDistanceBetweenSystems($nextSystem->id, $nearestStationSystemToNextSystem->id);
+
+				if ($fuelInLightyearsAfterJump > $fuelNecessaryToGetToClosestStation) {
+					$currentLocation = $nextSystem;
+					$currentFuelInLightyears = $fuelInLightyearsAfterJump;
+					$instructions[] = "Jump to " . $nextSystem->system_name . " and dock at " . $nextResourceOccurence->colony->location_string . ". Collect x" . $amountToCollect . " " . $nextResourceOccurence->description;
+					unset($resourceOccurencesOfWhatWeNeed[$nextResourceOccurence->resourceId]);
+				}
+				else {
+					// damn it! we can't make it, gotta find the nearest refuel spot to that system that we can reach
+					$refuelSystem = $sm->getNearestStationSystemToSystemThatIsLessThanDistanceToSystem($nextSystem->id, $currentLocation->id, $currentFuelInLightyears);
+					$currentLocation = $refuelSystem;
+					$currentFuelInLightyears = $fuelCapacityInLightyears;
+					$instructions[] = "Refuel at " . $refuelSystem->system_name;
+				}
+			}
+			else {
+				$nextSystem = $manufacturingColony->system;
+
+				// check if we can make it there and then back to a station
+				$fuelInLightyearsAfterJump = $currentFuelInLightyears - $sm->getDistanceBetweenSystems($currentLocation->id, $nextSystem->id);
+
+				$nearestStationSystemToNextSystem = $sm->getNearestStationSystemToSystem($nextSystem->id);
+				$fuelNecessaryToGetToClosestStation = $sm->getDistanceBetweenSystems($nextSystem->id, $nearestStationSystemToNextSystem->id, false, false, false, false, true);
+
+				if ($fuelInLightyearsAfterJump > $fuelNecessaryToGetToClosestStation) {
+					$currentLocation = $nextSystem;
+					$currentFuelInLightyears = $fuelInLightyearsAfterJump;
+					$instructions[] = "Jump to " . $nextSystem->system_name . " and dock at " . $manufacturingColony->location_string . ". Drop off all your resources and begin production";
+					$instructions[] = "Jump back to the station system " . $nearestStationSystemToNextSystem->system_name;
+					break;
+				}
+				else {
+					// damn it! we can't make it, gotta find the nearest refuel spot to that system that we can reach
+					$refuelSystem = $sm->getNearestStationSystemToSystemThatIsLessThanDistanceToSystem($nextSystem->id, $currentLocation->id, $currentFuelInLightyears);
+					$currentLocation = $refuelSystem;
+					$currentFuelInLightyears = $fuelCapacityInLightyears;
+					$instructions[] = "Refuel at " . $refuelSystem->system_name;
+				}
+			}
+		}
+
+		return $instructions;
 	}
 }
 ?>

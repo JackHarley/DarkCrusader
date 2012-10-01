@@ -196,11 +196,13 @@ class StoredItemsModel extends Model {
 	 * Gets the stored items in a colony
 	 * 
 	 * @param int $colony colony id
+	 * @param int $user user id
 	 * @return array array of StoredItemBeans
 	 */
-	public function getStoredItemsInColony($colony) {
+	public function getStoredItemsInColony($colony, $user) {
 		$q = new Query("SELECT");
 		$q->where("colony_id = ?", $colony);
+		$q->where("stored_items.user_id = ?", $user);
 		$q->where("location_type = ?", "colony");
 
 		$sibs = StoredItemBean::select($q, true);
@@ -211,13 +213,15 @@ class StoredItemsModel extends Model {
 	 * Gets the stored resources in a colony
 	 * 
 	 * @param int $colony colony id
+	 * @param int $user user id
 	 * @param bool $includeFoodAndWater set to false to not include Food and Water
 	 * @param bool $includeWorkers set to false to not include Workers
 	 * @return array array of StoredItemBeans
 	 */
-	public function getStoredResourcesInColony($colony, $includeFoodAndWater=true, $includeWorkers=true) {
+	public function getStoredResourcesInColony($colony, $user, $includeFoodAndWater=true, $includeWorkers=true) {
 		$q = new Query("SELECT");
 		$q->where("colony_id = ?", $colony);
+		$q->where("stored_items.user_id = ?", $user);
 		$q->where("location_type = ?", "colony");
 		$q->where("type = ?", "resource");
 		if (!$includeFoodAndWater) {
