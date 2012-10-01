@@ -95,7 +95,7 @@ class ColonyBean extends SQLBean {
 	protected $Resources = false;
 	public function get_resources() {
 		if (!$this->Resources)
-			$this->Resources = StoredItemsModel::getInstance()->getStoredResourcesInColony($this->id, false, false);
+			$this->Resources = StoredItemsModel::getInstance()->getStoredResourcesInColony($this->id, $this->user_id, false, false);
 
 		return $this->Resources;
 	}
@@ -103,7 +103,7 @@ class ColonyBean extends SQLBean {
 	protected $StoredItems = false;
 	public function get_stored_items() {
 		if (!$this->StoredItems)
-			$this->StoredItems = StoredItemsModel::getInstance()->getStoredItemsInColony($this->id);
+			$this->StoredItems = StoredItemsModel::getInstance()->getStoredItemsInColony($this->id, $this->user_id);
 
 		return $this->StoredItems;
 	}

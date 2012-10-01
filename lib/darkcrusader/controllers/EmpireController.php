@@ -148,12 +148,13 @@ class EmpireController extends Controller {
 				for($i=1; isset($_POST["resourcename" . $i]); $i++) {
 					$bm->addBlueprintResource($_POST["blueprint"], $_POST["resourcename" . $i], $_POST["resourcequantity" . $i]);
 				}
+				$this->redirect("/index.php/empire/manufacturing");
 			break;
 		}
 
 		// step 3: show route to take
 		if ($_POST["submit2"]) {
-			$instructions = $cm->calculateOptimalManufacturingRoute($_POST["blueprint"], $_POST, $_POST["ship_storage_capacity"], $_POST["start_location"], $_POST["drop_off_location"]);
+			$instructions = $cm->calculateOptimalManufacturingRoute($_POST["blueprint"], $_POST, $_POST["fuel"], $_POST["fuel_per_lightyear"], $_POST["ship_storage_capacity"], $_POST["start_system"], $_POST["manufacturing_colony_name"], $user->id);
 			View::load('manufacturing/route', array(
 				"instructions" => $instructions
 			));

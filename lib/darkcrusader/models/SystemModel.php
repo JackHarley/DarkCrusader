@@ -630,7 +630,8 @@ class SystemModel extends Model {
 	 * @param int $systemTwoX second system x coord
 	 * @param int $systemTwoY second system y coord
 	 */
-	public function getDistanceBetweenSystems($systemOne, $systemTwo, $systemOneX=false, $systemOneY=false, $systemTwoX=false, $systemTwoY=false) {
+	public function getDistanceBetweenSystems($systemOne, $systemTwo, $systemOneX=false, $systemOneY=false, $systemTwoX=false, $systemTwoY=false, $debug=false) {
+
 		if ((!$systemOneX) || (!$systemOneY)) {
 			$system = $this->getSystem($systemOne);
 			$systemOneX = $system->x;
@@ -643,7 +644,7 @@ class SystemModel extends Model {
 			$systemTwoY = $system->y;
 		}
 
-		// use pyhtagoras theorem, dist = sqrt(horizontaldistance^2 + verticaldistance^2)
+		// use pythagoras theorem, dist = sqrt(horizontaldistance^2 + verticaldistance^2)
 		$x = $systemTwoX - $systemOneX;
 		$y = $systemTwoY - $systemOneY;
 		$distance = sqrt(($x*$x) + ($y*$y));
@@ -659,7 +660,7 @@ class SystemModel extends Model {
 	 * @param int $systemX system x coord
 	 * @param int $systemY system y coord
 	 */
-	public function getNearestStationSystemToSystem($system, $systemX, $systemY) {
+	public function getNearestStationSystemToSystem($system, $systemX=false, $systemY=false) {
 		if ((!$systemX) || (!$systemY)) {
 			$system = $this->getSystem($system);
 			$systemX = $system->x;
@@ -682,6 +683,45 @@ class SystemModel extends Model {
 
 		return $closestStationSystem;
 
+	}
+
+	/**
+	 * Gets the nearest station system to the given system that is less than a certain distance to another
+	 * system
+	 * 
+	 * @param int $nearestToSystem system id of the system you want the station to be nearest to
+	 * @param int $lessThanDistanceToSystem system id of the system you want the station to be less than
+	 * a certain distance to
+	 * @param int $distance distance in ly that the less than distance to system must be less than
+	 * @return SystemBean system
+	 */
+	public function getNearestStationSystemToSystemThatIsLessThanDistanceToSystem($nearestToSystem, $lessThanDistanceToSystem, $distance) {
+
+		// get all systems with a station
+		$stationSystems = $this->getStationSystemsCached();
+
+		// eliminate any systems more than the distance they must be less than
+		// FUCKING TONGUE TWISTERS
+		foreach($stationSystems as $id => $stationSystem) {
+			$d = $this->getDistanceBetweenSystems($stationSystem->id, $lessThanDistanceToSystem);
+
+			if ($d > $distance)
+				unset($stationSystems[$id]);
+		}
+
+		// now find which of them is closest
+		$closestStationSystemDistance = 40000; // double of the entire universe lol
+
+		foreach($stationSystems as $stationSystem) {
+			$distance = $this->getDistanceBetweenSystems($nearestToSystem, $stationSystem->id);
+
+			if ($distance < $closestStationSystemDistance) {
+				$closestStationSystem = $stationSystem;
+				$closestStationSystemDistance = $distance;
+			}
+		}
+
+		return $closestStationSystem;
 	}
 
 	/**
