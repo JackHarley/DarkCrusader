@@ -23,7 +23,7 @@
 	has not had its required resources inputted into the database, please add the resources required for this BP below and DOUBLE CHECK ALL SPELLING AND QUANTITY. THERE IS NO WAY TO UPDATE THIS INFORMATION AFTER IT HAS BEEN INPUTTED!
 </p>
 
-<form method="post" action="/DarkCrusader/index.php/empire/manufacturing/blueprintresources">
+<form method="post" action="/index.php/empire/manufacturing/blueprintresources">
 	<input type="hidden" name="blueprint" value="{{blueprintDescription}}" /><br />
 	<input type="hidden" id="resourcenumber" value="1" /><br />
 	
