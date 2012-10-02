@@ -303,6 +303,11 @@ class StoredItemsModel extends Model {
 	 */
 	public function getResearchedBlueprints($user) {
 		
+		$defaultCharacter = UserModel::getInstance()->getDefaultCharacter($user);
+
+		if (!$defaultCharacter->api_key)
+			throw new UserDoesNotHaveAConfiguredCharacterException;
+		
 		$characterNoSpaces = str_replace(" ", "", $defaultCharacter->character_name);
 
 		$q = new Query("SELECT");
