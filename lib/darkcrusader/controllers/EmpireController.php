@@ -143,6 +143,9 @@ class EmpireController extends Controller {
 
 		$user = UserModel::getInstance()->getActiveUser();
 
+		$cm->updateDB($user->id);
+		$sim->updateDB($user->id);
+
 		switch($act) {
 			case "blueprintresources":
 				for($i=1; isset($_POST["resourcename" . $i]); $i++) {
@@ -154,9 +157,16 @@ class EmpireController extends Controller {
 
 		// step 3: show route to take
 		if ($_POST["submit2"]) {
-			$instructions = $cm->calculateOptimalManufacturingRoute($_POST["blueprint"], $_POST, $_POST["fuel"], $_POST["fuel_per_lightyear"], $_POST["ship_storage_capacity"], $_POST["start_system"], $_POST["manufacturing_colony_name"], $user->id);
+			$result = $cm->calculateOptimalManufacturingRoute($_POST["blueprint"], $_POST, $_POST["fuel"], $_POST["fuel_per_lightyear"], $_POST["ship_storage_capacity"], $_POST["start_system"], $_POST["manufacturing_colony_name"], $user->id);
+			
+			if ($result->handycapResource)
+				View::setVar("handycapResource", $result->handycapResource);
+
 			View::load('manufacturing/route', array(
-				"instructions" => $instructions
+				"instructions" => $result->instructions,
+				"handycap" => $result->handycap,
+				"items" => $result->items,
+				"blueprint" => $result->blueprintDescription
 			));
 		}
 		// step 2: choose colonies you're willing to collect from (IF RESOURCES FOR BP ARE UNKNOWN, PROMPT!),

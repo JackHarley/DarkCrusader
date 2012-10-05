@@ -277,6 +277,7 @@ class OuterEmpiresModel extends Model {
 			return array();
 
 		$rawStoredItems = $response->CargoItems->CargoItem;
+
 		if (!is_array($rawStoredItems))
 			$rawStoredItems = array($rawStoredItems);
 
@@ -284,6 +285,10 @@ class OuterEmpiresModel extends Model {
 		foreach($rawStoredItems as $rawStoredItem) {
 			$storedItem = new StoredItem;
 			$storedItem->location = $rawStoredItem->NameOfLocation;
+			
+			if ($rawStoredItem->NameOfItem == "")
+				continue;
+
 			$storedItem->description = $rawStoredItem->NameOfItem;
 			
 			switch ($rawStoredItem->ItemType) {

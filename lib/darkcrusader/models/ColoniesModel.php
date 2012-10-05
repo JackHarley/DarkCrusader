@@ -264,6 +264,11 @@ class ColoniesModel extends Model {
 			$amountWeCanMakeWithEachResource[$blueprintResource->resource_name] = (floor($totalResourcesAtDisposal / $blueprintResource->resource_quantity)); // divide amount we have by the amount needed for one item
 		}
 
+		// find out what resource limited us
+		$amountWeCanMakeWithEachResourceFlipped = array_keys($amountWeCanMakeWithEachResource);
+		ksort($amountWeCanMakeWithEachResourceFlipped);
+		$handycapResource = reset($amountWeCanMakeWithEachResourceFlipped);
+
 		// the lowest number is the maximum we can create (if we had unlimited storage space)
 		sort($amountWeCanMakeWithEachResource);
 		$maximumWeCanCreateWithResourcesAvailable = $amountWeCanMakeWithEachResource[0];
@@ -312,13 +317,17 @@ class ColoniesModel extends Model {
 
 		// our limit is whichever is lower (manufacturing colony storage, ship storage or resources available)
 		$limits = array(
-			$maximumWeCanCreateWithResourcesAvailable,
-			$maximumWeCanCreateWithShipStorage,
-			$maximumWeCanCreateWithManufacturingColonyStorage
+			"resource" => $maximumWeCanCreateWithResourcesAvailable,
+			"shipStorage" => $maximumWeCanCreateWithShipStorage,
+			"manufacturingColonyStorage" => $maximumWeCanCreateWithManufacturingColonyStorage
 		);
-		sort($limits);
+		asort($limits);
 
-		$itemsWeCanCreate = $limits[0];
+		$itemsWeCanCreate = reset($limits);
+
+		// find our handycap
+		$limitsFlipped = array_keys($limits);
+		$handycap = reset($limitsFlipped);
 
 		// ok, now work out how much of each resource we need, then subtract the amount already at the manu
 		// colony to find how much we need to collect
@@ -463,7 +472,16 @@ class ColoniesModel extends Model {
 			}
 		}
 
-		return $instructions;
+		$return = new \stdClass;
+		$return->instructions = $instructions;
+		$return->items = $itemsWeCanCreate;
+		$return->blueprintDescription = $blueprintDescription;
+		$return->handycap = $handycap;
+
+		if ($handycap == "resource")
+			$return->handycapResource = $handycapResource;
+
+		return $return;
 	}
 }
 ?>

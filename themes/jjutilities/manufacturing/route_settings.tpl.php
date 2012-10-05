@@ -18,7 +18,7 @@
 	</p>
 
 	
-	<h3 style="margin-bottom:0">Please choose the manufacturing colony you wish to use, if your manuafacturing colony does not show up, ensure you have classified it as a Manufacturing Colony in the colony manager</h3><br />
+	<h3 style="margin-bottom:0">Please choose the manufacturing colony you wish to use, if your manufacturing colony does not show up, ensure you have classified it as a Manufacturing Colony in the colony manager</h3><br />
 	<p>
 		<select name="manufacturing_colony_name">
 			{% for colony in manufacturingColonies %}
