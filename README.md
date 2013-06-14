@@ -19,3 +19,7 @@ Installation
 Changelog
 --------------
 See CHANGELOG.md
+
+License
+--------------
+See LICENSE.md
