@@ -126,6 +126,9 @@ if ($activeUser->id) {
     $lab->insert();
 }
 
+\darkcrusader\models\OuterEmpiresModel::getInstance()->getSkillTraining(1);
+\darkcrusader\models\OuterEmpiresModel::getInstance()->getCharacterSkills(1);
+
 // Add the dispatcher rules
 Dispatcher::addHomeMatchRule('\darkcrusader\controllers\HomeController', "index");
 Dispatcher::addPathInfoAutoMapRule('\darkcrusader\controllers', "Controller");

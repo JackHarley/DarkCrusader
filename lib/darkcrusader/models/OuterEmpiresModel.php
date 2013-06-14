@@ -467,5 +467,25 @@ class OuterEmpiresModel extends Model {
 		
 		print_r($response);
 	}
+
+	/**
+	 * Get character skills
+	 * 
+	 * @param int $user user id
+	 * @param mixed $accessKey leave as boolean false to use access key for default character of user
+	 * specified, or optionally override the user and use the access key supplied
+	 * @return array array of Skill's
+	 */
+	public function getCharacterSkills($user, $accessKey=false) {
+		
+		if ($accessKey)
+			$userAccessKey = $accessKey;
+		else
+			$userAccessKey = UserModel::getInstance()->getDefaultCharacter($user)->api_key;
+
+		$response = $this->queryAPI("GetCharacterSkills", array(), $userAccessKey);
+		
+		print_r($response);
+	}
 }
 ?>
